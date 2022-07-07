@@ -1,0 +1,19 @@
+[package]
+name = "rhai-lab"
+version = "0.1.0"
+edition = "2021"
+authors = ["Chris McComb <ccmcc2012@gmail.com>"]
+description = "MATLAB/Octave function package for Rhai"
+repository = "https://github.com/cmccomb/rhai-lab"
+homepage = "https://github.com/cmccomb/rhai-lab"
+readme = "README.md"
+license = "MIT OR Apache-2.0"
+keywords = ["scripting", "scripting-language", "embedded", "rhai", "random"]
+categories = ["embedded"]
+documentation = "https://docs.rs/rhai-lab"
+
+
+[dependencies]
+rhai = { version = "1.5" }
+rand = { version = "0.8", features = ["alloc"] }
+rust_decimal = { version = "1.25", features = ["rand"], optional = true }
