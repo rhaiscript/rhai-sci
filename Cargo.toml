@@ -12,8 +12,11 @@ keywords = ["scripting", "scripting-language", "embedded", "rhai", "random"]
 categories = ["embedded"]
 documentation = "https://docs.rs/rhai-lab"
 
-
 [dependencies]
 rhai = { version = "1.5", features = ["unchecked"]}
-rand = { version = "0.8", features = ["alloc"] }
-rust_decimal = { version = "1.25", features = ["rand"], optional = true }
+rhai-rand = "0.1.3"
+rustyline = { git = "https://github.com/schungx/rustyline" }
+
+[[bin]]
+name = "matlab-on-rhai"
+path = "src/matlab-on-rhai.rs"

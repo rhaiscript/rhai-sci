@@ -1,14 +1,16 @@
-use rand::prelude::*;
-use rhai::def_package;
-use rhai::plugin::*;
-use rhai::{EvalAltResult, Position, INT};
+use rhai::{
+    def_package,
+    packages::Package,
+    plugin::*,
+    EvalAltResult, Position, INT, {Array, FLOAT},
+};
+use rhai_rand::RandomPackage;
 use std::ops::{Range, RangeInclusive};
-
-use rhai::packages::Package;
-use rhai::{Array, FLOAT};
 
 def_package! {
     pub LabPackage(lib) {
+
+        RandomPackage::init(lib);
 
         //
         let engine = Engine::new();
@@ -68,6 +70,14 @@ fn aggregate_functions() -> String {
         + iqr()
         + prctile()
         + interp1()
+        + zeros()
+        + zeros_square()
+        + ones()
+        + ones_square()
+        + rand()
+        + rand_square()
+        + rand_matrix()
+        + pi()
 }
 
 /// ```
@@ -182,7 +192,8 @@ fn linspace() -> &'static str {
 
 fn logspace() -> &'static str {
     "fn logspace(a, b, n) {
-        linspace(10**a, 10**b, n)
+        let exponents = linspace(a, b, n);
+        exponents.map(|e| 10**e)
     };"
 }
 
@@ -205,6 +216,79 @@ fn interp1() -> &'static str {
         let a = b - 1;
         y[a] + (xq - x[a])*(y[b] - y[a])/(x[b] - x[a])
     };"
+}
+
+fn zeros_square() -> &'static str {
+    "fn zeros(n) {
+        zeros(n, n)
+    };"
+}
+
+fn zeros() -> &'static str {
+    "fn zeros(nx, ny) {
+        let row = [];
+        row.pad(ny, 0.0);
+
+        let matrix = [];
+        matrix.pad(nx, row);
+
+        matrix
+    };"
+}
+
+fn ones_square() -> &'static str {
+    "fn ones(n) {
+        ones(n, n)
+    };"
+}
+
+fn ones() -> &'static str {
+    "fn ones(nx, ny) {
+        let row = [];
+        row.pad(ny, 1.0);
+
+        let matrix = [];
+        matrix.pad(nx, row);
+
+        matrix
+    };"
+}
+
+/// ```
+/// # use rhai::FLOAT;
+/// # use rhai_lab::one_line_eval;
+/// let result: FLOAT = one_line_eval("rand()").unwrap();
+/// assert!(result < 1.0 && result > 0.0);
+fn rand() -> &'static str {
+    "fn rand() {
+        rand_float()
+    };"
+}
+
+fn rand_square() -> &'static str {
+    "fn rand(n) {
+        rand(n, n)
+    };"
+}
+
+fn rand_matrix() -> &'static str {
+    "fn rand(nx, ny) {
+        let matrix = zeros(nx, ny);
+        for i in 0..nx {
+            for j in 0..ny {
+                m[i][j] = rand();
+            }
+        }
+    };"
+}
+
+/// ```
+/// # use rhai::FLOAT;
+/// # use rhai_lab::one_line_eval;
+/// let result: FLOAT = one_line_eval("pi").unwrap();
+/// assert_eq!(result, std::f64::consts::PI);
+fn pi() -> &'static str {
+    "const pi = 3.14159265358979323846264338327950288; export pi;"
 }
 
 pub fn one_line_eval<T: Clone + 'static>(script: &str) -> Result<T, Box<EvalAltResult>> {
