@@ -14,6 +14,6 @@ documentation = "https://docs.rs/rhai-lab"
 
 
 [dependencies]
-rhai = { version = "1.5" }
+rhai = { version = "1.5", features = ["unchecked"]}
 rand = { version = "0.8", features = ["alloc"] }
 rust_decimal = { version = "1.25", features = ["rand"], optional = true }
