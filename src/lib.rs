@@ -1,9 +1,4 @@
-use rhai::{
-    def_package,
-    packages::Package,
-    plugin::*,
-    EvalAltResult, Position, INT, {Array, FLOAT},
-};
+use rhai::{def_package, packages::Package, plugin::*, Array, EvalAltResult, Position, FLOAT, INT};
 use rhai_rand::RandomPackage;
 use std::ops::{Range, RangeInclusive};
 
@@ -56,23 +51,23 @@ def_package! {
 
 fn aggregate_functions() -> String {
     String::new()
-        + max()
-        + max_array()
-        + maxk()
-        + argmax()
-        + min()
-        + min_array()
-        + mink()
-        + argmin()
-        + bounds()
-        + mode()
-        + mean()
-        + median()
-        + iqr()
-        + prctile()
-        + interp1()
-        + linspace()
-        + logspace()
+        + include_str!("../scripts/max.rhai")
+        + include_str!("../scripts/maxk.rhai")
+        + include_str!("../scripts/argmax.rhai")
+        + include_str!("../scripts/min.rhai")
+        + include_str!("../scripts/argmin.rhai")
+        + include_str!("../scripts/mink.rhai")
+        + include_str!("../scripts/bounds.rhai")
+        + include_str!("../scripts/mean.rhai")
+        + include_str!("../scripts/variance.rhai")
+        + include_str!("../scripts/std.rhai")
+        + include_str!("../scripts/mode.rhai")
+        + include_str!("../scripts/median.rhai")
+        + include_str!("../scripts/iqr.rhai")
+        + include_str!("../scripts/prctile.rhai")
+        + include_str!("../scripts/interp1.rhai")
+        + include_str!("../scripts/linspace.rhai")
+        + include_str!("../scripts/logspace.rhai")
         + zeros()
         + zeros_square()
         + ones()
@@ -80,8 +75,7 @@ fn aggregate_functions() -> String {
         + rand()
         + rand_square()
         + rand_matrix()
-        + pi()
-        + e()
+        + include_str!("../scripts/constants.rhai")
 }
 
 /// ```
@@ -90,180 +84,124 @@ fn aggregate_functions() -> String {
 /// let result: INT = one_line_eval("max(41, 42)").unwrap();
 /// assert_eq!(result, 42);
 /// ```
-fn max() -> &'static str {
-    "fn max(a, b) {
-        if (a > b) { 
-            return a;
-        } else {
-            return b;
-        }
-    };"
-}
-
 /// ```
 /// # use rhai::INT;
 /// # use rhai_lab::one_line_eval;
 /// let result: INT = one_line_eval("min(43, 42)").unwrap();
 /// assert_eq!(result, 42);
 /// ```
-fn min() -> &'static str {
-    "fn min(a, b) {
-        if (a < b) { 
-            return a;
-        } else {
-            return b;
-        }
-    };"
-}
-
-fn max_array() -> &'static str {
-    "fn max(arr) { 
-        arr.sort(); 
-        arr[-1]
-    };"
-}
-
+/// ```
+/// # use rhai::INT;
+/// # use rhai_lab::one_line_eval;
+/// let result: INT = one_line_eval("max([41, 42, -1, 7, 2])").unwrap();
+/// assert_eq!(result, 42);
+/// ```
 /// ```
 /// # use rhai::INT;
 /// # use rhai_lab::one_line_eval;
 /// let result: INT = one_line_eval("argmax([43, 42, 500])").unwrap();
 /// assert_eq!(result, 2);
 /// ```
-fn argmax() -> &'static str {
-    "fn argmax(arr) { 
-        let original = arr;
-        arr.sort(); 
-        original.index_of(arr[-1])
-    };"
-}
-
-fn min_array() -> &'static str {
-    "fn min(arr) {
-        arr.sort(); 
-        arr[0]; 
-    };"
-}
-
+/// ```
+/// # use rhai::INT;
+/// # use rhai_lab::one_line_eval;
+/// let result: INT = one_line_eval("min([43, 42, 500])").unwrap();
+/// assert_eq!(result, 42);
+/// ```
 /// ```
 /// # use rhai::INT;
 /// # use rhai_lab::one_line_eval;
 /// let result: INT = one_line_eval("argmin([43, 42, -500])").unwrap();
 /// assert_eq!(result, 2);
 /// ```
-fn argmin() -> &'static str {
-    "fn argmin(arr) { 
-        let original = arr;
-        arr.sort(); 
-        original.index_of(arr[0])
-    };"
-}
-
-fn mink() -> &'static str {
-    "fn mink(arr, k) {
-        arr.sort(); 
-        arr.extract(0..k); 
-    };"
-}
-
-fn maxk() -> &'static str {
-    "fn maxk(arr, k) {
-        arr.sort();
-        let L = arr.len();
-        arr.extract((L-k)..L);
-    };"
-}
-
-fn bounds() -> &'static str {
-    "fn bounds(arr) {
-        [min(arr), max(arr)]
-    };"
-}
-
-fn mean() -> &'static str {
-    "fn mean(arr) {
-        arr.reduce(|sum, v| sum + v*1.0, 0)/arr.len()
-    };"
-}
-
-fn mode() -> &'static str {
-    "fn mode(arr) {
-        arr.sort();
-        let unique = arr;
-        unique.dedup();
-        let count = []; count.pad(unique.len(), 0);
-        for el in arr {
-            let idx = unique.index_of(el);
-            count[idx] = count[idx] + 1;
-        }
-        let mode_idx = count.index_of(max(count));
-        unique[mode_idx]
-    };"
-}
-
-fn median() -> &'static str {
-    "fn median(arr) {
-        prctile(arr, 50);
-    };"
-}
-
-fn iqr() -> &'static str {
-    "fn iqr(arr) {
-        prctile(arr, 75) - prctile(arr, 25)
-    };"
-}
-
+/// ```
+/// # use rhai::Array;
+/// # use rhai_lab::one_line_eval;
+/// let result: Array = one_line_eval("mink([32, 15, -7, 10, 1000, 41, 42], 3)").unwrap();
+/// println!("{result:?}");
+/// assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![-7, 10, 15]);
+/// ```
+/// ```
+/// # use rhai::Array;
+/// # use rhai_lab::one_line_eval;
+/// let result: Array = one_line_eval("maxk([32, 15, -7, 10, 1000, 41, 42], 3)").unwrap();
+/// println!("{result:?}");
+/// assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![41, 42, 1000]);
+/// ```
+/// ```
+/// # use rhai::Array;
+/// # use rhai_lab::one_line_eval;
+/// let result: Array = one_line_eval("bounds([32, 15, -7, 10, 1000, 41, 42])").unwrap();
+/// println!("{result:?}");
+/// assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![-7, 1000]);
+/// ```
 /// ```
 /// # use rhai::FLOAT;
 /// # use rhai_lab::one_line_eval;
-/// let result: FLOAT = one_line_eval("prctile([0, 1, 2, 3, 4], 50)").unwrap();
+/// let result: FLOAT = one_line_eval("mean([1, 2, 3])").unwrap();
 /// assert_eq!(result, 2.0);
 /// ```
-fn prctile() -> &'static str {
-    "fn prctile(arr, p) {
-        let x = linspace(0, 100, arr.len());
-        interp1(x, arr, p)
-    };"
-}
-
-fn linspace() -> &'static str {
-    "fn linspace(x1, x2, n) {
-        let arr = [1.0*x1];
-        let int = (1.0*x2 - x1)/(n-1); 
-        for i in 0..(n-2) {
-            arr.push(arr[-1] + int)
-        }
-        arr.push(1.0*x2);
-        arr
-    };"
-}
-
-fn logspace() -> &'static str {
-    "fn logspace(a, b, n) {
-        let exponents = linspace(a, b, n);
-        exponents.map(|e| 10**e)
-    };"
-}
-
+/// ```
+/// # use rhai::FLOAT;
+/// # use rhai_lab::one_line_eval;
+/// let result: FLOAT = one_line_eval("variance([1, 2, 3])").unwrap();
+/// assert_eq!(result, 1.0);
+/// ```
+/// ```
+/// # use rhai::FLOAT;
+/// # use rhai_lab::one_line_eval;
+/// let result: FLOAT = one_line_eval("std([1, 2, 3])").unwrap();
+/// assert_eq!(result, 1.0);
+/// ```
+/// ```
+/// # use rhai::INT;
+/// # use rhai_lab::one_line_eval;
+/// let result: INT = one_line_eval("mode([1, 2, 2, 2, 2, 3])").unwrap();
+/// assert_eq!(result, 2);
+/// ```
+///
+/// ```
+/// # use rhai::FLOAT;
+/// # use rhai_lab::one_line_eval;
+/// let result: FLOAT = one_line_eval("median([1, 1, 1, 1, 2, 5, 6, 7, 8])").unwrap();
+/// assert_eq!(result, 2.0);
+/// ```
+///
+/// ```
+/// # use rhai::FLOAT;
+/// # use rhai_lab::one_line_eval;
+/// let result: FLOAT = one_line_eval("iqr([1, 1, 1, 1, 1, 1, 1, 5, 6, 9, 9, 9, 9, 9, 9, 9, 9])").unwrap();
+/// assert_eq!(result, 8.0);
+/// ```
+///
+/// ```
+/// # use rhai::FLOAT;
+/// # use rhai_lab::one_line_eval;
+/// let result: FLOAT = one_line_eval("prctile([1, 2, 0, 3, 4], 50)").unwrap();
+/// assert_eq!(result, 2.0);
+/// ```
+///
+/// ```
+/// # use rhai::Array;
+/// # use rhai_lab::one_line_eval;
+/// let result: Array = one_line_eval("linspace(1, 2, 3)").unwrap();
+/// assert_eq!(result.into_iter().map(|x|x.cast::<f64>()).collect::<Vec<f64>>(), vec![1.0, 1.5, 2.0]);
+/// ```
+///
+/// ```
+/// # use rhai::Array;
+/// # use rhai_lab::one_line_eval;
+/// # let result: Array = one_line_eval("logspace(1, 3, 3)").unwrap();
+/// # assert_eq!(result.into_iter().map(|x|x.cast::<f64>()).collect::<Vec<f64>>(), vec![10.0, 100.0, 1000.0]);
+/// ```
+///
 /// ```
 /// # use rhai::FLOAT;
 /// # use rhai_lab::one_line_eval;
 /// let result: FLOAT = one_line_eval("interp1([0, 1], [1, 2], 0.5)").unwrap();
 /// assert_eq!(result, 1.5);
 /// ```
-fn interp1() -> &'static str {
-    "fn interp1(x, y, xq) { 
-        x.sort();
-        let b = 0;
-        for idx in 0..x.len() {
-            if x[idx] < xq {
-                b = idx;
-                break;
-            }
-        }
-        let a = b - 1;
-        y[a] + (xq - x[a])*(y[b] - y[a])/(x[b] - x[a])
-    };"
-}
+///
 
 fn zeros_square() -> &'static str {
     "fn zeros(n) {
@@ -334,49 +272,14 @@ fn rand_matrix() -> &'static str {
 /// # use rhai_lab::one_line_eval;
 /// let result: FLOAT = one_line_eval("pi").unwrap();
 /// assert_eq!(result, std::f64::consts::PI);
-fn pi() -> &'static str {
-    "const pi = 3.14159265358979323846264338327950288; export pi;"
-}
-
+/// ```
 /// ```
 /// # use rhai::FLOAT;
 /// # use rhai_lab::one_line_eval;
 /// let result: FLOAT = one_line_eval("e").unwrap();
 /// assert_eq!(result, std::f64::consts::E);
-fn e() -> &'static str {
-    "const e = 2.71828182845904523536028747135266250; export e;"
-}
-
 pub fn one_line_eval<T: Clone + 'static>(script: &str) -> Result<T, Box<EvalAltResult>> {
     let mut engine = Engine::new();
     engine.register_global_module(LabPackage::new().as_shared_module());
     engine.eval::<T>(script)
-}
-
-pub trait Eval<T> {
-    fn eval(&self) -> Result<T, Box<EvalAltResult>>;
-}
-
-/// ```
-/// # use rhai::FLOAT;
-/// # use rhai_lab::Eval;
-/// let result: FLOAT = "e".to_string().eval().unwrap();
-/// assert_eq!(result, std::f64::consts::E);
-impl<T: Clone + 'static> Eval<T> for String {
-    fn eval(&self) -> Result<T, Box<EvalAltResult>> {
-        let mut engine = Engine::new();
-        engine.register_global_module(LabPackage::new().as_shared_module());
-        engine.eval::<T>(self)
-    }
-}
-
-/// ```
-/// # use rhai::FLOAT;
-/// # use rhai_lab::Eval;
-/// let result: FLOAT = "e".eval().unwrap();
-/// assert_eq!(result, std::f64::consts::E);
-impl<T: Clone + 'static> Eval<T> for str {
-    fn eval(&self) -> Result<T, Box<EvalAltResult>> {
-        self.to_owned().eval()
-    }
 }
