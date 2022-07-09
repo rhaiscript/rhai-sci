@@ -3,7 +3,7 @@
 [![docs.rs](https://img.shields.io/docsrs/rhai-sci/latest?logo=rust)](https://docs.rs/rhai-sci)
 
 # About `rhai-sci`
-This crate provides some basic scientific computing utilities for the Rhai scripting language. 
+This crate provides some basic scientific computing utilities for the Rhai scripting language, inspired by languages like MATLAB.
 
 # Usage
 Using this crate is pretty simple

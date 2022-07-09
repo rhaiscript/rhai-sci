@@ -1,5 +1,5 @@
 use rhai::{packages::Package, Engine, EvalAltResult, INT};
-use rhai_sci::LabPackage;
+use rhai_sci::SciPackage;
 
 use rhai::FLOAT;
 
@@ -21,7 +21,7 @@ use rhai::FLOAT;
 fn test_matlab() -> Result<(), Box<EvalAltResult>> {
     let mut engine = Engine::new();
 
-    engine.register_global_module(LabPackage::new().as_shared_module());
+    engine.register_global_module(SciPackage::new().as_shared_module());
     let first = engine.eval::<INT>("max(42, 41)")?;
 
     assert!(first == 42);

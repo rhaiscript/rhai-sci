@@ -5,7 +5,7 @@ use rustyline::error::ReadlineError;
 use rustyline::{Cmd, Editor, Event, EventHandler, KeyCode, KeyEvent, Modifiers, Movement};
 
 use rhai::packages::Package;
-use rhai_sci::LabPackage;
+use rhai_sci::SciPackage;
 use std::{env, fs::File, io::Read, path::Path, process::exit};
 
 const HISTORY_FILE: &str = ".rhai-repl-history";
@@ -315,7 +315,7 @@ fn main() {
     engine.register_global_module(exported_module!(sample_functions).into());
 
     // Register lab function
-    engine.register_global_module(LabPackage::new().as_shared_module());
+    engine.register_global_module(SciPackage::new().as_shared_module());
 
     // Create scope
     let mut scope = Scope::new();

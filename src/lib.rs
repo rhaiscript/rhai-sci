@@ -5,6 +5,7 @@
 #![doc = include_str!("../README.md")]
 //! # Constants
 //! ## `pi`
+//! The ratio of a circle's circumference to its diameter.
 //! ```
 //! # use rhai::FLOAT;
 //! # use rhai_sci::eval;
@@ -15,6 +16,7 @@
 //! ```
 //!
 //! ## `e`
+//! Euler's number.
 //! ```
 //! # use rhai::FLOAT;
 //! # use rhai_sci::eval;
@@ -24,6 +26,7 @@
 //! # assert_eq!(result, std::f64::consts::E);
 //! ```
 //! ## `g`
+//! Acceleration due to gravity on Earth in m/s^2.
 //! ```
 //! # use rhai::FLOAT;
 //! # use rhai_sci::eval;
@@ -34,6 +37,7 @@
 //! ```
 //! # Functions
 //! ## `argmax`
+//!
 //! ```
 //! # use rhai::INT;
 //! # use rhai_sci::eval;
@@ -301,7 +305,7 @@ use rhai_rand::RandomPackage;
 use std::ops::{Range, RangeInclusive};
 
 def_package! {
-    pub LabPackage(lib) {
+    pub SciPackage(lib) {
 
         RandomPackage::init(lib);
 
@@ -380,6 +384,6 @@ fn aggregate_functions() -> String {
 /// ```
 pub fn eval<T: Clone + 'static>(script: &str) -> Result<T, Box<EvalAltResult>> {
     let mut engine = Engine::new();
-    engine.register_global_module(LabPackage::new().as_shared_module());
+    engine.register_global_module(SciPackage::new().as_shared_module());
     engine.eval::<T>(script)
 }
