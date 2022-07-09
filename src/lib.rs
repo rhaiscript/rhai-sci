@@ -1,3 +1,301 @@
+#![warn(clippy::all)]
+#![warn(missing_docs)]
+#![warn(rustdoc::missing_doc_code_examples)]
+#![warn(clippy::missing_docs_in_private_items)]
+#![doc = include_str!("../README.md")]
+//! # Constants
+//! ## `pi`
+//! ```
+//! # use rhai::FLOAT;
+//! # use rhai_sci::eval;
+//! # let result: FLOAT = eval("
+//! pi // => 3.141592653589793
+//! # ").unwrap();
+//! # assert_eq!(result, std::f64::consts::PI);
+//! ```
+//!
+//! ## `e`
+//! ```
+//! # use rhai::FLOAT;
+//! # use rhai_sci::eval;
+//! # let result: FLOAT = eval("
+//! e // => 2.718281828459045
+//! # ").unwrap();
+//! # assert_eq!(result, std::f64::consts::E);
+//! ```
+//! ## `g`
+//! ```
+//! # use rhai::FLOAT;
+//! # use rhai_sci::eval;
+//! # let result: FLOAT = eval("
+//! g // => 9.80665
+//! # ").unwrap();
+//! # assert_eq!(result, 9.80665);
+//! ```
+//! # Functions
+//! ## `argmax`
+//! ```
+//! # use rhai::INT;
+//! # use rhai_sci::eval;
+//! # let result: INT = eval("
+//! argmax([43, 42, 500]) // => 2
+//! # ").unwrap();
+//! # assert_eq!(result, 2);
+//! ```
+//! ## `argmin`
+//! ```
+//! # use rhai::INT;
+//! # use rhai_sci::eval;
+//! # let result: INT = eval("
+//! argmin([43, 42, -500]) // => 2
+//! # ").unwrap();
+//! # assert_eq!(result, 2);
+//! ```
+//! ## `bounds`
+//! ```
+//! # use rhai::Array;
+//! # use rhai_sci::eval;
+//! # let result: Array = eval("
+//! bounds([32, 15, -7, 10, 1000, 41, 42]) // => [-7, 1000]
+//! # ").unwrap();
+//! # assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![-7, 1000]);
+//! ```
+//! ## `interp1`
+//!
+//! ```
+//! # use rhai::FLOAT;
+//! # use rhai_sci::eval;
+//! # let result: FLOAT = eval("
+//! interp1([0, 1], [1, 2], 0.5) // => 1.5
+//! # ").unwrap();
+//! # assert_eq!(result, 1.5);
+//! ```
+//!
+//! ## `iqr`
+//! ```
+//! # use rhai::FLOAT;
+//! # use rhai_sci::eval;
+//! # let result: FLOAT = eval("
+//! iqr([1, 1, 1, 1, 1, 1, 1, 5, 6, 9, 9, 9, 9, 9, 9, 9, 9])" // => 8.0
+//! # ).unwrap();
+//! # assert_eq!(result, 8.0);
+//! ```
+//!
+//! ## `linspace`
+//! ```
+//! # use rhai::Array;
+//! # use rhai_sci::eval;
+//! # let result: Array = eval("
+//! linspace(1, 2, 5) // => [1.0, 1.25, 1.5, 1.75, 2.0]
+//! # ").unwrap();
+//! # assert_eq!(result.into_iter().map(|x|x.cast::<f64>()).collect::<Vec<f64>>(), vec![1.0, 1.25, 1.5, 1.75, 2.0]);
+//! ```
+//! ## `logspace`
+//! ```
+//! # use rhai::Array;
+//! # use rhai_sci::eval;
+//! # let result: Array = eval("
+//! logspace(1, 3, 3) // => [10.0, 100.0, 1000.0]
+//! # ").unwrap();
+//! # assert_eq!(result.into_iter().map(|x|x.cast::<f64>()).collect::<Vec<f64>>(), vec![10.0, 100.0, 1000.0]);
+//! ```
+//!
+//! ## `max`
+//! ```
+//! # use rhai::INT;
+//! # use rhai_sci::eval;
+//! # let result: INT = eval("
+//! max(41, 42) // => 42
+//! # ").unwrap();
+//! # assert_eq!(result, 42);
+//! ```
+//! ```
+//! # use rhai::INT;
+//! # use rhai_sci::eval;
+//! # let result: INT = eval("
+//! max([41, 42, -1, 7, 2]) // => 42
+//! # ").unwrap();
+//! # assert_eq!(result, 42);
+//! ```
+//! ## `min`
+//! ```
+//! # use rhai::INT;
+//! # use rhai_sci::eval;
+//! # let result: INT = eval("
+//! min(43, 42) // => 42
+//! # ").unwrap();
+//! # assert_eq!(result, 42);
+//! ```
+//! ```
+//! # use rhai::INT;
+//! # use rhai_sci::eval;
+//! # let result: INT = eval("
+//! min([43, 42, 500]) // => 42
+//! # ").unwrap();
+//! # assert_eq!(result, 42);
+//! ```
+//! ## `maxk`
+//! ```
+//! # use rhai::Array;
+//! # use rhai_sci::eval;
+//! # let result: Array = eval("
+//! maxk([32, 15, -7, 10, 1000, 41, 42], 3) // => [41, 42, 1000]
+//! # ").unwrap();
+//! # assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![41, 42, 1000]);
+//! ```
+//! ## `mean`
+//! ```
+//! # use rhai::FLOAT;
+//! # use rhai_sci::eval;
+//! # let result: FLOAT = eval("
+//! mean([1, 2, 3]) // => 2.0
+//! # ").unwrap();
+//! # assert_eq!(result, 2.0);
+//! ```
+//! ## `median`
+//!
+//! ```
+//! # use rhai::FLOAT;
+//! # use rhai_sci::eval;
+//! # let result: FLOAT = eval("
+//! median([1, 1, 1, 1, 2, 5, 6, 7, 8]) // => 2.0
+//! # ").unwrap();
+//! # assert_eq!(result, 2.0);
+//! ```
+//!
+//! ## `mink`
+//! ```
+//! # use rhai::Array;
+//! # use rhai_sci::eval;
+//! # let result: Array = eval("
+//! mink([32, 15, -7, 10, 1000, 41, 42], 3) // => [-7, 10, 15]
+//! # ").unwrap();
+//! # assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![-7, 10, 15]);
+//! ```
+//! ## `mode`
+//! ```
+//! # use rhai::INT;
+//! # use rhai_sci::eval;
+//! # let result: INT = eval("
+//! mode([1, 2, 2, 2, 2, 3]) // => 2
+//! # ").unwrap();
+//! # assert_eq!(result, 2);
+//! ```
+//! ## `ones`
+//! ```
+//! # use rhai::Array;
+//! # use rhai_sci::eval;
+//! # use rhai::serde::from_dynamic;
+//! # let result: Array = eval("
+//! ones(3) // => [[1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0]]
+//! # ").unwrap();
+//! # assert_eq!(result.into_iter().map(
+//! #         |x| from_dynamic(&x).unwrap()
+//! #    ).collect::<Vec<Vec<f64>>>(), vec![vec![1.0; 3]; 3]);
+//! ```
+//!
+//! ```
+//! # use rhai::Array;
+//! # use rhai_sci::eval;
+//! # use rhai::serde::from_dynamic;
+//! # let result: Array = eval("
+//! ones(3, 3) // => [[1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0]]
+//! # ").unwrap();
+//! # assert_eq!(result.into_iter().map(
+//! #         |x| from_dynamic(&x).unwrap()
+//! #     ).collect::<Vec<Vec<f64>>>(), vec![vec![1.0; 3]; 3]);
+//! ```
+//!
+//! ## `prctile`
+//! ```
+//! # use rhai::FLOAT;
+//! # use rhai_sci::eval;
+//! # let result: FLOAT = eval("
+//! prctile([1, 2, 0, 3, 4], 50) // => 2.0
+//! # ").unwrap();
+//! # assert_eq!(result, 2.0);
+//! ```
+//! ## `rand`
+//!
+//! ```
+//! # use rhai::FLOAT;
+//! # use rhai_sci::eval;
+//! # let result: FLOAT = eval("
+//! rand() // => 0.44392202188914254
+//! # ").unwrap();
+//! # assert!(result < 1.0 && result > 0.0);
+//! ```
+//!
+//! ```
+//! # use rhai::Array;
+//! # use rhai_sci::eval;
+//! # use rhai::serde::from_dynamic;
+//! # let result: Array = eval("
+//! rand(3) // => [[0.7333405150571339, 0.3597611759299407, 0.8809543481098305], [0.5327545327750203, 0.9185256001032435, 0.7226084132391764], [0.14803039057912748, 0.8924466624235429, 0.40943835774171167]]
+//! # ").unwrap();
+//! # let vecresult = result.into_iter().map(
+//! #         |x| from_dynamic(&x).unwrap()
+//! #     ).collect::<Vec<Vec<f64>>>();
+//! # let sum: f64 = vecresult.into_iter().map(|x| x.into_iter().sum()).collect::<Vec<f64>>().into_iter().sum();
+//! # assert!(sum < 9.0 && sum > 0.0);
+//! ```
+//!
+//! ```
+//! # use rhai::Array;
+//! # use rhai_sci::eval;
+//! # use rhai::serde::from_dynamic;
+//! # let result: Array = eval("
+//! rand(3, 3) // => [[0.7333405150571339, 0.3597611759299407, 0.8809543481098305], [0.5327545327750203, 0.9185256001032435, 0.7226084132391764], [0.14803039057912748, 0.8924466624235429, 0.40943835774171167]]
+//! # ").unwrap();
+//! # let vecresult = result.into_iter().map(
+//! #         |x| from_dynamic(&x).unwrap()
+//! #     ).collect::<Vec<Vec<f64>>>();
+//! # let sum: f64 = vecresult.into_iter().map(|x| x.into_iter().sum()).collect::<Vec<f64>>().into_iter().sum();
+//! # assert!(sum < 9.0 && sum > 0.0);
+//! ```
+//! ## `std`
+//! ```
+//! # use rhai::FLOAT;
+//! # use rhai_sci::eval;
+//! # let result: FLOAT = eval("
+//! std([1, 2, 3]) // => 1.0
+//! # ").unwrap();
+//! # assert_eq!(result, 1.0);
+//! ```
+//! ## `variance`
+//! ```
+//! # use rhai::FLOAT;
+//! # use rhai_sci::eval;
+//! # let result: FLOAT = eval("
+//! variance([1, 2, 3]) // => 1.0
+//! # ").unwrap();
+//! # assert_eq!(result, 1.0);
+//! ```
+//! ## `zeros`
+//! ```
+//! # use rhai::Array;
+//! # use rhai_sci::eval;
+//! # use rhai::serde::from_dynamic;
+//! # let result: Array = eval("
+//! zeros(3) // => [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
+//! ").unwrap();
+//! # assert_eq!(result.into_iter().map(
+//! #         |x| from_dynamic(&x).unwrap()
+//! #     ).collect::<Vec<Vec<f64>>>(), vec![vec![0.0; 3]; 3]);
+//! ```
+//! ```
+//! # use rhai::Array;
+//! # use rhai_sci::eval;
+//! # use rhai::serde::from_dynamic;
+//! # let result: Array = eval("
+//! zeros(3, 3) // => [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
+//! # ").unwrap();
+//! # assert_eq!(result.into_iter().map(
+//! #         |x| from_dynamic(&x).unwrap()
+//! #    ).collect::<Vec<Vec<f64>>>(), vec![vec![0.0; 3]; 3]);
+//! ```
+//!
+
 use rhai::{def_package, packages::Package, plugin::*, Array, EvalAltResult, Position, FLOAT, INT};
 use rhai_rand::RandomPackage;
 use std::ops::{Range, RangeInclusive};
@@ -19,19 +317,19 @@ def_package! {
 
 // #[export_module]
 // mod rand_functions {
-//     /// Generate a random boolean value with a probability of being `true`.
-//     ///
-//     /// `probability` must be between `0.0` and `1.0` (inclusive).
-//     ///
-//     /// # Example
-//     ///
-//     /// ```rhai
-//     /// let decision = rand(0.01);  // 1% probability
-//     ///
-//     /// if decision {
-//     ///     print("You hit the Jackpot!")
-//     /// }
-//     /// ```
+//     //! Generate a random boolean value with a probability of being `true`.
+//     //!
+//     //! `probability` must be between `0.0` and `1.0` (inclusive).
+//     //!
+//     //! # Example
+//     //!
+//     //! ```rhai
+//     //! let decision = rand(0.01);  // 1% probability
+//     //!
+//     //! if decision {
+//     //!     print("You hit the Jackpot!")
+//     //! }
+//     //! ```
 //     #[rhai_fn(return_raw)]
 //     pub fn rand_bool_with_probability(probability: FLOAT) -> Result<bool, Box<EvalAltResult>> {
 //         if probability < 0.0 || probability > 1.0 {
@@ -68,217 +366,19 @@ fn aggregate_functions() -> String {
         + include_str!("../scripts/interp1.rhai")
         + include_str!("../scripts/linspace.rhai")
         + include_str!("../scripts/logspace.rhai")
-        + zeros()
-        + zeros_square()
-        + ones()
-        + ones_square()
-        + rand()
-        + rand_square()
-        + rand_matrix()
+        + include_str!("../scripts/zeros.rhai")
+        + include_str!("../scripts/ones.rhai")
+        + include_str!("../scripts/myrand.rhai")
         + include_str!("../scripts/constants.rhai")
 }
 
+/// This provides the ability to easily evaluate a line (or lines) of code
 /// ```
-/// # use rhai::INT;
-/// # use rhai_lab::one_line_eval;
-/// let result: INT = one_line_eval("max(41, 42)").unwrap();
-/// assert_eq!(result, 42);
+/// use rhai_sci::eval;
+/// use rhai::FLOAT;
+/// print!("{:?}", eval::<FLOAT>("let x = max(5, 2); x + min(3, 72)"));
 /// ```
-/// ```
-/// # use rhai::INT;
-/// # use rhai_lab::one_line_eval;
-/// let result: INT = one_line_eval("min(43, 42)").unwrap();
-/// assert_eq!(result, 42);
-/// ```
-/// ```
-/// # use rhai::INT;
-/// # use rhai_lab::one_line_eval;
-/// let result: INT = one_line_eval("max([41, 42, -1, 7, 2])").unwrap();
-/// assert_eq!(result, 42);
-/// ```
-/// ```
-/// # use rhai::INT;
-/// # use rhai_lab::one_line_eval;
-/// let result: INT = one_line_eval("argmax([43, 42, 500])").unwrap();
-/// assert_eq!(result, 2);
-/// ```
-/// ```
-/// # use rhai::INT;
-/// # use rhai_lab::one_line_eval;
-/// let result: INT = one_line_eval("min([43, 42, 500])").unwrap();
-/// assert_eq!(result, 42);
-/// ```
-/// ```
-/// # use rhai::INT;
-/// # use rhai_lab::one_line_eval;
-/// let result: INT = one_line_eval("argmin([43, 42, -500])").unwrap();
-/// assert_eq!(result, 2);
-/// ```
-/// ```
-/// # use rhai::Array;
-/// # use rhai_lab::one_line_eval;
-/// let result: Array = one_line_eval("mink([32, 15, -7, 10, 1000, 41, 42], 3)").unwrap();
-/// println!("{result:?}");
-/// assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![-7, 10, 15]);
-/// ```
-/// ```
-/// # use rhai::Array;
-/// # use rhai_lab::one_line_eval;
-/// let result: Array = one_line_eval("maxk([32, 15, -7, 10, 1000, 41, 42], 3)").unwrap();
-/// println!("{result:?}");
-/// assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![41, 42, 1000]);
-/// ```
-/// ```
-/// # use rhai::Array;
-/// # use rhai_lab::one_line_eval;
-/// let result: Array = one_line_eval("bounds([32, 15, -7, 10, 1000, 41, 42])").unwrap();
-/// println!("{result:?}");
-/// assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![-7, 1000]);
-/// ```
-/// ```
-/// # use rhai::FLOAT;
-/// # use rhai_lab::one_line_eval;
-/// let result: FLOAT = one_line_eval("mean([1, 2, 3])").unwrap();
-/// assert_eq!(result, 2.0);
-/// ```
-/// ```
-/// # use rhai::FLOAT;
-/// # use rhai_lab::one_line_eval;
-/// let result: FLOAT = one_line_eval("variance([1, 2, 3])").unwrap();
-/// assert_eq!(result, 1.0);
-/// ```
-/// ```
-/// # use rhai::FLOAT;
-/// # use rhai_lab::one_line_eval;
-/// let result: FLOAT = one_line_eval("std([1, 2, 3])").unwrap();
-/// assert_eq!(result, 1.0);
-/// ```
-/// ```
-/// # use rhai::INT;
-/// # use rhai_lab::one_line_eval;
-/// let result: INT = one_line_eval("mode([1, 2, 2, 2, 2, 3])").unwrap();
-/// assert_eq!(result, 2);
-/// ```
-///
-/// ```
-/// # use rhai::FLOAT;
-/// # use rhai_lab::one_line_eval;
-/// let result: FLOAT = one_line_eval("median([1, 1, 1, 1, 2, 5, 6, 7, 8])").unwrap();
-/// assert_eq!(result, 2.0);
-/// ```
-///
-/// ```
-/// # use rhai::FLOAT;
-/// # use rhai_lab::one_line_eval;
-/// let result: FLOAT = one_line_eval("iqr([1, 1, 1, 1, 1, 1, 1, 5, 6, 9, 9, 9, 9, 9, 9, 9, 9])").unwrap();
-/// assert_eq!(result, 8.0);
-/// ```
-///
-/// ```
-/// # use rhai::FLOAT;
-/// # use rhai_lab::one_line_eval;
-/// let result: FLOAT = one_line_eval("prctile([1, 2, 0, 3, 4], 50)").unwrap();
-/// assert_eq!(result, 2.0);
-/// ```
-///
-/// ```
-/// # use rhai::Array;
-/// # use rhai_lab::one_line_eval;
-/// let result: Array = one_line_eval("linspace(1, 2, 3)").unwrap();
-/// assert_eq!(result.into_iter().map(|x|x.cast::<f64>()).collect::<Vec<f64>>(), vec![1.0, 1.5, 2.0]);
-/// ```
-///
-/// ```
-/// # use rhai::Array;
-/// # use rhai_lab::one_line_eval;
-/// # let result: Array = one_line_eval("logspace(1, 3, 3)").unwrap();
-/// # assert_eq!(result.into_iter().map(|x|x.cast::<f64>()).collect::<Vec<f64>>(), vec![10.0, 100.0, 1000.0]);
-/// ```
-///
-/// ```
-/// # use rhai::FLOAT;
-/// # use rhai_lab::one_line_eval;
-/// let result: FLOAT = one_line_eval("interp1([0, 1], [1, 2], 0.5)").unwrap();
-/// assert_eq!(result, 1.5);
-/// ```
-///
-
-fn zeros_square() -> &'static str {
-    "fn zeros(n) {
-        zeros(n, n)
-    };"
-}
-
-fn zeros() -> &'static str {
-    "fn zeros(nx, ny) {
-        let row = [];
-        row.pad(ny, 0.0);
-
-        let matrix = [];
-        matrix.pad(nx, row);
-
-        matrix
-    };"
-}
-
-fn ones_square() -> &'static str {
-    "fn ones(n) {
-        ones(n, n)
-    };"
-}
-
-fn ones() -> &'static str {
-    "fn ones(nx, ny) {
-        let row = [];
-        row.pad(ny, 1.0);
-
-        let matrix = [];
-        matrix.pad(nx, row);
-
-        matrix
-    };"
-}
-
-/// ```
-/// # use rhai::FLOAT;
-/// # use rhai_lab::one_line_eval;
-/// let result: FLOAT = one_line_eval("rand()").unwrap();
-/// assert!(result < 1.0 && result > 0.0);
-fn rand() -> &'static str {
-    "fn rand() {
-        rand_float()
-    };"
-}
-
-fn rand_square() -> &'static str {
-    "fn rand(n) {
-        rand(n, n)
-    };"
-}
-
-fn rand_matrix() -> &'static str {
-    "fn rand(nx, ny) {
-        let matrix = zeros(nx, ny);
-        for i in 0..nx {
-            for j in 0..ny {
-                m[i][j] = rand();
-            }
-        }
-    };"
-}
-
-/// ```
-/// # use rhai::FLOAT;
-/// # use rhai_lab::one_line_eval;
-/// let result: FLOAT = one_line_eval("pi").unwrap();
-/// assert_eq!(result, std::f64::consts::PI);
-/// ```
-/// ```
-/// # use rhai::FLOAT;
-/// # use rhai_lab::one_line_eval;
-/// let result: FLOAT = one_line_eval("e").unwrap();
-/// assert_eq!(result, std::f64::consts::E);
-pub fn one_line_eval<T: Clone + 'static>(script: &str) -> Result<T, Box<EvalAltResult>> {
+pub fn eval<T: Clone + 'static>(script: &str) -> Result<T, Box<EvalAltResult>> {
     let mut engine = Engine::new();
     engine.register_global_module(LabPackage::new().as_shared_module());
     engine.eval::<T>(script)

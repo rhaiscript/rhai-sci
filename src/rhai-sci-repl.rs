@@ -5,7 +5,7 @@ use rustyline::error::ReadlineError;
 use rustyline::{Cmd, Editor, Event, EventHandler, KeyCode, KeyEvent, Modifiers, Movement};
 
 use rhai::packages::Package;
-use rhai_lab::LabPackage;
+use rhai_sci::LabPackage;
 use std::{env, fs::File, io::Read, path::Path, process::exit};
 
 const HISTORY_FILE: &str = ".rhai-repl-history";

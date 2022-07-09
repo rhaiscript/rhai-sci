@@ -1,22 +1,22 @@
 [package]
-name = "rhai-lab"
+name = "rhai-sci"
 version = "0.1.0"
 edition = "2021"
 authors = ["Chris McComb <ccmcc2012@gmail.com>"]
 description = "MATLAB/Octave function package for Rhai"
-repository = "https://github.com/cmccomb/rhai-lab"
-homepage = "https://github.com/cmccomb/rhai-lab"
+repository = "https://github.com/cmccomb/rhai-sci"
+homepage = "https://github.com/cmccomb/rhai-sci"
 readme = "README.md"
 license = "MIT OR Apache-2.0"
 keywords = ["scripting", "scripting-language", "embedded", "rhai", "random"]
 categories = ["embedded"]
-documentation = "https://docs.rs/rhai-lab"
+documentation = "https://docs.rs/rhai-sci"
 
 [dependencies]
-rhai = { version = "1.5", features = ["unchecked"]}
+rhai = { version = "1.5", features = ["unchecked", "serde"]}
 rhai-rand = "0.1.3"
 rustyline = { git = "https://github.com/schungx/rustyline" }
 
 [[bin]]
 name = "matlab-on-rhai"
-path = "src/matlab-on-rhai.rs"
+path = "src/rhai-sci-repl.rs"

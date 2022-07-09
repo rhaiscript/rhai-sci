@@ -1,5 +1,5 @@
 use rhai::{packages::Package, Engine, EvalAltResult, INT};
-use rhai_lab::LabPackage;
+use rhai_sci::LabPackage;
 
 use rhai::FLOAT;
 
