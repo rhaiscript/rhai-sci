@@ -1,5 +1,5 @@
 fn diag(arr) {
-    try {
+    if type_of(arr[0]) == "array" {
         let n = min(len(arr[0]), len(arr));
         let v = [];
         for i in 0..n {
@@ -7,7 +7,7 @@ fn diag(arr) {
         }
         return v;
     }
-    catch {
+    else {
         let n = len(arr);
         let matrix = zeros(n);
         for i in 0..n {
