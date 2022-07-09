@@ -64,6 +64,33 @@
 //! # ").unwrap();
 //! # assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![-7, 1000]);
 //! ```
+//! ## `eye`
+//! ```
+//! # use rhai::Array;
+//! # use rhai_sci::eval;
+//! # use rhai::serde::from_dynamic;
+//! # let result: Array = eval("
+//! eye(3) // => [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
+//! # ").unwrap();
+//! # let vecresult = result.into_iter().map(
+//! #         |x| from_dynamic(&x).unwrap()
+//! #     ).collect::<Vec<Vec<f64>>>();
+//! # let sum: f64 = vecresult.into_iter().map(|x| x.into_iter().sum()).collect::<Vec<f64>>().into_iter().sum();
+//! # assert_eq!(sum, 3.0);
+//! ```
+//! ```
+//! # use rhai::Array;
+//! # use rhai_sci::eval;
+//! # use rhai::serde::from_dynamic;
+//! # let result: Array = eval("
+//! eye(3, 3) // => [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
+//! # ").unwrap();
+//! # let vecresult = result.into_iter().map(
+//! #         |x| from_dynamic(&x).unwrap()
+//! #     ).collect::<Vec<Vec<f64>>>();
+//! # let sum: f64 = vecresult.into_iter().map(|x| x.into_iter().sum()).collect::<Vec<f64>>().into_iter().sum();
+//! # assert_eq!(sum, 3.0);
+//! ```
 //! ## `interp1`
 //!
 //! ```
@@ -358,7 +385,9 @@ fn aggregate_functions() -> String {
         + include_str!("../scripts/argmax.rhai")
         + include_str!("../scripts/min.rhai")
         + include_str!("../scripts/argmin.rhai")
+        + include_str!("../scripts/eye.rhai")
         + include_str!("../scripts/mink.rhai")
+        + include_str!("../scripts/diag.rhai")
         + include_str!("../scripts/bounds.rhai")
         + include_str!("../scripts/mean.rhai")
         + include_str!("../scripts/variance.rhai")
