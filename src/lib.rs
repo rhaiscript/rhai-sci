@@ -64,6 +64,7 @@
 //! # ").unwrap();
 //! # assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![-7, 1000]);
 //! ```
+//! ## `diag`
 //! ## `eye`
 //! ```
 //! # use rhai::Array;
