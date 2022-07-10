@@ -5,15 +5,16 @@
 #![doc = include_str!("../README.md")]
 //! # Constants
 //! This package provides a few constants that are common and useful.
-//! ## `pi`
-//! The ratio of a circle's circumference to its diameter.
+//!
+//! ## `c`
+//! Speed of light in meters per second (m/s).
 //! ```
 //! # use rhai::FLOAT;
 //! # use rhai_sci::eval;
 //! # let result: FLOAT = eval("
-//! pi // => 3.141592653589793
+//! c // => 299792458.0
 //! # ").unwrap();
-//! # assert_eq!(result, std::f64::consts::PI);
+//! # assert_eq!(result, 299792458.0);
 //! ```
 //!
 //! ## `e`
@@ -28,7 +29,7 @@
 //! ```
 //!
 //! ## `g`
-//! Acceleration due to gravity on Earth in m/s^2.
+//! Acceleration due to gravity on Earth in meters per second per second (m/s^2).
 //! ```
 //! # use rhai::FLOAT;
 //! # use rhai_sci::eval;
@@ -37,6 +38,29 @@
 //! # ").unwrap();
 //! # assert_eq!(result, 9.80665);
 //! ```
+//!
+//! ## `h`
+//! The Planck constant in Joules per Hertz (J/Hz)
+//! ```
+//! # use rhai::FLOAT;
+//! # use rhai_sci::eval;
+//! # let result: FLOAT = eval("
+//! h // => 6.62607015e-34
+//! # ").unwrap();
+//! # assert_eq!(result, 6.626070150000001e-34);
+//! ```
+//!
+//! ## `pi`
+//! The ratio of a circle's circumference to its diameter.
+//! ```
+//! # use rhai::FLOAT;
+//! # use rhai_sci::eval;
+//! # let result: FLOAT = eval("
+//! pi // => 3.141592653589793
+//! # ").unwrap();
+//! # assert_eq!(result, std::f64::consts::PI);
+//! ```
+//!
 //!
 //! # Functions
 //! This package provides a large variety of functions to help with scientific computing. Each one

@@ -9,11 +9,11 @@ like MATLAB, Octave, and R. For a complete API reference, check [the docs](https
 # Install
 To use the latest released version of `rhai-sci`, add this to your `Cargo.toml`:
 ```toml
-automl = "0.1.0"
+rhai-sci = "0.1.0"
 ```
 To use the bleeding edge instead, add this:
 ```toml
-automl = { git = "https://github.com/cmccomb/rhai-sci" }
+rhai-sci = { git = "https://github.com/cmccomb/rhai-sci" }
 ```
 
 # Usage
