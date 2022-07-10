@@ -99,6 +99,17 @@
 //! # assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![-7, 1000]);
 //! ```
 //!
+//! ## `cumsum`
+//! Returns an array representing the cumulative sum of a 1-D array.
+//! ```
+//! # use rhai::Array;
+//! # use rhai_sci::eval;
+//! # let result: Array = eval("
+//! cumsum([1.1, 2.5, 3.4]) // => [1.1, 3.6, 7.0]
+//! # ").unwrap();
+//! # assert_eq!(result.into_iter().map(|x|x.cast::<f64>()).collect::<Vec<f64>>(), vec![1.1, 3.6, 7.0]);
+//! ```
+//!
 //! ## `diag`
 //! This function can be used in two distinct ways.
 //! 1. If the argument is an 2-D array, `diag` returns an array containing the diagonal of the array.
@@ -272,6 +283,18 @@
 //! # assert_eq!(result, 2.0);
 //! ```
 //!
+//!
+//! ## `meshgrid`
+//! Returns an object map containing 2-D grid coordinates based on the uni-axial coordinates
+//! contained in arguments x and y.
+//! ```
+//! # use rhai::{Map, serde::from_dynamic};
+//! # use rhai_sci::eval;
+//! # let result: Map = eval("
+//! meshgrid([1, 2], [3, 4]) // => #{\"x\": [[1, 2], [1, 2]], \"y\": [[3, 3], [4, 4]]}
+//! # ").unwrap();
+//! ```
+//!
 //! ## `mink`
 //! Returns the k smallest values in a 1-D array.
 //! ```
@@ -422,6 +445,31 @@
 //! # assert_eq!(result, 1.0);
 //! ```
 //!
+//! ## `sum`
+//! Sums the elements of a 1-D array
+//! ```
+//! # use rhai::FLOAT;
+//! # use rhai_sci::eval;
+//! # let result: FLOAT = eval("
+//! sum([1.1, 2.5, 3.4]) // => 7.0
+//! # ").unwrap();
+//! # assert_eq!(result, 7.0);
+//! ```
+//!
+//! ## `transpose`
+//! Transposes a matrix
+//! ```
+//! # use rhai::{Array, serde::from_dynamic};
+//! # use rhai_sci::eval;
+//! # let result: Array = eval("
+//! transpose([[1, 2], [3, 4]]) // => [[1, 3], [2, 4]]
+//! # ").unwrap();
+//! # let vecresult = result.into_iter().map(
+//! #         |x| from_dynamic(&x).unwrap()
+//! #     ).collect::<Vec<Vec<i64>>>();
+//! # assert_eq!(vecresult, vec![vec![1, 3], vec![2, 4]]);
+//! ```
+//!
 //! ## `variance`
 //! Returns the variance of a 1-D array.
 //! ```
@@ -533,6 +581,8 @@ fn aggregate_functions() -> String {
         + include_str!("../scripts/median.rhai")
         + include_str!("../scripts/iqr.rhai")
         + include_str!("../scripts/prctile.rhai")
+        + include_str!("../scripts/sum.rhai")
+        + include_str!("../scripts/cumsum.rhai")
         + include_str!("../scripts/interp1.rhai")
         + include_str!("../scripts/linspace.rhai")
         + include_str!("../scripts/logspace.rhai")
@@ -540,6 +590,8 @@ fn aggregate_functions() -> String {
         + include_str!("../scripts/ones.rhai")
         + include_str!("../scripts/myrand.rhai")
         + include_str!("../scripts/constants.rhai")
+        + include_str!("../scripts/transpose.rhai")
+        + include_str!("../scripts/meshgrid.rhai")
 }
 
 /// This provides the ability to easily evaluate a line (or lines) of code without explicitly
