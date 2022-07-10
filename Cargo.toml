@@ -15,19 +15,3 @@ documentation = "https://docs.rs/rhai-sci"
 [dependencies]
 rhai = { version = "1.5", features = ["unchecked", "serde"]}
 rhai-rand = "0.1.3"
-rustyline = { version = "9", optional = true }
-
-[features]
-default = ["rl"]
-rl = ["rustyline"]
-
-[[bin]]
-name = "rhai-sci-repl"
-path = "src/rhai-sci-repl.rs"
-required-features = ["rl"]
-
-
-[patch.crates-io]
-# Notice that a custom modified version of `rustyline` is used which supports bracketed paste on Windows.
-# This can be moved to the official version when bracketed paste is added.
-rustyline = { git = "https://github.com/schungx/rustyline" }

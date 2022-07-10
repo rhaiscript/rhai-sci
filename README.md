@@ -37,7 +37,3 @@ engine.register_global_module(SciPackage::new().as_shared_module());
 // Now run your code
 let value = engine.eval::<INT>("argmin([43, 42, -500])").unwrap();
 ```
-
-# The `rhai-sci` REPL
-This package comes with a REPL that is pretty much identical to [`rhai-repl`](https://github.com/rhaiscript/rhai/blob/main/src/bin/rhai-repl.rs).
-The only major difference is that `rhai-sci` is automatically loaded. 
