@@ -4,6 +4,7 @@
 #![warn(clippy::missing_docs_in_private_items)]
 #![doc = include_str!("../README.md")]
 //! # Constants
+//! This package provides a few constants that are common and useful.
 //! ## `pi`
 //! The ratio of a circle's circumference to its diameter.
 //! ```
@@ -25,6 +26,7 @@
 //! # ").unwrap();
 //! # assert_eq!(result, std::f64::consts::E);
 //! ```
+//!
 //! ## `g`
 //! Acceleration due to gravity on Earth in m/s^2.
 //! ```
@@ -35,9 +37,13 @@
 //! # ").unwrap();
 //! # assert_eq!(result, 9.80665);
 //! ```
-//! # Functions
-//! ## `argmax`
 //!
+//! # Functions
+//! This package provides a large variety of functions to help with scientific computing. Each one
+//! of these is written in [`Rhai`](https://rhai.rs/) itself! The source code is [here](https://github.com/cmccomb/rhai-sci/tree/master/scripts).
+//!
+//! ## `argmax`
+//! Returns the argument of the largest element in a 1-D array.
 //! ```
 //! # use rhai::INT;
 //! # use rhai_sci::eval;
@@ -46,7 +52,9 @@
 //! # ").unwrap();
 //! # assert_eq!(result, 2);
 //! ```
+//!
 //! ## `argmin`
+//! Returns the argument of the smallest element in a 1-D array.
 //! ```
 //! # use rhai::INT;
 //! # use rhai_sci::eval;
@@ -55,7 +63,9 @@
 //! # ").unwrap();
 //! # assert_eq!(result, 2);
 //! ```
+//!
 //! ## `bounds`
+//! Returns the bounds (smallest and largest elements) of a 1-D array.
 //! ```
 //! # use rhai::Array;
 //! # use rhai_sci::eval;
@@ -64,7 +74,12 @@
 //! # ").unwrap();
 //! # assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![-7, 1000]);
 //! ```
+//!
 //! ## `diag`
+//! This function can be used in two distinct ways.
+//! 1. If the argument is an 2-D array, `diag` returns an array containing the diagonal of the array.
+//! 2. If the argument is a 1-D array, `diag` returns a matrix containing the argument along the
+//! diagonal and zeros elsewhere.
 //! ```
 //! # use rhai::Array;
 //! # use rhai_sci::eval;
@@ -84,7 +99,11 @@
 //! #     ).collect::<Vec<Vec<f64>>>();
 //! # assert_eq!(vecresult, vec![vec![1.0, 0.0, 0.0], vec![0.0, 2.0, 0.0], vec![0.0, 0.0, 3.0]]);
 //! ```
+//!
 //! ## `eye`
+//! Create an identity matrix with ones along the diagonal and zeros elsewhere. Can be called with
+//! either one argument (creating a square matrix) or two arguments (specifying the number of rows
+//! and columns separately).
 //! ```
 //! # use rhai::Array;
 //! # use rhai_sci::eval;
@@ -111,8 +130,9 @@
 //! # let sum: f64 = vecresult.into_iter().map(|x| x.into_iter().sum()).collect::<Vec<f64>>().into_iter().sum();
 //! # assert_eq!(sum, 3.0);
 //! ```
-//! ## `interp1`
 //!
+//! ## `interp1`
+//! Given reference data, perform linear interpolation.
 //! ```
 //! # use rhai::FLOAT;
 //! # use rhai_sci::eval;
@@ -123,6 +143,7 @@
 //! ```
 //!
 //! ## `iqr`
+//! Returns the inter-quartile range for a 1-D array.
 //! ```
 //! # use rhai::FLOAT;
 //! # use rhai_sci::eval;
@@ -133,6 +154,7 @@
 //! ```
 //!
 //! ## `linspace`
+//! Returns an array containing a number of elements linearly spaced between two bounds.
 //! ```
 //! # use rhai::Array;
 //! # use rhai_sci::eval;
@@ -141,7 +163,9 @@
 //! # ").unwrap();
 //! # assert_eq!(result.into_iter().map(|x|x.cast::<f64>()).collect::<Vec<f64>>(), vec![1.0, 1.25, 1.5, 1.75, 2.0]);
 //! ```
+//!
 //! ## `logspace`
+//! Returns an array containing a number of elements logarithmically spaced between two bounds.  
 //! ```
 //! # use rhai::Array;
 //! # use rhai_sci::eval;
@@ -152,6 +176,8 @@
 //! ```
 //!
 //! ## `max`
+//! Returns the highest value between a pair of numbers (if called with two arguments) or in a 1-D
+//! array (if called with a single `Array`-type argument).
 //! ```
 //! # use rhai::INT;
 //! # use rhai_sci::eval;
@@ -168,7 +194,10 @@
 //! # ").unwrap();
 //! # assert_eq!(result, 42);
 //! ```
+//!
 //! ## `min`
+//! Returns the lowest value between a pair of numbers (if called with two arguments) or in a 1-D
+//! array (if called with a single `Array`-type argument).
 //! ```
 //! # use rhai::INT;
 //! # use rhai_sci::eval;
@@ -185,7 +214,9 @@
 //! # ").unwrap();
 //! # assert_eq!(result, 42);
 //! ```
+//!
 //! ## `maxk`
+//! Returns the k highest values from a 1-D array.
 //! ```
 //! # use rhai::Array;
 //! # use rhai_sci::eval;
@@ -194,7 +225,9 @@
 //! # ").unwrap();
 //! # assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![41, 42, 1000]);
 //! ```
+//!
 //! ## `mean`
+//! Returns the average of a 1-D array.
 //! ```
 //! # use rhai::FLOAT;
 //! # use rhai_sci::eval;
@@ -203,8 +236,9 @@
 //! # ").unwrap();
 //! # assert_eq!(result, 2.0);
 //! ```
-//! ## `median`
 //!
+//! ## `median`
+//! Returns the median of a 1-D array.
 //! ```
 //! # use rhai::FLOAT;
 //! # use rhai_sci::eval;
@@ -215,6 +249,7 @@
 //! ```
 //!
 //! ## `mink`
+//! Returns the k smallest values in a 1-D array.
 //! ```
 //! # use rhai::Array;
 //! # use rhai_sci::eval;
@@ -223,7 +258,9 @@
 //! # ").unwrap();
 //! # assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![-7, 10, 15]);
 //! ```
+//!
 //! ## `mode`
+//! Returns the mode of a 1-D array.
 //! ```
 //! # use rhai::INT;
 //! # use rhai_sci::eval;
@@ -234,6 +271,7 @@
 //! ```
 //!
 //! ## `ndims`
+//! Returns the number of dimensions in an array.
 //! ```
 //! # use rhai::INT;
 //! # use rhai_sci::eval;
@@ -243,8 +281,8 @@
 //! # assert_eq!(result, 2);
 //! ```
 //!
-//!
 //! ## `numel`
+//! Returns the number of elements in an array.
 //! ```
 //! # use rhai::INT;
 //! # use rhai_sci::eval;
@@ -254,8 +292,9 @@
 //! # assert_eq!(result, 24);
 //! ```
 //!
-//!
 //! ## `ones`
+//! Create an matrix filled with ones. Can be called with either one argument (creating a square
+//! matrix) or two arguments (specifying the number of rows and columns separately).
 //! ```
 //! # use rhai::Array;
 //! # use rhai_sci::eval;
@@ -267,7 +306,6 @@
 //! #         |x| from_dynamic(&x).unwrap()
 //! #    ).collect::<Vec<Vec<f64>>>(), vec![vec![1.0; 3]; 3]);
 //! ```
-//!
 //! ```
 //! # use rhai::Array;
 //! # use rhai_sci::eval;
@@ -281,6 +319,7 @@
 //! ```
 //!
 //! ## `prctile`
+//! Returns a given percentile value for a 1-D array of data.
 //! ```
 //! # use rhai::FLOAT;
 //! # use rhai_sci::eval;
@@ -289,8 +328,11 @@
 //! # ").unwrap();
 //! # assert_eq!(result, 2.0);
 //! ```
-//! ## `rand`
 //!
+//! ## `rand`
+//! Create a matrix filled with random values between 0 and 1. Can be called with either zero
+//! arguments (returning a single random value), one argument (creating a square matrix) or two
+//! arguments (specifying the number of rows and columns separately).
 //! ```
 //! # use rhai::FLOAT;
 //! # use rhai_sci::eval;
@@ -299,7 +341,6 @@
 //! # ").unwrap();
 //! # assert!(result < 1.0 && result > 0.0);
 //! ```
-//!
 //! ```
 //! # use rhai::Array;
 //! # use rhai_sci::eval;
@@ -313,7 +354,6 @@
 //! # let sum: f64 = vecresult.into_iter().map(|x| x.into_iter().sum()).collect::<Vec<f64>>().into_iter().sum();
 //! # assert!(sum < 9.0 && sum > 0.0);
 //! ```
-//!
 //! ```
 //! # use rhai::Array;
 //! # use rhai_sci::eval;
@@ -327,7 +367,9 @@
 //! # let sum: f64 = vecresult.into_iter().map(|x| x.into_iter().sum()).collect::<Vec<f64>>().into_iter().sum();
 //! # assert!(sum < 9.0 && sum > 0.0);
 //! ```
+//!
 //! ## `size`
+//! Returns the size along each dimension of an array.
 //! ```
 //! # use rhai::Array;
 //! # use rhai_sci::eval;
@@ -344,7 +386,9 @@
 //! # ").unwrap();
 //! # assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![1, 1, 2]);
 //! ```
+//!
 //! ## `std`
+//! Returns the standard deviation of a 1-D array.
 //! ```
 //! # use rhai::FLOAT;
 //! # use rhai_sci::eval;
@@ -353,7 +397,9 @@
 //! # ").unwrap();
 //! # assert_eq!(result, 1.0);
 //! ```
+//!
 //! ## `variance`
+//! Returns the variance of a 1-D array.
 //! ```
 //! # use rhai::FLOAT;
 //! # use rhai_sci::eval;
@@ -362,14 +408,17 @@
 //! # ").unwrap();
 //! # assert_eq!(result, 1.0);
 //! ```
+//!
 //! ## `zeros`
+//! Create an matrix filled with ones. Can be called with either one argument (creating a square
+//! matrix) or two arguments (specifying the number of rows and columns separately).
 //! ```
 //! # use rhai::Array;
 //! # use rhai_sci::eval;
 //! # use rhai::serde::from_dynamic;
 //! # let result: Array = eval("
 //! zeros(3) // => [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
-//! ").unwrap();
+//! # ").unwrap();
 //! # assert_eq!(result.into_iter().map(
 //! #         |x| from_dynamic(&x).unwrap()
 //! #     ).collect::<Vec<Vec<f64>>>(), vec![vec![0.0; 3]; 3]);
@@ -392,6 +441,7 @@ use rhai_rand::RandomPackage;
 use std::ops::{Range, RangeInclusive};
 
 def_package! {
+    /// Package for scientific computing
     pub SciPackage(lib) {
 
         RandomPackage::init(lib);
@@ -468,7 +518,8 @@ fn aggregate_functions() -> String {
         + include_str!("../scripts/constants.rhai")
 }
 
-/// This provides the ability to easily evaluate a line (or lines) of code
+/// This provides the ability to easily evaluate a line (or lines) of code without explicitly
+/// setting up a script engine
 /// ```
 /// use rhai_sci::eval;
 /// use rhai::FLOAT;

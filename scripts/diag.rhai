@@ -1,5 +1,5 @@
 fn diag(arr) {
-    if type_of(arr[0]) == "array" {
+    if ndims(arr) == 2 {
         let n = min(len(arr[0]), len(arr));
         let v = [];
         for i in 0..n {
