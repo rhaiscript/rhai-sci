@@ -65,6 +65,25 @@
 //! # assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![-7, 1000]);
 //! ```
 //! ## `diag`
+//! ```
+//! # use rhai::Array;
+//! # use rhai_sci::eval;
+//! # let result: Array = eval("
+//! diag([[1, 2, 3], [4, 5, 6], [7, 8, 9]]) // => [1, 5, 9]
+//! # ").unwrap();
+//! # assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![1, 5, 9]);
+//! ```
+//! ```
+//! # use rhai::{Array, serde::from_dynamic};
+//! # use rhai_sci::eval;
+//! # let result: Array = eval("
+//! diag([1, 2, 3]) // => [[1.0, 0.0, 0.0], [0.0, 2.0, 0.0], [0.0, 0.0, 3.0]]
+//! # ").unwrap();
+//! # let vecresult = result.into_iter().map(
+//! #         |x| from_dynamic(&x).unwrap()
+//! #     ).collect::<Vec<Vec<f64>>>();
+//! # assert_eq!(vecresult, vec![vec![1.0, 0.0, 0.0], vec![0.0, 2.0, 0.0], vec![0.0, 0.0, 3.0]]);
+//! ```
 //! ## `eye`
 //! ```
 //! # use rhai::Array;
@@ -285,6 +304,23 @@
 //! # let sum: f64 = vecresult.into_iter().map(|x| x.into_iter().sum()).collect::<Vec<f64>>().into_iter().sum();
 //! # assert!(sum < 9.0 && sum > 0.0);
 //! ```
+//! ## `size`
+//! ```
+//! # use rhai::Array;
+//! # use rhai_sci::eval;
+//! # let result: Array = eval("
+//! size(ones(3, 5)) // => [3, 5]
+//! # ").unwrap();
+//! # assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![3, 5]);
+//! ```
+//! ```
+//! # use rhai::Array;
+//! # use rhai_sci::eval;
+//! # let result: Array = eval("
+//! size([[[1, 2]]]) // => [1, 1, 2]
+//! # ").unwrap();
+//! # assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![1, 1, 2]);
+//! ```
 //! ## `std`
 //! ```
 //! # use rhai::FLOAT;
@@ -390,6 +426,7 @@ fn aggregate_functions() -> String {
         + include_str!("../scripts/mink.rhai")
         + include_str!("../scripts/diag.rhai")
         + include_str!("../scripts/bounds.rhai")
+        + include_str!("../scripts/size.rhai")
         + include_str!("../scripts/mean.rhai")
         + include_str!("../scripts/variance.rhai")
         + include_str!("../scripts/std.rhai")
