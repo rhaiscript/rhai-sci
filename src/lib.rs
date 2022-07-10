@@ -232,6 +232,29 @@
 //! # ").unwrap();
 //! # assert_eq!(result, 2);
 //! ```
+//!
+//! ## `ndims`
+//! ```
+//! # use rhai::INT;
+//! # use rhai_sci::eval;
+//! # let result: INT = eval("
+//! ndims(ones(4, 6)) // => 2
+//! # ").unwrap();
+//! # assert_eq!(result, 2);
+//! ```
+//!
+//!
+//! ## `numel`
+//! ```
+//! # use rhai::INT;
+//! # use rhai_sci::eval;
+//! # let result: INT = eval("
+//! numel(ones(4, 6)) // => 24
+//! # ").unwrap();
+//! # assert_eq!(result, 24);
+//! ```
+//!
+//!
 //! ## `ones`
 //! ```
 //! # use rhai::Array;
@@ -428,6 +451,8 @@ fn aggregate_functions() -> String {
         + include_str!("../scripts/bounds.rhai")
         + include_str!("../scripts/size.rhai")
         + include_str!("../scripts/mean.rhai")
+        + include_str!("../scripts/numel.rhai")
+        + include_str!("../scripts/ndims.rhai")
         + include_str!("../scripts/variance.rhai")
         + include_str!("../scripts/std.rhai")
         + include_str!("../scripts/mode.rhai")
