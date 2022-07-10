@@ -135,6 +135,17 @@
 //! # assert_eq!(vecresult, vec![vec![1.0, 0.0, 0.0], vec![0.0, 2.0, 0.0], vec![0.0, 0.0, 3.0]]);
 //! ```
 //!
+//! ## `diff`
+//! Returns the difference between successive elements of a 1-D array.
+//! ```
+//! # use rhai::Array;
+//! # use rhai_sci::eval;
+//! # let result: Array = eval("
+//! diff([2, 5, 1, 7, 8]) // => [3, -4, 6, 1]
+//! # ").unwrap();
+//! # assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![3, -4, 6, 1]);
+//! ```
+//!
 //! ## `eye`
 //! Create an identity matrix with ones along the diagonal and zeros elsewhere. Can be called with
 //! either one argument (creating a square matrix) or two arguments (specifying the number of rows
@@ -376,6 +387,18 @@
 //! # assert_eq!(result, 2.0);
 //! ```
 //!
+//! ## `prod`
+//! The product (multiplication) of all elements in a 1-D array.
+//! ```
+//! # use rhai::INT;
+//! # use rhai_sci::eval;
+//! # let result: INT = eval("
+//! prod([1, 2, 3, 4, 10]) // => 240
+//! # ").unwrap();
+//! # assert_eq!(result, 240);
+//! ```
+//!
+//!
 //! ## `rand`
 //! Create a matrix filled with random values between 0 and 1. Can be called with either zero
 //! arguments (returning a single random value), one argument (creating a square matrix) or two
@@ -592,6 +615,8 @@ fn aggregate_functions() -> String {
         + include_str!("../scripts/constants.rhai")
         + include_str!("../scripts/transpose.rhai")
         + include_str!("../scripts/meshgrid.rhai")
+        + include_str!("../scripts/diff.rhai")
+        + include_str!("../scripts/prod.rhai")
 }
 
 /// This provides the ability to easily evaluate a line (or lines) of code without explicitly
