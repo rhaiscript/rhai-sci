@@ -1,0 +1,3 @@
+fn rms(arr) {
+    sqrt(1.0*arr.reduce(|sum, v| sum + v*v, 0)/len(arr))
+};

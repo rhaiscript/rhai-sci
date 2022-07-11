@@ -45,6 +45,7 @@ fn aggregate_functions() -> String {
         + include_str!("../scripts/mode.rhai")
         + include_str!("../scripts/median.rhai")
         + include_str!("../scripts/iqr.rhai")
+        + include_str!("../scripts/rms.rhai")
         + include_str!("../scripts/prctile.rhai")
         + include_str!("../scripts/sum.rhai")
         + include_str!("../scripts/cumsum.rhai")

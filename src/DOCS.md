@@ -467,6 +467,17 @@ rand(3, 3) // => [[0.7333405150571339, 0.3597611759299407, 0.8809543481098305], 
 # assert!(sum < 9.0 && sum > 0.0);
 ```
 
+## `rms`
+Returns the root mean square of a 1-D array.
+```rust
+# use rhai::FLOAT;
+# use rhai_sci::eval;
+# let result: FLOAT = eval("
+rms([1, 2, 3, 4, 5]) // => 3.31662479036
+# ").unwrap();
+# assert_eq!(result, 3.3166247903554);
+```
+
 ## `size`
 Returns the size along each dimension of an array.
 ```rust
