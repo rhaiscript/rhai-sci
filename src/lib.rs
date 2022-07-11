@@ -63,6 +63,8 @@ fn aggregate_functions() -> String {
         + include_str!("../scripts/cumprod.rhai")
         + include_str!("../scripts/cummax.rhai")
         + include_str!("../scripts/cummin.rhai")
+        + include_str!("../scripts/cumtrapz.rhai")
+        + include_str!("../scripts/trapz.rhai")
 }
 
 /// This provides the ability to easily evaluate a line (or lines) of code without explicitly

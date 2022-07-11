@@ -139,6 +139,27 @@ cumprod([1, 2, 3, 4, 5]) // => [1, 2, 6, 24, 120]
 # assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![1, 2, 6, 24, 120]);
 ```
 
+
+## `cumtrapz`
+Returns the cumulative approximate integral of the curve defined by Y and X using the trapezoidal method.
+```rust
+# use rhai::Array;
+# use rhai_sci::eval;
+# let result: Array = eval("
+cumtrapz([1.0, 1.5, 2.0], [1, 2, 3]); // => [0.0, 0.5, 1.0]
+# ").unwrap();
+# assert_eq!(result.into_iter().map(|x|x.cast::<f64>()).collect::<Vec<f64>>(), vec![0.0, 0.5, 1.0]);
+```
+```rust
+# use rhai::Array;
+# use rhai_sci::eval;
+# let result: Array = eval("
+cumtrapz([1, 2, 3]); // => [0.0, 1.0, 2.0]
+# ").unwrap();
+# assert_eq!(result.into_iter().map(|x|x.cast::<f64>()).collect::<Vec<f64>>(), vec![0.0, 1.0, 2.0]);
+```
+
+
 ## `diag`
 This function can be used in two distinct ways.
 1. If the argument is an 2-D array, `diag` returns an array containing the diagonal of the array.
@@ -531,6 +552,26 @@ transpose([[1, 2], [3, 4]]) // => [[1, 3], [2, 4]]
 #         |x| from_dynamic(&x).unwrap()
 #     ).collect::<Vec<Vec<i64>>>();
 # assert_eq!(vecresult, vec![vec![1, 3], vec![2, 4]]);
+```
+
+
+## `trapz`
+Returns the approximate integral of the curve defined by Y and X using the trapezoidal method. 
+```rust
+# use rhai::FLOAT;
+# use rhai_sci::eval;
+# let result: FLOAT = eval("
+trapz([1.0, 1.5, 2.0], [1, 2, 3]); // => 1.0
+# ").unwrap();
+# assert_eq!(result, 1.0);
+```
+```rust
+# use rhai::FLOAT;
+# use rhai_sci::eval;
+# let result: FLOAT = eval("
+trapz([1, 2, 3]); // => 2.0
+# ").unwrap();
+# assert_eq!(result, 2.0);
 ```
 
 ## `variance`
