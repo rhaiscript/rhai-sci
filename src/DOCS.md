@@ -94,6 +94,29 @@ bounds([32, 15, -7, 10, 1000, 41, 42]) // => [-7, 1000]
 # assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![-7, 1000]);
 ```
 
+## `cummax`
+Returns an array representing the cumulative sum of a 1-D array.
+```rust
+# use rhai::Array;
+# use rhai_sci::eval;
+# let result: Array = eval("
+cummax([1, 4, 5, 3, 9, 8]) // => [1, 4, 5, 5, 9, 9]
+# ").unwrap();
+# assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![1, 4, 5, 5, 9, 9]);
+```
+
+## `cummin`
+Returns an array representing the cumulative sum of a 1-D array.
+```rust
+# use rhai::Array;
+# use rhai_sci::eval;
+# let result: Array = eval("
+cummin([8, 9, 3, 5, 4, 1]) // => [8, 8, 3, 3, 3, 1]
+# ").unwrap();
+# assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![8, 8, 3, 3, 3, 1]);
+```
+
+
 ## `cumsum`
 Returns an array representing the cumulative sum of a 1-D array.
 ```rust
