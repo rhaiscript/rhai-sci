@@ -105,6 +105,17 @@ cumsum([1.1, 2.5, 3.4]) // => [1.1, 3.6, 7.0]
 # assert_eq!(result.into_iter().map(|x|x.cast::<f64>()).collect::<Vec<f64>>(), vec![1.1, 3.6, 7.0]);
 ```
 
+## `cumprod`
+Returns an array representing the cumulative product of a 1-D array.
+```rust
+# use rhai::Array;
+# use rhai_sci::eval;
+# let result: Array = eval("
+cumprod([1, 2, 3, 4, 5]) // => [1, 2, 6, 24, 120]
+# ").unwrap();
+# assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![1, 2, 6, 24, 120]);
+```
+
 ## `diag`
 This function can be used in two distinct ways.
 1. If the argument is an 2-D array, `diag` returns an array containing the diagonal of the array.
