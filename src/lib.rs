@@ -68,6 +68,7 @@ fn aggregate_functions() -> String {
         + include_str!("../scripts/fliplr.rhai")
         + include_str!("../scripts/flipud.rhai")
         + include_str!("../scripts/rot90.rhai")
+        + include_str!("../scripts/movmean.rhai")
 }
 
 /// This provides the ability to easily evaluate a line (or lines) of code without explicitly

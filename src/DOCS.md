@@ -408,6 +408,18 @@ mode([1, 2, 2, 2, 2, 3]) // => 2
 # assert_eq!(result, 2);
 ```
 
+
+## `movmean`
+Returns an array of the moving average (with a given width) across the input array.
+```rust
+# use rhai::Array;
+# use rhai_sci::eval;
+# let result: Array = eval("
+movmean([1, 2, 3, 4, 5, 6], 3) // => [1.5, 2.0, 3.0, 4.0, 5.0, 5.5]
+# ").unwrap();
+# assert_eq!(result.into_iter().map(|x|x.cast::<f64>()).collect::<Vec<f64>>(), vec![1.5, 2.0, 3.0, 4.0, 5.0, 5.5]);
+```
+
 ## `ndims`
 Returns the number of dimensions in an array.
 ```rust
