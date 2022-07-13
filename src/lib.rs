@@ -54,7 +54,7 @@ fn aggregate_functions() -> String {
         + include_str!("../scripts/logspace.rhai")
         + include_str!("../scripts/zeros.rhai")
         + include_str!("../scripts/ones.rhai")
-        + include_str!("../scripts/myrand.rhai")
+        + include_str!("../scripts/rand.rhai")
         + include_str!("../scripts/constants.rhai")
         + include_str!("../scripts/transpose.rhai")
         + include_str!("../scripts/meshgrid.rhai")
