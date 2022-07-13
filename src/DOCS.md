@@ -242,7 +242,7 @@ fliplr(diag([1, 2])) // => [[0.0, 1.0], [2.0, 0.0]]
 # assert_eq!(vecresult, vec![vec![0.0, 1.0], vec![2.0, 0.0]]);
 ```
 
-## `fipud`
+## `flipud`
 Reverse the columns in a matrix.
 ```rust
 # use rhai::Array;
@@ -266,6 +266,17 @@ Given reference data, perform linear interpolation.
 interp1([0, 1], [1, 2], 0.5) // => 1.5
 # ").unwrap();
 # assert_eq!(result, 1.5);
+```
+
+## `intersect`
+Performs set intersection of two arrays
+```rust
+# use rhai::Array;
+# use rhai_sci::eval;
+# let result: Array = eval("
+intersect([7, 1, 7, 7, 4], [7, 0, 4, 4, 0]) // => [4, 7]
+# ").unwrap();
+# assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![4, 7]);
 ```
 
 ## `iqr`
@@ -766,8 +777,6 @@ transpose([[1, 2], [3, 4]]) // => [[1, 3], [2, 4]]
 # assert_eq!(vecresult, vec![vec![1, 3], vec![2, 4]]);
 ```
 
-
-
 ## `trapz`
 Returns the approximate integral of the curve defined by Y and X using the trapezoidal method. 
 ```rust
@@ -787,15 +796,26 @@ trapz([1, 2, 3]); // => 2.0
 # assert_eq!(result, 2.0);
 ```
 
+## `union`
+Returns the set union of two ararys.
+```rust
+# use rhai::Array;
+# use rhai_sci::eval;
+# let result: Array = eval("
+union([7, 1, 7, 7, 4], [7, 0, 4, 4, 0]) // => [0, 1, 4, 7]
+# ").unwrap();
+# assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![0, 1, 4, 7]);
+```
+
 ## `unique`
 Returns an array of the unique elements in an array. 
 ```rust
 # use rhai::Array;
 # use rhai_sci::eval;
 # let result: Array = eval("
-unique([1, 2, 2, 2, 5, 4, 4, 2, 5, 8]) // => [1, 2, 5, 4, 8]
+unique([1, 2, 2, 2, 5, 4, 4, 2, 5, 8]) // => [1, 2, 4, 5, 8]
 # ").unwrap();
-# assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![1, 2, 5, 4, 8]);
+# assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![1, 2, 4, 5, 8]);
 ```
 
 ## `variance`
