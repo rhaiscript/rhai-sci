@@ -787,6 +787,17 @@ trapz([1, 2, 3]); // => 2.0
 # assert_eq!(result, 2.0);
 ```
 
+## `unique`
+Returns an array of the unique elements in an array. 
+```rust
+# use rhai::Array;
+# use rhai_sci::eval;
+# let result: Array = eval("
+unique([1, 2, 2, 2, 5, 4, 4, 2, 5, 8]) // => [1, 2, 5, 4, 8]
+# ").unwrap();
+# assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![1, 2, 5, 4, 8]);
+```
+
 ## `variance`
 Returns the variance of a 1-D array.
 ```rust
