@@ -471,6 +471,18 @@ movstd([1, 2, 3, 4, 5, 6], 3) // => [0.707, 1.0, 1.0, 1.0, 1.0, 0.707]
 # assert_eq!(result.into_iter().map(|x|x.cast::<f64>()).collect::<Vec<f64>>(), vec![0.5_f64.sqrt(), 1.0, 1.0, 1.0, 1.0, 0.5_f64.sqrt()]);
 ```
 
+
+## `movsum`
+Returns an array of the moving sum (with a given width) across the input array.
+```rust
+# use rhai::Array;
+# use rhai_sci::eval;
+# let result: Array = eval("
+movsum([1, 2, 3, 4, 5, 6], 3) // => [3, 6, 9, 12, 15, 11]
+# ").unwrap();
+# assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![3, 6, 9, 12, 15, 11]);
+```
+
 ## `movvar`
 Returns an array of the moving variance (with a given width) across the input array.
 ```rust
