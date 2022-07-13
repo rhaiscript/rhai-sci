@@ -438,6 +438,28 @@ movmad([1, 2, 4, -1, -2, -3, -1, 3, 2, 1], 3) // => [0.5, 1.0, 2.0, 1.0, 1.0, 1.
 # assert_eq!(result.into_iter().map(|x|x.cast::<f64>()).collect::<Vec<f64>>(), vec![0.5, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 0.5]);
 ```
 
+## `movmax`
+Returns an array of the moving maximum (with a given width) across the input array.
+```rust
+# use rhai::Array;
+# use rhai_sci::eval;
+# let result: Array = eval("
+movmax([1, 2, 4, -1, -2, -3, -1, 3, 2, 1], 3) // => [2, 4, 4, 4, -1, -1, 3, 3, 3, 2]
+# ").unwrap();
+# assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![2, 4, 4, 4, -1, -1, 3, 3, 3, 2]);
+```
+
+## `movmin`
+Returns an array of the moving minimum (with a given width) across the input array.
+```rust
+# use rhai::Array;
+# use rhai_sci::eval;
+# let result: Array = eval("
+movmin([1, 2, 4, -1, -2, -3, -1, 3, 2, 1], 3) // => [1, 1, -1, -2, -3, -3, -3, -1, 1, 1]
+# ").unwrap();
+# assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![1, 1, -1, -2, -3, -3, -3, -1, 1, 1]);
+```
+
 ## `movmean`
 Returns an array of the moving average (with a given width) across the input array.
 ```rust
@@ -460,6 +482,17 @@ movmedian([1, 2, 3, 4, 5, 6], 3) // => [1.5, 2.0, 3.0, 4.0, 5.0, 5.5]
 # assert_eq!(result.into_iter().map(|x|x.cast::<f64>()).collect::<Vec<f64>>(), vec![1.5, 2.0, 3.0, 4.0, 5.0, 5.5]);
 ```
 
+## `movprod`
+Returns an array of the moving product (with a given width) across the input array.
+```rust
+# use rhai::Array;
+# use rhai_sci::eval;
+# let result: Array = eval("
+movprod([1, 2, 3, 4, 5, 6], 3) // => [2, 6, 24, 60, 120, 30]
+# ").unwrap();
+# assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![2, 6, 24, 60, 120, 30]);
+```
+
 ## `movstd`
 Returns an array of the moving standard deviation (with a given width) across the input array.
 ```rust
@@ -470,7 +503,6 @@ movstd([1, 2, 3, 4, 5, 6], 3) // => [0.707, 1.0, 1.0, 1.0, 1.0, 0.707]
 # ").unwrap();
 # assert_eq!(result.into_iter().map(|x|x.cast::<f64>()).collect::<Vec<f64>>(), vec![0.5_f64.sqrt(), 1.0, 1.0, 1.0, 1.0, 0.5_f64.sqrt()]);
 ```
-
 
 ## `movsum`
 Returns an array of the moving sum (with a given width) across the input array.
