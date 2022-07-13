@@ -617,12 +617,20 @@ std([1, 2, 3]) // => 1.0
 ```
 
 ## `sum`
-Sums the elements of a 1-D array
+Sums the elements of a 1-D array. Can be called as a function or as an array method. 
 ```rust
 # use rhai::FLOAT;
 # use rhai_sci::eval;
 # let result: FLOAT = eval("
 sum([1.1, 2.5, 3.4]) // => 7.0
+# ").unwrap();
+# assert_eq!(result, 7.0);
+```
+```rust
+# use rhai::FLOAT;
+# use rhai_sci::eval;
+# let result: FLOAT = eval("
+[1.1, 2.5, 3.4].sum() // => 7.0
 # ").unwrap();
 # assert_eq!(result, 7.0);
 ```
