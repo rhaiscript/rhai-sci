@@ -9,5 +9,9 @@ fn ones(nx, ny) {
 };
 
 fn ones(n) {
-    ones(n, n)
+    if type_of(n) == "array" {
+        ones(n[0], n[1])
+    } else {
+        ones(n, n)
+    }
 };

@@ -3,7 +3,11 @@ fn rand() {
 };
 
 fn rand(n) {
-    rand(n, n)
+    if type_of(n) == "array" {
+        rand(n[0], n[1])
+    } else {
+        rand(n, n)
+    }
 };
 
 fn rand(nx, ny) {

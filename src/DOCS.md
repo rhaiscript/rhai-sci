@@ -431,8 +431,9 @@ numel(ones(4, 6)) // => 24
 ```
 
 ## `ones`
-Create an matrix filled with ones. Can be called with either one argument (creating a square
-matrix) or two arguments (specifying the number of rows and columns separately).
+Create an matrix filled with ones. Can be called with either one int argument (creating a square
+matrix), on array argument (indicating the dimensions, such as that which is returned by `[size]`)
+or two arguments (specifying the number of rows and columns separately).
 ```rust
 # use rhai::Array;
 # use rhai_sci::eval;
@@ -455,6 +456,19 @@ ones(3, 3) // => [[1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0]]
 #         |x| from_dynamic(&x).unwrap()
 #     ).collect::<Vec<Vec<f64>>>(), vec![vec![1.0; 3]; 3]);
 ```
+```rust
+# use rhai::Array;
+# use rhai_sci::eval;
+# use rhai::serde::from_dynamic;
+# let result: Array = eval("
+let x = zeros(3, 3);
+ones(size(x)) // => [[1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0]]
+# ").unwrap();
+# assert_eq!(result.into_iter().map(
+#         |x| from_dynamic(&x).unwrap()
+#     ).collect::<Vec<Vec<f64>>>(), vec![vec![1.0; 3]; 3]);
+```
+
 
 ## `prctile`
 Returns a given percentile value for a 1-D array of data.
@@ -480,9 +494,9 @@ prod([1, 2, 3, 4, 10]) // => 240
 
 
 ## `rand`
-Create a matrix filled with random values between 0 and 1. Can be called with either zero
-arguments (returning a single random value), one argument (creating a square matrix) or two
-arguments (specifying the number of rows and columns separately).
+Create a matrix filled with random values between 0 and 1. Can be called with either no argument (returning a single value), 
+one int argument (creating a square matrix), on array argument (indicating the dimensions, such as that which is returned by `[size]`)
+or two arguments (specifying the number of rows and columns separately).
 ```rust
 # use rhai::FLOAT;
 # use rhai_sci::eval;
@@ -509,7 +523,8 @@ rand(3) // => [[0.7333405150571339, 0.3597611759299407, 0.8809543481098305], [0.
 # use rhai_sci::eval;
 # use rhai::serde::from_dynamic;
 # let result: Array = eval("
-rand(3, 3) // => [[0.7333405150571339, 0.3597611759299407, 0.8809543481098305], [0.5327545327750203, 0.9185256001032435, 0.7226084132391764], [0.14803039057912748, 0.8924466624235429, 0.40943835774171167]]
+let x = zeros(3);
+rand(size(x)) // => [[0.7333405150571339, 0.3597611759299407, 0.8809543481098305], [0.5327545327750203, 0.9185256001032435, 0.7226084132391764], [0.14803039057912748, 0.8924466624235429, 0.40943835774171167]]
 # ").unwrap();
 # let vecresult = result.into_iter().map(
 #         |x| from_dynamic(&x).unwrap()
@@ -646,8 +661,9 @@ variance([1, 2, 3]) // => 1.0
 ```
 
 ## `zeros`
-Create an matrix filled with ones. Can be called with either one argument (creating a square
-matrix) or two arguments (specifying the number of rows and columns separately).
+Create an matrix filled with ones. Can be called with either one int argument (creating a square
+matrix), on array argument (indicating the dimensions, such as that which is returned by `[size]`)
+or two arguments (specifying the number of rows and columns separately).
 ```rust
 # use rhai::Array;
 # use rhai_sci::eval;
@@ -665,6 +681,18 @@ zeros(3) // => [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
 # use rhai::serde::from_dynamic;
 # let result: Array = eval("
 zeros(3, 3) // => [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
+# ").unwrap();
+# assert_eq!(result.into_iter().map(
+#         |x| from_dynamic(&x).unwrap()
+#    ).collect::<Vec<Vec<f64>>>(), vec![vec![0.0; 3]; 3]);
+```
+```rust
+# use rhai::Array;
+# use rhai_sci::eval;
+# use rhai::serde::from_dynamic;
+# let result: Array = eval("
+let x = ones(3, 3);
+zeros(size(x)) // => [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
 # ").unwrap();
 # assert_eq!(result.into_iter().map(
 #         |x| from_dynamic(&x).unwrap()
