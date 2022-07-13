@@ -427,6 +427,17 @@ mode([1, 2, 2, 2, 2, 3]) // => 2
 # assert_eq!(result, 2);
 ```
 
+## `movmad`
+Returns an array of the moving maximum absolute deviation (with a given width) across the input array.
+```rust
+# use rhai::Array;
+# use rhai_sci::eval;
+# let result: Array = eval("
+movmad([1, 2, 4, -1, -2, -3, -1, 3, 2, 1], 3) // => [0.5, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 0.5]
+# ").unwrap();
+# assert_eq!(result.into_iter().map(|x|x.cast::<f64>()).collect::<Vec<f64>>(), vec![0.5, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 0.5]);
+```
+
 ## `movmean`
 Returns an array of the moving average (with a given width) across the input array.
 ```rust
@@ -439,7 +450,7 @@ movmean([1, 2, 3, 4, 5, 6], 3) // => [1.5, 2.0, 3.0, 4.0, 5.0, 5.5]
 ```
 
 ## `movmedian`
-Returns an array of the moving average (with a given width) across the input array.
+Returns an array of the moving median (with a given width) across the input array.
 ```rust
 # use rhai::Array;
 # use rhai_sci::eval;
@@ -450,7 +461,7 @@ movmedian([1, 2, 3, 4, 5, 6], 3) // => [1.5, 2.0, 3.0, 4.0, 5.0, 5.5]
 ```
 
 ## `movstd`
-Returns an array of the moving average (with a given width) across the input array.
+Returns an array of the moving standard deviation (with a given width) across the input array.
 ```rust
 # use rhai::Array;
 # use rhai_sci::eval;
@@ -461,7 +472,7 @@ movstd([1, 2, 3, 4, 5, 6], 3) // => [0.707, 1.0, 1.0, 1.0, 1.0, 0.707]
 ```
 
 ## `movvar`
-Returns an array of the moving average (with a given width) across the input array.
+Returns an array of the moving variance (with a given width) across the input array.
 ```rust
 # use rhai::Array;
 # use rhai_sci::eval;
