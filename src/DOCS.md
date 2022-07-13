@@ -408,7 +408,6 @@ mode([1, 2, 2, 2, 2, 3]) // => 2
 # assert_eq!(result, 2);
 ```
 
-
 ## `movmean`
 Returns an array of the moving average (with a given width) across the input array.
 ```rust
@@ -418,6 +417,39 @@ Returns an array of the moving average (with a given width) across the input arr
 movmean([1, 2, 3, 4, 5, 6], 3) // => [1.5, 2.0, 3.0, 4.0, 5.0, 5.5]
 # ").unwrap();
 # assert_eq!(result.into_iter().map(|x|x.cast::<f64>()).collect::<Vec<f64>>(), vec![1.5, 2.0, 3.0, 4.0, 5.0, 5.5]);
+```
+
+## `movmedian`
+Returns an array of the moving average (with a given width) across the input array.
+```rust
+# use rhai::Array;
+# use rhai_sci::eval;
+# let result: Array = eval("
+movmedian([1, 2, 3, 4, 5, 6], 3) // => [1.5, 2.0, 3.0, 4.0, 5.0, 5.5]
+# ").unwrap();
+# assert_eq!(result.into_iter().map(|x|x.cast::<f64>()).collect::<Vec<f64>>(), vec![1.5, 2.0, 3.0, 4.0, 5.0, 5.5]);
+```
+
+## `movstd`
+Returns an array of the moving average (with a given width) across the input array.
+```rust
+# use rhai::Array;
+# use rhai_sci::eval;
+# let result: Array = eval("
+movstd([1, 2, 3, 4, 5, 6], 3) // => [0.707, 1.0, 1.0, 1.0, 1.0, 0.707]
+# ").unwrap();
+# assert_eq!(result.into_iter().map(|x|x.cast::<f64>()).collect::<Vec<f64>>(), vec![0.5_f64.sqrt(), 1.0, 1.0, 1.0, 1.0, 0.5_f64.sqrt()]);
+```
+
+## `movvar`
+Returns an array of the moving average (with a given width) across the input array.
+```rust
+# use rhai::Array;
+# use rhai_sci::eval;
+# let result: Array = eval("
+movvar([1, 2, 3, 4, 5, 6], 3) // => [0.5, 1.0, 1.0, 1.0, 1.0, 0.5]
+# ").unwrap();
+# assert_eq!(result.into_iter().map(|x|x.cast::<f64>()).collect::<Vec<f64>>(), vec![0.5, 1.0, 1.0, 1.0, 1.0, 0.5]);
 ```
 
 ## `ndims`
