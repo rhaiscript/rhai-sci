@@ -9,5 +9,9 @@ fn zeros(nx, ny) {
 };
 
 fn zeros(n) {
-    zeros(n, n)
+    if type_of(n) == "array" {
+        zeros(n[0], n[1])
+    } else {
+        zeros(n, n)
+    }
 };
