@@ -700,14 +700,3 @@ unique([1, 2, 2, 2, 5, 4, 4, 2, 5, 8]) // => [1, 2, 4, 5, 8]
 # ").unwrap();
 # assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![1, 2, 4, 5, 8]);
 ```
-
-## `variance`
-Returns the variance of a 1-D array.
-```rust
-# use rhai::FLOAT;
-# use rhai_sci::eval;
-# let result: FLOAT = eval("
-variance([1, 2, 3]) // => 1.0
-# ").unwrap();
-# assert_eq!(result, 1.0);
-```
