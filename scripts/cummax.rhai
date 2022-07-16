@@ -2,8 +2,8 @@
 Returns an array representing the cumulative maximum of a 1-D array.
 ```rhai
 let arr = [1, 4, 5, 3, 9, 8];
-let cm = cummax(arr);
-assert_eq(cm, [1, 4, 5, 5, 9, 9]);
+let c = cummax(arr);
+assert_eq(c, [1, 4, 5, 5, 9, 9]);
 ```
 **/
 fn cummax(arr) {

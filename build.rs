@@ -1,5 +1,5 @@
 use std::io::Write;
-use rhai::{Func, packages::Package, plugin::*};
+use rhai::{packages::Package, plugin::*};
 use itertools::Itertools;
 use rhai_rand::RandomPackage;
 
@@ -28,12 +28,16 @@ fn main() {
         }
     }
 
-    // Build documentation
+    // Make a file for documentation
     let mut doc_file = std::fs::File::create("docs/rhai-lab-docs.md").unwrap();
+
+    // Build an engine for doctests
     let mut engine = Engine::new();
     let ast = engine.compile(std::fs::read_to_string("scripts/rhai-lab-compiled.txt").unwrap()).unwrap();
     engine.register_global_module(RandomPackage::new().as_shared_module());
     engine.register_global_module(rhai::Shared::new(Module::eval_ast_as_new(rhai::Scope::new(), &ast, &engine).unwrap()));
+
+    // Write functions
     write!(doc_file, "# Functions\n This package provides a large variety of functions to help with scientific computing. Each one of these is written in Rhai itself! The source code is here.\n").expect("Cannot write to {test_file}");
     for function in ast.iter_functions().sorted() {
         if function.access == FnAccess::Public && !function.name.starts_with("anon") {
@@ -44,6 +48,7 @@ fn main() {
             let code = comments.split("```").collect::<Vec<&str>>();
             if code.len() == 3 {
                 let clean_code = code[1].replace("rhai", "").replace("\n", "");
+                println!("{clean_code}");
                 assert!(engine.eval::<bool>(&clean_code).unwrap());
             }
         }

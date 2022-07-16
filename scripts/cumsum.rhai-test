@@ -1,2 +1,0 @@
-// Test cumsum
-assert_eq(cumsum([1.1, 2.5, 3.4]), [1.1, 3.6, 7.0]);

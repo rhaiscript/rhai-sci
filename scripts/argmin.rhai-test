@@ -1,2 +1,0 @@
-// Test that argmin returns the right argument
-assert_eq(argmin([43, 42, -500]), 2);
