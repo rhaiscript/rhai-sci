@@ -214,19 +214,6 @@ mean([1, 2, 3]) // => 2.0
 # assert_eq!(result, 2.0);
 ```
 
-## `median`
-Returns the median of a 1-D array.
-```rust
-# use rhai::FLOAT;
-# use rhai_sci::eval;
-# let result: FLOAT = eval("
-median([1, 1, 1, 1, 2, 5, 6, 7, 8]) // => 2.0
-# ").unwrap();
-# assert_eq!(result, 2.0);
-```
-
-
-
 
 
 
