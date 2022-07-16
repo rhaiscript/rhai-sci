@@ -153,27 +153,6 @@ logspace(1, 3, 3) // => [10.0, 100.0, 1000.0]
 # assert_eq!(result.into_iter().map(|x|x.cast::<f64>()).collect::<Vec<f64>>(), vec![10.0, 100.0, 1000.0]);
 ```
 
-## `mad`
-Returns the maximum absolute deviation of an arry. 
-```rust
-# use rhai::FLOAT;
-# use rhai_sci::eval;
-# let result: FLOAT = eval("
-mad([1.0, 2.0, 3.0, 3.0, 4.0, 4.0, 4.0, 5.0, 5.5, 6.0, 6.0, 6.5, 7.0, 7.0, 7.5, 8.0, 9.0, 12.0, 52.0, 90.0]) // => 2.0
-# ").unwrap();
-# assert_eq!(result, 2.0);
-```
-```rust
-# use rhai::INT;
-# use rhai_sci::eval;
-# let result: INT = eval("
-max([41, 42, -1, 7, 2]) // => 42
-# ").unwrap();
-# assert_eq!(result, 42);
-```
-
-## `max`
-
 
 
 
