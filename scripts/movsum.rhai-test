@@ -1,0 +1,2 @@
+// Test movesum
+assert_eq(movsum([1, 2, 3, 4, 5, 6], 3), [3, 6, 9, 12, 15, 11]);
