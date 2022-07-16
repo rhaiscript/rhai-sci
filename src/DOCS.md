@@ -143,12 +143,10 @@ linspace(1, 2, 5) // => [1.0, 1.25, 1.5, 1.75, 2.0]
 ```
 
 ## `logspace`
-Returns an array containing a number of elements logarithmically spaced between two bounds.
 ```rust
 # use rhai::Array;
 # use rhai_sci::eval;
 # let result: Array = eval("
-logspace(1, 3, 3) // => [10.0, 100.0, 1000.0]
 # ").unwrap();
 # assert_eq!(result.into_iter().map(|x|x.cast::<f64>()).collect::<Vec<f64>>(), vec![10.0, 100.0, 1000.0]);
 ```
