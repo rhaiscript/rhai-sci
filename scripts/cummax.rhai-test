@@ -1,0 +1,2 @@
+// Test cummaxa
+assert_eq(cummax([1, 4, 5, 3, 9, 8]),  [1, 4, 5, 5, 9, 9]);

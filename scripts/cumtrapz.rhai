@@ -1,3 +1,5 @@
+// Returns the cumulative approximate integral of the curve defined by Y and X using the trapezoidal method.
+
 fn cumtrapz(x, y) {
     let trapsum = 0.0;
     let cumtrapsum = [0.0];
@@ -7,8 +9,6 @@ fn cumtrapz(x, y) {
     }
     cumtrapsum
 }
-
-
 
 fn cumtrapz(y) {
     let x = linspace(1, len(y), len(y));

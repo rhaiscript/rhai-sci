@@ -1,0 +1,2 @@
+// Test cumprod
+assert_eq(cumprod([1, 2, 3, 4, 5]), [1, 2, 6, 24, 120]);
