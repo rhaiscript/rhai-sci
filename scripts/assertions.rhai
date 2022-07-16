@@ -8,6 +8,8 @@ fn assert(expression, error) {
 
 fn assert_eq(a, b, error) {
     if a != b {
+        print(a);
+        print(b);
         throw error;
     } else {
         return true;
@@ -16,6 +18,8 @@ fn assert_eq(a, b, error) {
 
 fn assert_neq(a, b, error) {
     if a == b {
+        print(a);
+        print(b);
         throw error;
     }else {
         return true;
