@@ -513,32 +513,3 @@ rms([1, 2, 3, 4, 5]) // => 3.31662479036
 # ").unwrap();
 # assert_eq!(result, 3.3166247903554);
 ```
-
-
-## `rot90`
-Rotates a matrix 90 degrees counterclockwise, either in a single increments 
-(if a single argument is provided), or in `k` increments (if a second argument is provided).
-```rust
-# use rhai::Array;
-# use rhai_sci::eval;
-# use rhai::serde::from_dynamic;
-# let result: Array = eval("
-rot90(diag([1, 2])) // => [[0.0, 2.0], [1.0, 0.0]]
-# ").unwrap();
-# let vecresult = result.into_iter().map(
-#         |x| from_dynamic(&x).unwrap()
-#     ).collect::<Vec<Vec<f64>>>();
-# assert_eq!(vecresult, vec![vec![0.0, 2.0], vec![1.0, 0.0]]);
-```
-```rust
-# use rhai::Array;
-# use rhai_sci::eval;
-# use rhai::serde::from_dynamic;
-# let result: Array = eval("
-rot90(diag([1, 2]), 2) // => [[2.0, 0.0], [0.0, 1.0]]
-# ").unwrap();
-# let vecresult = result.into_iter().map(
-#         |x| from_dynamic(&x).unwrap()
-#     ).collect::<Vec<Vec<f64>>>();
-# assert_eq!(vecresult, vec![vec![2.0, 0.0], vec![0.0, 1.0]]);
-```
