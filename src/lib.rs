@@ -3,11 +3,9 @@
 #![warn(rustdoc::missing_doc_code_examples)]
 #![warn(clippy::missing_docs_in_private_items)]
 #![doc = include_str!("../README.md")]
-// #![doc = include_str!("./DOCS.md")]
 
-use rhai::{def_package, packages::Package, plugin::*, Array, EvalAltResult, Position, FLOAT, INT};
+use rhai::{def_package, packages::Package, plugin::*, EvalAltResult};
 use rhai_rand::RandomPackage;
-use std::ops::{Range, RangeInclusive};
 
 def_package! {
     /// Package for scientific computing
