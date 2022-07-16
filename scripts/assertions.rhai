@@ -31,7 +31,7 @@ fn assert_eq(a, b, error) {
 /**
 Assert that two arguments are non-equal, and throw a custom error if it is not.
 ```rhai
-assert_eq(2, 1, "Oh no!");
+assert_neq(2, 1, "Oh no!");
 ```
 **/
 fn assert_neq(a, b, error) {

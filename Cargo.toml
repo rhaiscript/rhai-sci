@@ -21,3 +21,4 @@ rhai-rand = "0.1.3"
 [build-dependencies]
 rhai = { version = "1.5", features = ["unchecked", "serde", "metadata"]}
 itertools = "0.10.3"
+rhai-rand = "0.1.3"

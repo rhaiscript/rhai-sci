@@ -1,4 +1,5 @@
 # Functions
+ This package provides a large variety of functions to help with scientific computing. Each one of these is written in Rhai itself! The source code is here.
 ## argmax(arr)
 
 Returns the index of the largest element in a 1-D array.
@@ -55,7 +56,7 @@ assert_neq(2, 1);
 
 Assert that two arguments are non-equal, and throw a custom error if it is not.
 ```rhai
-assert_eq(2, 1, "Oh no!");
+assert_neq(2, 1, "Oh no!");
 ```
 
 ## bounds(arr)
