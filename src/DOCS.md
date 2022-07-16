@@ -99,30 +99,14 @@ flipud(diag([1, 2])) // => [[0.0, 2.0], [1.0, 0.0]]
 ```
 
 ## `interp1`
-Given reference data, perform linear interpolation.
 ```rust
 # use rhai::FLOAT;
 # use rhai_sci::eval;
 # let result: FLOAT = eval("
-interp1([0, 1], [1, 2], 0.5) // => 1.5
+
 # ").unwrap();
 # assert_eq!(result, 1.5);
 ```
-
-## `intersect`
-Performs set intersection of two arrays
-```rust
-# use rhai::Array;
-# use rhai_sci::eval;
-# let result: Array = eval("
-intersect([7, 1, 7, 7, 4], [7, 0, 4, 4, 0]) // => [4, 7]
-# ").unwrap();
-# assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![4, 7]);
-```
-
-
-
-
 
 
 
