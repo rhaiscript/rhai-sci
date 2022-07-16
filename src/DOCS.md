@@ -593,34 +593,3 @@ sum([1.1, 2.5, 3.4]) // => 7.0
 # assert_eq!(result, 7.0);
 ```
 
-## `trapz`
-Returns the approximate integral of the curve defined by Y and X using the trapezoidal method. 
-```rust
-# use rhai::FLOAT;
-# use rhai_sci::eval;
-# let result: FLOAT = eval("
-trapz([1.0, 1.5, 2.0], [1, 2, 3]); // => 1.0
-# ").unwrap();
-# assert_eq!(result, 1.0);
-```
-```rust
-# use rhai::FLOAT;
-# use rhai_sci::eval;
-# let result: FLOAT = eval("
-trapz([1, 2, 3]); // => 2.0
-# ").unwrap();
-# assert_eq!(result, 2.0);
-```
-
-## `union`
-Returns the set union of two ararys.
-```rust
-# use rhai::Array;
-# use rhai_sci::eval;
-# let result: Array = eval("
-union([7, 1, 7, 7, 4], [7, 0, 4, 4, 0]) // => [0, 1, 4, 7]
-# ").unwrap();
-# assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![0, 1, 4, 7]);
-```
-
-## `unique`
