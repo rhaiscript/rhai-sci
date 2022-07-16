@@ -44,7 +44,6 @@ fn main() {
             let code = comments.split("```").collect::<Vec<&str>>();
             if code.len() == 3 {
                 let clean_code = code[1].replace("rhai", "").replace("\n", "");
-                println!("----\n{}\n----", clean_code);
                 assert!(engine.eval::<bool>(&clean_code).unwrap());
             }
         }
