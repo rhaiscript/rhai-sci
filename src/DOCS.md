@@ -2,17 +2,6 @@
 This package provides a large variety of functions to help with scientific computing. Each one
 of these is written in [`Rhai`](https://rhai.rs/) itself! The source code is [here](https://github.com/cmccomb/rhai-sci/tree/master/scripts).
 
-## `bounds`
-Returns the bounds (smallest and largest elements) of a 1-D array.
-```rust
-# use rhai::Array;
-# use rhai_sci::eval;
-# let result: Array = eval("
-bounds([32, 15, -7, 10, 1000, 41, 42]) // => [-7, 1000]
-# ").unwrap();
-# assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![-7, 1000]);
-```
-
 ## `cummax`
 Returns an array representing the cumulative sum of a 1-D array.
 ```rust
@@ -746,43 +735,4 @@ Returns the variance of a 1-D array.
 variance([1, 2, 3]) // => 1.0
 # ").unwrap();
 # assert_eq!(result, 1.0);
-```
-
-## `zeros`
-Create an matrix filled with ones. Can be called with either one int argument (creating a square
-matrix), on array argument (indicating the dimensions, such as that which is returned by `[size]`)
-or two arguments (specifying the number of rows and columns separately).
-```rust
-# use rhai::Array;
-# use rhai_sci::eval;
-# use rhai::serde::from_dynamic;
-# let result: Array = eval("
-zeros(3) // => [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
-# ").unwrap();
-# assert_eq!(result.into_iter().map(
-#         |x| from_dynamic(&x).unwrap()
-#     ).collect::<Vec<Vec<f64>>>(), vec![vec![0.0; 3]; 3]);
-```
-```rust
-# use rhai::Array;
-# use rhai_sci::eval;
-# use rhai::serde::from_dynamic;
-# let result: Array = eval("
-zeros(3, 3) // => [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
-# ").unwrap();
-# assert_eq!(result.into_iter().map(
-#         |x| from_dynamic(&x).unwrap()
-#    ).collect::<Vec<Vec<f64>>>(), vec![vec![0.0; 3]; 3]);
-```
-```rust
-# use rhai::Array;
-# use rhai_sci::eval;
-# use rhai::serde::from_dynamic;
-# let result: Array = eval("
-let x = ones(3, 3);
-zeros(size(x)) // => [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
-# ").unwrap();
-# assert_eq!(result.into_iter().map(
-#         |x| from_dynamic(&x).unwrap()
-#    ).collect::<Vec<Vec<f64>>>(), vec![vec![0.0; 3]; 3]);
 ```
