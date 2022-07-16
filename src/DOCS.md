@@ -67,16 +67,6 @@ cumtrapz([1, 2, 3]); // => [0.0, 1.0, 2.0]
 # assert_eq!(result.into_iter().map(|x|x.cast::<f64>()).collect::<Vec<f64>>(), vec![0.0, 1.0, 2.0]);
 ```
 
-## `diff`
-Returns the difference between successive elements of a 1-D array.
-```rust
-# use rhai::Array;
-# use rhai_sci::eval;
-# let result: Array = eval("
-diff([2, 5, 1, 7, 8]) // => [3, -4, 6, 1]
-# ").unwrap();
-# assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![3, -4, 6, 1]);
-```
 
 ## `eye`
 Create an identity matrix with ones along the diagonal and zeros elsewhere. Can be called with

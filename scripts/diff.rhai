@@ -1,3 +1,4 @@
+// Returns the difference between successive elements of a 1-D array.
 fn diff(arr) {
     let new_arr = [];
     let sum = 0;
