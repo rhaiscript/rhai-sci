@@ -192,27 +192,8 @@ max([41, 42, -1, 7, 2]) // => 42
 # assert_eq!(result, 42);
 ```
 
-## `maxk`
-Returns the k highest values from a 1-D array.
-```rust
-# use rhai::Array;
-# use rhai_sci::eval;
-# let result: Array = eval("
-maxk([32, 15, -7, 10, 1000, 41, 42], 3) // => [41, 42, 1000]
-# ").unwrap();
-# assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![41, 42, 1000]);
-```
 
-## `mean`
 
-```rust
-# use rhai::FLOAT;
-# use rhai_sci::eval;
-# let result: FLOAT = eval("
-
-# ").unwrap();
-# assert_eq!(result, 2.0);
-```
 
 
 
