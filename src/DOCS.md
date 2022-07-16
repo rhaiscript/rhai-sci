@@ -542,23 +542,3 @@ rot90(diag([1, 2]), 2) // => [[2.0, 0.0], [0.0, 1.0]]
 #     ).collect::<Vec<Vec<f64>>>();
 # assert_eq!(vecresult, vec![vec![2.0, 0.0], vec![0.0, 1.0]]);
 ```
-
-
-## `size`
-Returns the size along each dimension of an array.
-```rust
-# use rhai::Array;
-# use rhai_sci::eval;
-# let result: Array = eval("
-size(ones(3, 5)) // => [3, 5]
-# ").unwrap();
-# assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![3, 5]);
-```
-```rust
-# use rhai::Array;
-# use rhai_sci::eval;
-# let result: Array = eval("
-size([[[1, 2]]]) // => [1, 1, 2]
-# ").unwrap();
-# assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![1, 1, 2]);
-```

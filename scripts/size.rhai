@@ -1,3 +1,5 @@
+// Returns the size along each dimension of an array.
+
 fn size(arr) {
     let s = size_me_up([], arr);
     if s[-1] == 0 {
