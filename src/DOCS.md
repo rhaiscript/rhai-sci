@@ -173,24 +173,6 @@ max([41, 42, -1, 7, 2]) // => 42
 ```
 
 ## `max`
-Returns the highest value between a pair of numbers (if called with two arguments) or in a 1-D
-array (if called with a single `Array`-type argument).
-```rust
-# use rhai::INT;
-# use rhai_sci::eval;
-# let result: INT = eval("
-max(41, 42) // => 42
-# ").unwrap();
-# assert_eq!(result, 42);
-```
-```rust
-# use rhai::INT;
-# use rhai_sci::eval;
-# let result: INT = eval("
-max([41, 42, -1, 7, 2]) // => 42
-# ").unwrap();
-# assert_eq!(result, 42);
-```
 
 
 
