@@ -1,18 +1,24 @@
 fn assert(expression, error) {
     if !expression {
         throw error;
+    } else {
+        return true;
     }
 }
 
 fn assert_eq(a, b, error) {
     if a != b {
         throw error;
+    } else {
+        return true;
     }
 }
 
 fn assert_neq(a, b, error) {
     if a == b {
         throw error;
+    }else {
+        return true;
     }
 }
 

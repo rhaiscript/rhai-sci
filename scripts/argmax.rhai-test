@@ -1,0 +1,2 @@
+// Test that argmax returns the right argument
+assert_eq(argmax([43, 42, 500]), 2);

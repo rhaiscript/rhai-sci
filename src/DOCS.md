@@ -61,17 +61,6 @@ pi // => 3.141592653589793
 This package provides a large variety of functions to help with scientific computing. Each one
 of these is written in [`Rhai`](https://rhai.rs/) itself! The source code is [here](https://github.com/cmccomb/rhai-sci/tree/master/scripts).
 
-## `argmax`
-Returns the argument of the largest element in a 1-D array.
-```rust
-# use rhai::INT;
-# use rhai_sci::eval;
-# let result: INT = eval("
-argmax([43, 42, 500]) // => 2
-# ").unwrap();
-# assert_eq!(result, 2);
-```
-
 ## `argmin`
 Returns the argument of the smallest element in a 1-D array.
 ```rust
