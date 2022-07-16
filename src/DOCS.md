@@ -204,12 +204,12 @@ maxk([32, 15, -7, 10, 1000, 41, 42], 3) // => [41, 42, 1000]
 ```
 
 ## `mean`
-Returns the average of a 1-D array.
+
 ```rust
 # use rhai::FLOAT;
 # use rhai_sci::eval;
 # let result: FLOAT = eval("
-mean([1, 2, 3]) // => 2.0
+
 # ").unwrap();
 # assert_eq!(result, 2.0);
 ```
