@@ -67,32 +67,6 @@ cumtrapz([1, 2, 3]); // => [0.0, 1.0, 2.0]
 # assert_eq!(result.into_iter().map(|x|x.cast::<f64>()).collect::<Vec<f64>>(), vec![0.0, 1.0, 2.0]);
 ```
 
-
-## `diag`
-This function can be used in two distinct ways.
-1. If the argument is an 2-D array, `diag` returns an array containing the diagonal of the array.
-2. If the argument is a 1-D array, `diag` returns a matrix containing the argument along the
-   diagonal and zeros elsewhere.
-```rust
-# use rhai::Array;
-# use rhai_sci::eval;
-# let result: Array = eval("
-diag([[1, 2, 3], [4, 5, 6], [7, 8, 9]]) // => [1, 5, 9]
-# ").unwrap();
-# assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![1, 5, 9]);
-```
-```rust
-# use rhai::{Array, serde::from_dynamic};
-# use rhai_sci::eval;
-# let result: Array = eval("
-diag([1, 2, 3]) // => [[1.0, 0.0, 0.0], [0.0, 2.0, 0.0], [0.0, 0.0, 3.0]]
-# ").unwrap();
-# let vecresult = result.into_iter().map(
-#         |x| from_dynamic(&x).unwrap()
-#     ).collect::<Vec<Vec<f64>>>();
-# assert_eq!(vecresult, vec![vec![1.0, 0.0, 0.0], vec![0.0, 2.0, 0.0], vec![0.0, 0.0, 3.0]]);
-```
-
 ## `diff`
 Returns the difference between successive elements of a 1-D array.
 ```rust
