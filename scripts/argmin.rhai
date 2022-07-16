@@ -1,4 +1,11 @@
-/// Returns the argument of the smallest element in a 1-D array.
+/**
+Returns the index of the smallest element in a 1-D array.
+```
+let arr = [43, 42, -500];
+let idx = argmin(arr);
+assert_eq(idx, 2);
+```
+**/
 fn argmin(arr) {
     let original = arr;
     arr.sort();
