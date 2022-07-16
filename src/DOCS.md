@@ -131,26 +131,6 @@ iqr([1, 1, 1, 1, 1, 1, 1, 5, 6, 9, 9, 9, 9, 9, 9, 9, 9]) // => 8.0"
 # assert_eq!(result, 8.0);
 ```
 
-## `linspace`
-Returns an array containing a number of elements linearly spaced between two bounds.
-```rust
-# use rhai::Array;
-# use rhai_sci::eval;
-# let result: Array = eval("
-linspace(1, 2, 5) // => [1.0, 1.25, 1.5, 1.75, 2.0]
-# ").unwrap();
-# assert_eq!(result.into_iter().map(|x|x.cast::<f64>()).collect::<Vec<f64>>(), vec![1.0, 1.25, 1.5, 1.75, 2.0]);
-```
-
-## `logspace`
-```rust
-# use rhai::Array;
-# use rhai_sci::eval;
-# let result: Array = eval("
-# ").unwrap();
-# assert_eq!(result.into_iter().map(|x|x.cast::<f64>()).collect::<Vec<f64>>(), vec![10.0, 100.0, 1000.0]);
-```
-
 
 
 
