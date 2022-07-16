@@ -450,14 +450,3 @@ prctile([1, 2, 0, 3, 4], 50) // => 2.0
 # ").unwrap();
 # assert_eq!(result, 2.0);
 ```
-
-## `prod`
-The product (multiplication) of all elements in a 1-D array.
-```rust
-# use rhai::INT;
-# use rhai_sci::eval;
-# let result: INT = eval("
-prod([1, 2, 3, 4, 10]) // => 240
-# ").unwrap();
-# assert_eq!(result, 240);
-```
