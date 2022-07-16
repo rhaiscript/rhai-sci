@@ -192,26 +192,6 @@ max([41, 42, -1, 7, 2]) // => 42
 # assert_eq!(result, 42);
 ```
 
-## `min`
-Returns the lowest value between a pair of numbers (if called with two arguments) or in a 1-D
-array (if called with a single `Array`-type argument).
-```rust
-# use rhai::INT;
-# use rhai_sci::eval;
-# let result: INT = eval("
-min(43, 42) // => 42
-# ").unwrap();
-# assert_eq!(result, 42);
-```
-```rust
-# use rhai::INT;
-# use rhai_sci::eval;
-# let result: INT = eval("
-min([43, 42, 500]) // => 42
-# ").unwrap();
-# assert_eq!(result, 42);
-```
-
 ## `maxk`
 Returns the k highest values from a 1-D array.
 ```rust
@@ -257,16 +237,12 @@ meshgrid([1, 2], [3, 4]) // => #{\"x\": [[1, 2], [1, 2]], \"y\": [[3, 3], [4, 4]
 # ").unwrap();
 ```
 
-## `mink`
-Returns the k smallest values in a 1-D array.
-```rust
-# use rhai::Array;
-# use rhai_sci::eval;
-# let result: Array = eval("
-mink([32, 15, -7, 10, 1000, 41, 42], 3) // => [-7, 10, 15]
-# ").unwrap();
-# assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![-7, 10, 15]);
-```
+
+
+
+
+
+
 
 ## `movmad`
 Returns an array of the moving maximum absolute deviation (with a given width) across the input array.
