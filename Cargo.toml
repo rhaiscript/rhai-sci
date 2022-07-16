@@ -11,7 +11,9 @@ license = "MIT OR Apache-2.0"
 keywords = ["scripting", "rhai", "scientific", "scripting-language", "matlab"]
 categories = ["algorithms", "science"]
 documentation = "https://docs.rs/rhai-sci"
+build = "build.rs"
 
 [dependencies]
 rhai = { version = "1.5", features = ["unchecked", "serde"]}
 rhai-rand = "0.1.3"
+

@@ -18,71 +18,10 @@ def_package! {
 
         // Load scripts
         let engine = Engine::new();
-        let ast = engine.compile(aggregate_functions()).unwrap();
+        let ast = engine.compile(include_str!("../scripts/rhai-lab-compiled.txt")).unwrap();
         let my_module = Module::eval_ast_as_new(rhai::Scope::new(), &ast, &engine).unwrap();
         lib.fill_with(&my_module);
     }
-}
-
-/// This function aggregates all of the rhai scripts that will make up the library.
-fn aggregate_functions() -> String {
-    String::new()
-        + include_str!("../scripts/max.rhai")
-        + include_str!("../scripts/maxk.rhai")
-        + include_str!("../scripts/argmax.rhai")
-        + include_str!("../scripts/min.rhai")
-        + include_str!("../scripts/argmin.rhai")
-        + include_str!("../scripts/eye.rhai")
-        + include_str!("../scripts/mink.rhai")
-        + include_str!("../scripts/diag.rhai")
-        + include_str!("../scripts/bounds.rhai")
-        + include_str!("../scripts/size.rhai")
-        + include_str!("../scripts/mean.rhai")
-        + include_str!("../scripts/numel.rhai")
-        + include_str!("../scripts/ndims.rhai")
-        + include_str!("../scripts/variance.rhai")
-        + include_str!("../scripts/std.rhai")
-        + include_str!("../scripts/mode.rhai")
-        + include_str!("../scripts/median.rhai")
-        + include_str!("../scripts/iqr.rhai")
-        + include_str!("../scripts/rms.rhai")
-        + include_str!("../scripts/prctile.rhai")
-        + include_str!("../scripts/sum.rhai")
-        + include_str!("../scripts/cumsum.rhai")
-        + include_str!("../scripts/interp1.rhai")
-        + include_str!("../scripts/linspace.rhai")
-        + include_str!("../scripts/logspace.rhai")
-        + include_str!("../scripts/zeros.rhai")
-        + include_str!("../scripts/ones.rhai")
-        + include_str!("../scripts/rand.rhai")
-        + include_str!("../scripts/constants.rhai")
-        + include_str!("../scripts/transpose.rhai")
-        + include_str!("../scripts/meshgrid.rhai")
-        + include_str!("../scripts/diff.rhai")
-        + include_str!("../scripts/prod.rhai")
-        + include_str!("../scripts/cumprod.rhai")
-        + include_str!("../scripts/cummax.rhai")
-        + include_str!("../scripts/cummin.rhai")
-        + include_str!("../scripts/cumtrapz.rhai")
-        + include_str!("../scripts/trapz.rhai")
-        + include_str!("../scripts/fliplr.rhai")
-        + include_str!("../scripts/flipud.rhai")
-        + include_str!("../scripts/rot90.rhai")
-        + include_str!("../scripts/movmean.rhai")
-        + include_str!("../scripts/movmedian.rhai")
-        + include_str!("../scripts/movstd.rhai")
-        + include_str!("../scripts/movvar.rhai")
-        + include_str!("../scripts/mad.rhai")
-        + include_str!("../scripts/movmad.rhai")
-        + include_str!("../scripts/mov.rhai")
-        + include_str!("../scripts/movsum.rhai")
-        + include_str!("../scripts/movmax.rhai")
-        + include_str!("../scripts/movmin.rhai")
-        + include_str!("../scripts/movprod.rhai")
-        + include_str!("../scripts/unique.rhai")
-        + include_str!("../scripts/intersect.rhai")
-        + include_str!("../scripts/union.rhai")
-        + include_str!("../scripts/assertions.rhai")
 }
 
 /// This provides the ability to easily evaluate a line (or lines) of code without explicitly
