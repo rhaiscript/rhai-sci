@@ -502,14 +502,3 @@ rand(size(x)) // => [[0.7333405150571339, 0.3597611759299407, 0.8809543481098305
 # let sum: f64 = vecresult.into_iter().map(|x| x.into_iter().sum()).collect::<Vec<f64>>().into_iter().sum();
 # assert!(sum < 9.0 && sum > 0.0);
 ```
-
-## `rms`
-Returns the root mean square of a 1-D array.
-```rust
-# use rhai::FLOAT;
-# use rhai_sci::eval;
-# let result: FLOAT = eval("
-rms([1, 2, 3, 4, 5]) // => 3.31662479036
-# ").unwrap();
-# assert_eq!(result, 3.3166247903554);
-```
