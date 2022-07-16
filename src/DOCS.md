@@ -377,25 +377,3 @@ movvar([1, 2, 3, 4, 5, 6], 3) // => [0.5, 1.0, 1.0, 1.0, 1.0, 0.5]
 # ").unwrap();
 # assert_eq!(result.into_iter().map(|x|x.cast::<f64>()).collect::<Vec<f64>>(), vec![0.5, 1.0, 1.0, 1.0, 1.0, 0.5]);
 ```
-
-## `ndims`
-Returns the number of dimensions in an array.
-```rust
-# use rhai::INT;
-# use rhai_sci::eval;
-# let result: INT = eval("
-ndims(ones(4, 6)) // => 2
-# ").unwrap();
-# assert_eq!(result, 2);
-```
-
-## `numel`
-Returns the number of elements in an array.
-```rust
-# use rhai::INT;
-# use rhai_sci::eval;
-# let result: INT = eval("
-numel(ones(4, 6)) // => 24
-# ").unwrap();
-# assert_eq!(result, 24);
-```
