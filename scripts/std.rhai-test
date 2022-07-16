@@ -1,0 +1,2 @@
+// Test std
+assert_eq(std([1, 2, 3]), 1.0);
