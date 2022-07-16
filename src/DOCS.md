@@ -68,37 +68,6 @@ cumtrapz([1, 2, 3]); // => [0.0, 1.0, 2.0]
 ```
 
 
-## `eye`
-Create an identity matrix with ones along the diagonal and zeros elsewhere. Can be called with
-either one argument (creating a square matrix) or two arguments (specifying the number of rows
-and columns separately).
-```rust
-# use rhai::Array;
-# use rhai_sci::eval;
-# use rhai::serde::from_dynamic;
-# let result: Array = eval("
-eye(3) // => [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
-# ").unwrap();
-# let vecresult = result.into_iter().map(
-#         |x| from_dynamic(&x).unwrap()
-#     ).collect::<Vec<Vec<f64>>>();
-# let sum: f64 = vecresult.into_iter().map(|x| x.into_iter().sum()).collect::<Vec<f64>>().into_iter().sum();
-# assert_eq!(sum, 3.0);
-```
-```rust
-# use rhai::Array;
-# use rhai_sci::eval;
-# use rhai::serde::from_dynamic;
-# let result: Array = eval("
-eye(3, 3) // => [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
-# ").unwrap();
-# let vecresult = result.into_iter().map(
-#         |x| from_dynamic(&x).unwrap()
-#     ).collect::<Vec<Vec<f64>>>();
-# let sum: f64 = vecresult.into_iter().map(|x| x.into_iter().sum()).collect::<Vec<f64>>().into_iter().sum();
-# assert_eq!(sum, 3.0);
-```
-
 ## `fiplr`
 Reverse the rows in a matrix.
 ```rust
