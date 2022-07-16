@@ -68,48 +68,6 @@ cumtrapz([1, 2, 3]); // => [0.0, 1.0, 2.0]
 ```
 
 
-## `fiplr`
-Reverse the rows in a matrix.
-```rust
-# use rhai::Array;
-# use rhai_sci::eval;
-# use rhai::serde::from_dynamic;
-# let result: Array = eval("
-fliplr(diag([1, 2])) // => [[0.0, 1.0], [2.0, 0.0]]
-# ").unwrap();
-# let vecresult = result.into_iter().map(
-#         |x| from_dynamic(&x).unwrap()
-#     ).collect::<Vec<Vec<f64>>>();
-# assert_eq!(vecresult, vec![vec![0.0, 1.0], vec![2.0, 0.0]]);
-```
-
-## `flipud`
-Reverse the columns in a matrix.
-```rust
-# use rhai::Array;
-# use rhai_sci::eval;
-# use rhai::serde::from_dynamic;
-# let result: Array = eval("
-flipud(diag([1, 2])) // => [[0.0, 2.0], [1.0, 0.0]]
-# ").unwrap();
-# let vecresult = result.into_iter().map(
-#         |x| from_dynamic(&x).unwrap()
-#     ).collect::<Vec<Vec<f64>>>();
-# assert_eq!(vecresult, vec![vec![0.0, 2.0], vec![1.0, 0.0]]);
-```
-
-## `interp1`
-```rust
-# use rhai::FLOAT;
-# use rhai_sci::eval;
-# let result: FLOAT = eval("
-
-# ").unwrap();
-# assert_eq!(result, 1.5);
-```
-
-
-
 
 
 

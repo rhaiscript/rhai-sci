@@ -1,3 +1,4 @@
+// Reverse the rows in a matrix.
 fn fliplr(arr) {
     for (row, idx) in arr {
         row.reverse();
