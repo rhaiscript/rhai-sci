@@ -268,17 +268,6 @@ mink([32, 15, -7, 10, 1000, 41, 42], 3) // => [-7, 10, 15]
 # assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![-7, 10, 15]);
 ```
 
-## `mode`
-Returns the mode of a 1-D array.
-```rust
-# use rhai::INT;
-# use rhai_sci::eval;
-# let result: INT = eval("
-mode([1, 2, 2, 2, 2, 3]) // => 2
-# ").unwrap();
-# assert_eq!(result, 2);
-```
-
 ## `movmad`
 Returns an array of the moving maximum absolute deviation (with a given width) across the input array.
 ```rust
