@@ -226,18 +226,6 @@ median([1, 1, 1, 1, 2, 5, 6, 7, 8]) // => 2.0
 ```
 
 
-## `meshgrid`
-Returns an object map containing 2-D grid coordinates based on the uni-axial coordinates
-contained in arguments x and y.
-```rust
-# use rhai::{Map, serde::from_dynamic};
-# use rhai_sci::eval;
-# let result: Map = eval("
-meshgrid([1, 2], [3, 4]) // => #{\"x\": [[1, 2], [1, 2]], \"y\": [[3, 3], [4, 4]]}
-# ").unwrap();
-```
-
-
 
 
 
