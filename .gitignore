@@ -5,3 +5,4 @@ Cargo.lock
 .idea/
 .rhai-repl-history
 scripts/rhai-lab-compiled.txt
+tests/rhai-lab-test.txt
