@@ -2,7 +2,7 @@
 ## argmax(arr)
 
 Returns the index of the largest element in a 1-D array.
-```
+```rhai
 let arr = [43, 42, 500];
 let idx = argmax(arr);
 assert_eq(idx, 2);
@@ -11,7 +11,7 @@ assert_eq(idx, 2);
 ## argmin(arr)
 
 Returns the index of the smallest element in a 1-D array.
-```
+```rhai
 let arr = [43, 42, -500];
 let idx = argmin(arr);
 assert_eq(idx, 2);
@@ -19,20 +19,63 @@ assert_eq(idx, 2);
 
 ## assert(expression)
 
+Assert that a statement is true and throw an error if it is not.
+```rhai
+assert(2==2);
+```
+
 ## assert(expression, error)
 
+Assert that a statement is true, and throw a custom error if it is not.
+```rhai
+assert(2 == 2, "Oh no!");
+```
+
 ## assert_eq(a, b)
+ Assert that two arguments are equal and throw an error if they are not.
+```rhai
+assert_eq(2, 2);
+```
 
 ## assert_eq(a, b, error)
 
+Assert that two arguments are equal, and throw a custom error if it is not.
+```rhai
+assert_eq(2, 2, "Oh no!");
+```
+
 ## assert_neq(a, b)
+
+Assert that two arguments are non-equal and throw an error if they are not.
+```rhai
+assert_neq(2, 1);
+```
 
 ## assert_neq(a, b, error)
 
+Assert that two arguments are non-equal, and throw a custom error if it is not.
+```rhai
+assert_eq(2, 1, "Oh no!");
+```
+
 ## bounds(arr)
- Returns the bounds (smallest and largest elements) of a 1-D array.
+
+Returns the bounds (smallest and largest elements) of a 1-D array.
+```rhai
+let arr = [-100, -1, 2, 3, 5, 1000];
+let b = bounds(arr);
+assert_eq(b, [-100, 1000]);
+```
+
 ## cummax(arr)
- Returns an array representing the cumulative maximum of a 1-D array.
+
+Returns an array representing the cumulative maximum of a 1-D array.
+```rhai
+let arr = [1, 4, 5, 3, 9, 8];
+let cm = cummax(arr);
+assert_eq(cm, [1, 4, 5, 5, 9, 9]);
+```
+
 ## cummin(arr)
  Returns an array representing the cumulative minimum of a 1-D array.
 ## cumprod(arr)
