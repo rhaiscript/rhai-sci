@@ -1,8 +1,8 @@
-/* This function can be used in two distinct ways.
-     1. If the argument is an 2-D array, `diag` returns an array containing the diagonal of the array.
-     2. If the argument is a 1-D array, `diag` returns a matrix containing the argument along the
-        diagonal and zeros elsewhere.
-*/
+/** This function can be used in two distinct ways.
+    1. If the argument is an 2-D array, `diag` returns an array containing the diagonal of the array.
+    2. If the argument is a 1-D array, `diag` returns a matrix containing the argument along the
+     diagonal and zeros elsewhere.
+**/
 
 fn diag(arr) {
     if ndims(arr) == 2 {

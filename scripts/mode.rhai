@@ -1,4 +1,4 @@
-// Returns the mode of a 1-D array.
+/// Returns the mode of a 1-D array.
 fn mode(arr) {
     arr.sort();
     let unique = arr;

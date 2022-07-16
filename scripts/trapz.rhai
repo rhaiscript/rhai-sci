@@ -1,4 +1,4 @@
-// Returns the approximate integral of the curve defined by Y and X using the trapezoidal method.
+/// Returns the approximate integral of the curve defined by Y and X using the trapezoidal method.
 fn trapz(x, y) {
     let trapsum = 0.0;
     for i in 1..len(x) {

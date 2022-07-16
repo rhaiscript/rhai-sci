@@ -1,4 +1,4 @@
-// Returns the cumulative approximate integral of the curve defined by Y and X using the trapezoidal method.
+/// Returns the cumulative approximate integral of the curve defined by Y and X using the trapezoidal method.
 
 fn cumtrapz(x, y) {
     let trapsum = 0.0;

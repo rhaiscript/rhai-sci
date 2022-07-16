@@ -1,3 +1,4 @@
+/// Applied an operation (given as a function) to the array as a moving window
 fn mov(arr, k, function_name) {
     let f = Fn(function_name);
     let new_arr = [];

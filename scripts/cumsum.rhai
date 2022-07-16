@@ -1,4 +1,4 @@
-// Returns an array representing the cumulative sum of a 1-D array.
+/// Returns an array representing the cumulative sum of a 1-D array.
 fn cumsum(arr) {
     let new_arr = [];
     let sum = 0;

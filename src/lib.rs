@@ -3,8 +3,9 @@
 #![warn(rustdoc::missing_doc_code_examples)]
 #![warn(clippy::missing_docs_in_private_items)]
 #![doc = include_str!("../README.md")]
+#![doc = include_str!("../docs/rhai-lab-docs.md")]
 
-use rhai::{def_package, packages::Package, plugin::*, EvalAltResult};
+use rhai::{Engine, def_package, packages::Package, plugin::*, EvalAltResult};
 use rhai_rand::RandomPackage;
 
 def_package! {

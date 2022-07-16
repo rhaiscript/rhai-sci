@@ -1,4 +1,4 @@
-// Given reference data, perform linear interpolation.
+/// Given reference data, perform linear interpolation.
 fn interp1(x, y, xq) {
     x.sort();
     let b = 0;

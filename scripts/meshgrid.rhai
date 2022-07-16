@@ -1,6 +1,6 @@
-/* Returns an object map containing 2-D grid coordinates based on the uni-axial coordinates
+/** Returns an object map containing 2-D grid coordinates based on the uni-axial coordinates
    contained in arguments x and y.
-*/
+**/
 
 fn meshgrid(x, y) {
     let nx = len(x);

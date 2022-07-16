@@ -1,6 +1,6 @@
-/* Rotates a matrix 90 degrees counterclockwise, either in a single increments
+/** Rotates a matrix 90 degrees counterclockwise, either in a single increments
    (if a single argument is provided), or in `k` increments (if a second argument is provided).
-*/
+**/
 
 fn rot90(arr) {
     let s = size(arr);

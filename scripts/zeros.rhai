@@ -1,7 +1,7 @@
-/* Create an matrix filled with ones. Can be called with either one int argument (creating a square
+/** Create an matrix filled with ones. Can be called with either one int argument (creating a square
     matrix), on array argument (indicating the dimensions, such as that which is returned by `[size]`)
     or two arguments (specifying the number of rows and columns separately).
-*/
+**/
 
 fn zeros(nx, ny) {
     let row = [];

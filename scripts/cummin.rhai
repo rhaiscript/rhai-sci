@@ -1,4 +1,4 @@
-// Returns an array representing the cumulative minimum of a 1-D array.
+/// Returns an array representing the cumulative minimum of a 1-D array.
 fn cummin(arr) {
     let new_arr = [];
     let current_min = arr[0];
