@@ -120,16 +120,6 @@ intersect([7, 1, 7, 7, 4], [7, 0, 4, 4, 0]) // => [4, 7]
 # assert_eq!(result.into_iter().map(|x|x.cast::<i64>()).collect::<Vec<i64>>(), vec![4, 7]);
 ```
 
-## `iqr`
-Returns the inter-quartile range for a 1-D array.
-```rust
-# use rhai::FLOAT;
-# use rhai_sci::eval;
-# let result: FLOAT = eval("
-iqr([1, 1, 1, 1, 1, 1, 1, 5, 6, 9, 9, 9, 9, 9, 9, 9, 9]) // => 8.0"
-# ).unwrap();
-# assert_eq!(result, 8.0);
-```
 
 
 
