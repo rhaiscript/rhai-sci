@@ -1,0 +1,3 @@
+// Test transpose
+assert_eq(transpose([[1, 2], [3, 4]]), [[1, 3], [2, 4]]);
+assert_eq([[1, 2], [3, 4]].t(), [[1, 3], [2, 4]]);

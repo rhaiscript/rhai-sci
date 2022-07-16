@@ -660,31 +660,6 @@ sum([1.1, 2.5, 3.4]) // => 7.0
 # assert_eq!(result, 7.0);
 ```
 
-## `transpose`, `.t()`
-Transposes a matrix. Can be called as either a function, or as a method
-```rust
-# use rhai::{Array, serde::from_dynamic};
-# use rhai_sci::eval;
-# let result: Array = eval("
-transpose([[1, 2], [3, 4]]) // => [[1, 3], [2, 4]]
-# ").unwrap();
-# let vecresult = result.into_iter().map(
-#         |x| from_dynamic(&x).unwrap()
-#     ).collect::<Vec<Vec<i64>>>();
-# assert_eq!(vecresult, vec![vec![1, 3], vec![2, 4]]);
-```
-```rust
-# use rhai::{Array, serde::from_dynamic};
-# use rhai_sci::eval;
-# let result: Array = eval("
-[[1, 2], [3, 4]].t() // => [[1, 3], [2, 4]]
-# ").unwrap();
-# let vecresult = result.into_iter().map(
-#         |x| from_dynamic(&x).unwrap()
-#     ).collect::<Vec<Vec<i64>>>();
-# assert_eq!(vecresult, vec![vec![1, 3], vec![2, 4]]);
-```
-
 ## `trapz`
 Returns the approximate integral of the curve defined by Y and X using the trapezoidal method. 
 ```rust

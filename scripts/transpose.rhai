@@ -1,3 +1,5 @@
+// Transposes a matrix. Can be called as either a function, or as a method.
+
 fn transpose(arr) {
     let s = size(arr);
     let new_arr = zeros(s[1], s[0]);
