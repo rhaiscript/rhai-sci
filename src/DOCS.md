@@ -438,15 +438,3 @@ ones(size(x)) // => [[1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0]]
 #         |x| from_dynamic(&x).unwrap()
 #     ).collect::<Vec<Vec<f64>>>(), vec![vec![1.0; 3]; 3]);
 ```
-
-
-## `prctile`
-Returns a given percentile value for a 1-D array of data.
-```rust
-# use rhai::FLOAT;
-# use rhai_sci::eval;
-# let result: FLOAT = eval("
-prctile([1, 2, 0, 3, 4], 50) // => 2.0
-# ").unwrap();
-# assert_eq!(result, 2.0);
-```
