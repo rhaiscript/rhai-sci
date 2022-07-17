@@ -4,5 +4,3 @@ Cargo.lock
 .cargo/
 .idea/
 .rhai-repl-history
-scripts/rhai-sci-compiled.txt
-docs/rhai-sci-docs.md
