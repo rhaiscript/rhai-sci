@@ -44,27 +44,34 @@ fn main() {
     for idx in 0..good_iter.len() {
         let function = good_iter[idx].clone();
         if function.access == FnAccess::Public && !function.name.starts_with("anon") {
+            // Pull out basic info
             let name = function.name;
             let params = function.params.join(", ");
             let comments = function.comments.join("\n").replace("///", "").replace("/**", "").replace("**/", "");
+
+            // Check if there are multiple arities, and if so add a header and indent
             if idx < good_iter.len()-1 {
                 if name == good_iter[idx + 1].name && !indented {
                     write!(doc_file, "## {name}\n").expect("Cannot write to {doc_file}");
                     indented = true;
                 }
             }
+
+            // Print definition with right level of indentation
             if indented {
                 write!(doc_file, "### {name}({params})\n{comments}\n").expect("Cannot write to {doc_file}");
             } else {
                 write!(doc_file, "## {name}({params})\n{comments}\n").expect("Cannot write to {doc_file}");
             }
 
+            // End indentation when its time
             if idx != 0 && idx < good_iter.len()-1 {
                 if name == good_iter[idx - 1].name && name != good_iter[idx + 1].name {
                     indented = false;
                 }
             }
 
+            // Run doc tests
             let code = comments.split("```").collect::<Vec<&str>>();
             for i in (1..code.len()).step_by(2) {
                 let clean_code = code[i].replace("javascript", "").replace("\n", "");
