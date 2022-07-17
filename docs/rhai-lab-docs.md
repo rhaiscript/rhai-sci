@@ -135,14 +135,18 @@ This function can be used in two distinct ways.
  diagonal and zeros elsewhere.
 
  ```javascript
- let matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
+ let matrix = [[1, 2, 3],
+               [4, 5, 6],
+               [7, 8, 9]];
  let d = diag(matrix);
  assert_eq(d, [1, 5, 9]);
  ```
  ```javascript
  let diagonal = [1, 2, 3];
  let matrix = diag(diagonal);
- assert_eq(matrix, [[1.0, 0.0, 0.0], [0.0, 2.0, 0.0], [0.0, 0.0, 3.0]]);
+ assert_eq(matrix, [[1.0, 0.0, 0.0],
+                    [0.0, 2.0, 0.0],
+                    [0.0, 0.0, 3.0]]);
  ```
 
 ## diff(arr)
@@ -156,16 +160,54 @@ assert_eq(d, [3, -4, 6, 1]);
 
 ## eye
 ### eye(n)
- Create an identity matrix with ones along the diagonal and zeros elsewhere. Can be called with
-   either one argument (creating a square matrix) or two arguments (specifying the number of rows
-   and columns separately).
+
+Create an identity matrix with ones along the diagonal and zeros elsewhere. Can be called with
+either one integer argument (creating a square matrix) or with a 2-element array (specifying the number of rows
+and columns separately).
+```javascript
+let matrix = eye(3);
+assert_eq(matrix, [[1.0, 0.0, 0.0],
+                   [0.0, 1.0, 0.0],
+                   [0.0, 0.0, 1.0]]);
+```
+```javascript
+let matrix = eye([3, 3]);
+assert_eq(matrix, [[1.0, 0.0, 0.0],
+                   [0.0, 1.0, 0.0],
+                   [0.0, 0.0, 1.0]]);
+```
 
 ### eye(nx, ny)
 
+Create an identity matrix with ones along the diagonal and zeros elsewhere. Can be called with
+two integer arguments (specifying the number of rows and columns separately).
+```javascript
+let matrix = eye(3, 3);
+assert_eq(matrix, [[1.0, 0.0, 0.0],
+                   [0.0, 1.0, 0.0],
+                   [0.0, 0.0, 1.0]]);
+```
+
 ## fliplr(arr)
- Reverse the rows in a matrix.
+
+Reverse the rows in a matrix.
+```javascript
+let matrix = fliplr([[1.0, 0.0],
+                     [0.0, 2.0]]);
+assert_eq(matrix, [[0.0, 1.0],
+                   [2.0, 0.0]]);
+```
+
 ## flipud(arr)
- Reverse the columns in a matrix.
+
+Reverse the columns in a matrix.
+```javascript
+let matrix = flipud([[1.0, 0.0],
+                     [0.0, 2.0]]);
+assert_eq(matrix, [[0.0, 2.0],
+                   [1.0, 0.0]]);
+```
+
 ## interp1(x, y, xq)
  Given reference data, perform linear interpolation.
 ## intersect(arr1, arr2)
