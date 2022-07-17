@@ -3,7 +3,7 @@
 ## argmax(arr)
 
 Returns the index of the largest element in a 1-D array.
-```rhai
+```javascript
 let arr = [43, 42, 500];
 let idx = argmax(arr);
 assert_eq(idx, 2);
@@ -12,57 +12,60 @@ assert_eq(idx, 2);
 ## argmin(arr)
 
 Returns the index of the smallest element in a 1-D array.
-```rhai
+```javascript
 let arr = [43, 42, -500];
 let idx = argmin(arr);
 assert_eq(idx, 2);
 ```
 
-## assert(expression)
+## assert
+### assert(expression)
 
 Assert that a statement is true and throw an error if it is not.
-```rhai
+```javascript
 assert(2==2);
 ```
 
-## assert(expression, error)
+### assert(expression, error)
 
 Assert that a statement is true, and throw a custom error if it is not.
-```rhai
+```javascript
 assert(2 == 2, "Oh no!");
 ```
 
-## assert_eq(a, b)
+## assert_eq
+### assert_eq(a, b)
  Assert that two arguments are equal and throw an error if they are not.
-```rhai
+```javascript
 assert_eq(2, 2);
 ```
 
-## assert_eq(a, b, error)
+### assert_eq(a, b, error)
 
 Assert that two arguments are equal, and throw a custom error if it is not.
-```rhai
+```javascript
 assert_eq(2, 2, "Oh no!");
 ```
 
-## assert_neq(a, b)
+## assert_neq
+### assert_neq(a, b)
 
 Assert that two arguments are non-equal and throw an error if they are not.
-```rhai
+```javascript
 assert_neq(2, 1);
 ```
 
-## assert_neq(a, b, error)
+### assert_neq(a, b, error)
 
 Assert that two arguments are non-equal, and throw a custom error if it is not.
-```rhai
+```javascript
 assert_neq(2, 1, "Oh no!");
 ```
 
 ## bounds(arr)
 
 Returns the bounds (smallest and largest elements) of a 1-D array.
-```rhai
+```javascript
 let arr = [-100, -1, 2, 3, 5, 1000];
 let b = bounds(arr);
 assert_eq(b, [-100, 1000]);
@@ -71,7 +74,7 @@ assert_eq(b, [-100, 1000]);
 ## cummax(arr)
 
 Returns an array representing the cumulative maximum of a 1-D array.
-```rhai
+```javascript
 let arr = [1, 4, 5, 3, 9, 8];
 let c = cummax(arr);
 assert_eq(c, [1, 4, 5, 5, 9, 9]);
@@ -80,7 +83,7 @@ assert_eq(c, [1, 4, 5, 5, 9, 9]);
 ## cummin(arr)
 
 Returns an array representing the cumulative minimum of a 1-D array.
-```rhai
+```javascript
 let arr = [8, 9, 3, 5, 4, 1];
 let c = cummin(arr);
 assert_eq(c, [8, 8, 3, 3, 3, 1]);
@@ -89,7 +92,7 @@ assert_eq(c, [8, 8, 3, 3, 3, 1]);
 ## cumprod(arr)
 
 Returns an array representing the cumulative product of a 1-D array.
-```rhai
+```javascript
 let arr = [1, 2, 3, 4, 5];
 let c = cumprod(arr);
 assert_eq(c, [1, 2, 6, 24, 120]);
@@ -98,26 +101,27 @@ assert_eq(c, [1, 2, 6, 24, 120]);
 ## cumsum(arr)
 
 Returns an array representing the cumulative product of a 1-D array.
-```rhai
+```javascript
 let arr = [1.1, 2.5, 3.4];
 let c = cumsum(arr);
 assert_eq(c, [1.1, 3.6, 7.0]);
 ```
 
-## cumtrapz(x, y)
+## cumtrapz
+### cumtrapz(x, y)
 
 Returns the cumulative approximate integral of the curve defined by Y and x using the trapezoidal method.
-```rhai
+```javascript
 let y = [1, 2, 3];
 let x = [1.0, 1.5, 2.0];
 let c = cumtrapz(x, y);
 assert_eq(c, [0.0, 0.5, 1.0]);
 ```
 
-## cumtrapz(y)
+### cumtrapz(y)
 
 Returns the cumulative approximate integral of the curve defined by y, assuming that there is unit spacing.
-```rhai
+```javascript
 let y = [1, 2, 3];
 let c = cumtrapz(y);
 assert_eq(c, [0.0, 1.0, 2.0]);
@@ -130,12 +134,12 @@ This function can be used in two distinct ways.
 2. If the argument is a 1-D array, `diag` returns a matrix containing the argument along the
  diagonal and zeros elsewhere.
 
- ```rhai
+ ```javascript
  let matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
  let d = diag(matrix);
  assert_eq(d, [1, 5, 9]);
  ```
- ```rhai
+ ```javascript
  let diagonal = [1, 2, 3];
  let matrix = diag(diagonal);
  assert_eq(matrix, [[1.0, 0.0, 0.0], [0.0, 2.0, 0.0], [0.0, 0.0, 3.0]]);
@@ -143,12 +147,13 @@ This function can be used in two distinct ways.
 
 ## diff(arr)
  Returns the difference between successive elements of a 1-D array.
-## eye(n)
+## eye
+### eye(n)
  Create an identity matrix with ones along the diagonal and zeros elsewhere. Can be called with
    either one argument (creating a square matrix) or two arguments (specifying the number of rows
    and columns separately).
 
-## eye(nx, ny)
+### eye(nx, ny)
 
 ## fliplr(arr)
  Reverse the rows in a matrix.
@@ -166,11 +171,12 @@ This function can be used in two distinct ways.
  Returns an array containing a number of elements logarithmically spaced between two bounds.
 ## mad(arr)
  Returns the maximum absolute deviation of an arry.
-## max(a, b)
+## max
+### max(a, b)
  Returns the highest value between a pair of numbers (if called with two arguments) or in a 1-D
    array (if called with a single `Array`-type argument).
 
-## max(arr)
+### max(arr)
 
 ## maxk(arr, k)
  Returns the k highest values from a 1-D array.
@@ -182,11 +188,12 @@ This function can be used in two distinct ways.
  Returns an object map containing 2-D grid coordinates based on the uni-axial coordinates
    contained in arguments x and y.
 
-## min(a, b)
+## min
+### min(a, b)
  Returns the lowest value between a pair of numbers (if called with two arguments) or in a 1-D
    array (if called with a single `Array`-type argument).
 
-## min(arr)
+### min(arr)
 
 ## mink(arr, k)
  Returns the k smallest values in a 1-D array.
@@ -216,9 +223,10 @@ This function can be used in two distinct ways.
  Returns the number of dimensions in an array.
 ## numel(arr)
  Returns the number of elements in an array.
-## ones(n)
+## ones
+### ones(n)
 
-## ones(nx, ny)
+### ones(nx, ny)
  Create an matrix filled with ones. Can be called with either one int argument (creating a square
    matrix), on array argument (indicating the dimensions, such as that which is returned by `[size]`)
    or two arguments (specifying the number of rows and columns separately).
@@ -227,36 +235,41 @@ This function can be used in two distinct ways.
  Returns a given percentile value for a 1-D array of data.
 ## prod(arr)
  The product (multiplication) of all elements in a 1-D array.
-## rand()
+## rand
+### rand()
  Create a matrix filled with random values between 0 and 1. Can be called with either no argument (returning a single value),
    one int argument (creating a square matrix), on array argument (indicating the dimensions, such as that which is returned by `[size]`)
    or two arguments (specifying the number of rows and columns separately).
 
-## rand(n)
+### rand(n)
 
-## rand(nx, ny)
+### rand(nx, ny)
 
 ## rms(arr)
  Returns the root mean square of a 1-D array.
-## rot90(mat)
+## rot90
+### rot90(mat)
  Rotates a matrix 90 degrees counterclockwise.
-## rot90(mat, k)
+### rot90(mat, k)
  Rotates a matrix 90 degrees counterclockwise by `k` increments.
 ## size(arr)
  Returns the size along each dimension of an array.
 ## std(arr)
  Returns the standard deviation of an array
-## sum()
+## sum
+### sum()
  Sums the elements of a 1-D array (called as a method of the array).
-## sum(arr)
+### sum(arr)
  Sums the elements of a 1-D array (called as a function with the array as an argument).
-## t()
+## transpose
+### transpose()
  Transposes a matrix (called as a method of the matrix).
-## transpose(arr)
+### transpose(arr)
 
-## trapz(x, y)
+## trapz
+### trapz(x, y)
  Returns the approximate integral of the curve defined by Y and X using the trapezoidal method.
-## trapz(y)
+### trapz(y)
 
 ## union(arr1, arr2)
  Returns the set union of two ararys.
@@ -264,9 +277,10 @@ This function can be used in two distinct ways.
  Returns an array of the unique elements in an array.
 ## variance(arr)
  Returns the variance of a 1-D array.
-## zeros(n)
+## zeros
+### zeros(n)
 
-## zeros(nx, ny)
+### zeros(nx, ny)
  Create an matrix filled with ones. Can be called with either one int argument (creating a square
     matrix), on array argument (indicating the dimensions, such as that which is returned by `[size]`)
     or two arguments (specifying the number of rows and columns separately).

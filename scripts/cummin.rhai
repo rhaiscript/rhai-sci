@@ -1,6 +1,6 @@
 /**
 Returns an array representing the cumulative minimum of a 1-D array.
-```rhai
+```javascript
 let arr = [8, 9, 3, 5, 4, 1];
 let c = cummin(arr);
 assert_eq(c, [8, 8, 3, 3, 3, 1]);

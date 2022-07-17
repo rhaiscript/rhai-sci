@@ -1,6 +1,6 @@
 /**
 Returns an array representing the cumulative product of a 1-D array.
-```rhai
+```javascript
 let arr = [1.1, 2.5, 3.4];
 let c = cumsum(arr);
 assert_eq(c, [1.1, 3.6, 7.0]);

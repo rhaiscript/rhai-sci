@@ -1,6 +1,6 @@
 /**
 Returns the cumulative approximate integral of the curve defined by Y and x using the trapezoidal method.
-```rhai
+```javascript
 let y = [1, 2, 3];
 let x = [1.0, 1.5, 2.0];
 let c = cumtrapz(x, y);
@@ -19,7 +19,7 @@ fn cumtrapz(x, y) {
 
 /**
 Returns the cumulative approximate integral of the curve defined by y, assuming that there is unit spacing.
-```rhai
+```javascript
 let y = [1, 2, 3];
 let c = cumtrapz(y);
 assert_eq(c, [0.0, 1.0, 2.0]);

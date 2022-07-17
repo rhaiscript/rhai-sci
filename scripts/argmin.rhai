@@ -1,6 +1,6 @@
 /**
 Returns the index of the smallest element in a 1-D array.
-```rhai
+```javascript
 let arr = [43, 42, -500];
 let idx = argmin(arr);
 assert_eq(idx, 2);

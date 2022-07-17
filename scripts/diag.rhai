@@ -4,12 +4,12 @@ This function can be used in two distinct ways.
 2. If the argument is a 1-D array, `diag` returns a matrix containing the argument along the
  diagonal and zeros elsewhere.
 
- ```rhai
+ ```javascript
  let matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
  let d = diag(matrix);
  assert_eq(d, [1, 5, 9]);
  ```
- ```rhai
+ ```javascript
  let diagonal = [1, 2, 3];
  let matrix = diag(diagonal);
  assert_eq(matrix, [[1.0, 0.0, 0.0], [0.0, 2.0, 0.0], [0.0, 0.0, 3.0]]);

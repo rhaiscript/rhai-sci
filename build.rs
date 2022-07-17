@@ -1,5 +1,5 @@
 use std::io::Write;
-use rhai::{packages::Package, plugin::*};
+use rhai::{packages::Package, plugin::*, ScriptFnMetadata};
 use itertools::Itertools;
 use rhai_rand::RandomPackage;
 
@@ -39,15 +39,35 @@ fn main() {
 
     // Write functions
     write!(doc_file, "# Functions\n This package provides a large variety of functions to help with scientific computing. Each one of these is written in Rhai itself! The source code is here.\n").expect("Cannot write to {test_file}");
-    for function in ast.iter_functions().sorted() {
+    let mut indented = false;
+    let good_iter: Vec<ScriptFnMetadata> = ast.iter_functions().sorted().collect();
+    for idx in 0..good_iter.len() {
+        let function = good_iter[idx].clone();
         if function.access == FnAccess::Public && !function.name.starts_with("anon") {
             let name = function.name;
             let params = function.params.join(", ");
             let comments = function.comments.join("\n").replace("///", "").replace("/**", "").replace("**/", "");
-            write!(doc_file, "## {name}({params})\n{comments}\n").expect("Cannot write to {test_file}");
+            if idx < good_iter.len()-1 {
+                if name == good_iter[idx + 1].name && !indented {
+                    write!(doc_file, "## {name}\n").expect("Cannot write to {doc_file}");
+                    indented = true;
+                }
+            }
+            if indented {
+                write!(doc_file, "### {name}({params})\n{comments}\n").expect("Cannot write to {doc_file}");
+            } else {
+                write!(doc_file, "## {name}({params})\n{comments}\n").expect("Cannot write to {doc_file}");
+            }
+
+            if idx != 0 && idx < good_iter.len()-1 {
+                if name == good_iter[idx - 1].name && name != good_iter[idx + 1].name {
+                    indented = false;
+                }
+            }
+
             let code = comments.split("```").collect::<Vec<&str>>();
-            if code.len() == 3 {
-                let clean_code = code[1].replace("rhai", "").replace("\n", "");
+            for i in (1..code.len()).step_by(2) {
+                let clean_code = code[i].replace("javascript", "").replace("\n", "");
                 println!("{clean_code}");
                 assert!(engine.eval::<bool>(&clean_code).unwrap());
             }

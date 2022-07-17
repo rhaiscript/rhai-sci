@@ -1,6 +1,6 @@
 /**
 Assert that a statement is true, and throw a custom error if it is not.
-```rhai
+```javascript
 assert(2 == 2, "Oh no!");
 ```
 **/
@@ -14,7 +14,7 @@ fn assert(expression, error) {
 
 /**
 Assert that two arguments are equal, and throw a custom error if it is not.
-```rhai
+```javascript
 assert_eq(2, 2, "Oh no!");
 ```
 **/
@@ -30,7 +30,7 @@ fn assert_eq(a, b, error) {
 
 /**
 Assert that two arguments are non-equal, and throw a custom error if it is not.
-```rhai
+```javascript
 assert_neq(2, 1, "Oh no!");
 ```
 **/
@@ -46,7 +46,7 @@ fn assert_neq(a, b, error) {
 
 /**
 Assert that a statement is true and throw an error if it is not.
-```rhai
+```javascript
 assert(2==2);
 ```
 **/
@@ -55,7 +55,7 @@ fn assert(expression) {
 }
 
 /** Assert that two arguments are equal and throw an error if they are not.
-```rhai
+```javascript
 assert_eq(2, 2);
 ```
 **/
@@ -65,7 +65,7 @@ fn assert_eq(a, b) {
 
 /**
 Assert that two arguments are non-equal and throw an error if they are not.
-```rhai
+```javascript
 assert_neq(2, 1);
 ```
 **/

@@ -11,7 +11,7 @@ fn transpose(arr) {
 }
 
 /// Transposes a matrix (called as a method of the matrix).
-fn t() {
+fn transpose() {
     let arr = this;
     let s = size(arr);
     let new_arr = zeros(s[1], s[0]);

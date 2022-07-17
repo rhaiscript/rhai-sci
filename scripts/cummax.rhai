@@ -1,6 +1,6 @@
 /**
 Returns an array representing the cumulative maximum of a 1-D array.
-```rhai
+```javascript
 let arr = [1, 4, 5, 3, 9, 8];
 let c = cummax(arr);
 assert_eq(c, [1, 4, 5, 5, 9, 9]);
