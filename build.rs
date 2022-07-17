@@ -26,7 +26,7 @@ fn main() {
     }
 
     // Make a file for documentation
-    let mut doc_file = std::fs::File::create("docs/rhai-sci-docs.md").unwrap();
+    let mut doc_file = std::fs::File::create("target/rhai-sci-docs.md").unwrap();
 
     // Build an engine for doctests
     let mut engine = Engine::new();
