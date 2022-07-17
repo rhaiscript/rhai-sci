@@ -146,7 +146,14 @@ This function can be used in two distinct ways.
  ```
 
 ## diff(arr)
- Returns the difference between successive elements of a 1-D array.
+
+Returns the difference between successive elements of a 1-D array.
+```javascript
+let arr = [2, 5, 1, 7, 8];
+let d = diff(arr);
+assert_eq(d, [3, -4, 6, 1]);
+```
+
 ## eye
 ### eye(n)
  Create an identity matrix with ones along the diagonal and zeros elsewhere. Can be called with
