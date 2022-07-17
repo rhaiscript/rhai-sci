@@ -333,8 +333,6 @@ fn main() {
     let mut ast_u = AST::empty();
     let mut ast = AST::empty();
 
-    print_help();
-
     'main_loop: loop {
         if let Some(replace) = replacement.take() {
             input = replace;
@@ -576,6 +574,4 @@ fn main() {
     }
 
     rl.save_history(HISTORY_FILE).unwrap();
-
-    println!("Bye!");
 }
