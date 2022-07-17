@@ -716,4 +716,4 @@ assert_eq(matrix, [[0.0, 0.0, 0.0],
 ```
 
 # Constants
-<table><tr><th>Name</th><th>Value</th></tr><tr><td>c</td><td>299792458.0</td></tr><tr><td>e</td><td>2.718281828459045</td></tr><tr><td>g</td><td>9.80665</td></tr><tr><td>pi</td><td>3.141592653589793</td></tr><tr><td>h</td><td>6.626070150000001e-34</td></tr></table>
+<table><tr><th>Name</th><th>Value</th></tr><tr><td><code>c<code></td><td><code>299792458.0<code></td></tr><tr><td><code>e<code></td><td><code>2.718281828459045<code></td></tr><tr><td><code>g<code></td><td><code>9.80665<code></td></tr><tr><td><code>pi<code></td><td><code>3.141592653589793<code></td></tr><tr><td><code>h<code></td><td><code>6.626070150000001e-34<code></td></tr></table>

@@ -84,7 +84,7 @@ fn main() {
     // Write the constants
     write!(doc_file, "# Constants\n<table><tr><th>Name</th><th>Value</th></tr>").expect("Cannot write to {doc_file}");
     for (name, _, value) in ast.iter_literal_variables(true, false) {
-        write!(doc_file, "<tr><td>{name}</td><td>{value}</td></tr>").expect("Cannot write to {doc_file}");
+        write!(doc_file, "<tr><td><code>{name}<code></td><td><code>{value}<code></td></tr>").expect("Cannot write to {doc_file}");
     }
     write!(doc_file, "</table>").expect("Cannot write to {doc_file}");
 
