@@ -12,8 +12,7 @@ fn main() {
     let paths = std::fs::read_dir("scripts").unwrap();
 
     // Open file to write to
-    let mut func_file = std::fs::File::create("scripts/rhai-lab-compiled.txt").unwrap();
-    let mut test_file = std::fs::File::create("tests/rhai-lab-test.txt").unwrap();
+    let mut func_file = std::fs::File::create("scripts/rhai-sci-compiled.txt").unwrap();
 
     // Build library and test files
     for path in paths {
@@ -22,18 +21,14 @@ fn main() {
             let contents = std::fs::read_to_string(name.clone()).unwrap();
             write!(func_file, "{contents}\n\n").expect("Cannot write to {func_file}");
         }
-        if name.clone().to_str().unwrap().ends_with(".rhai-test") {
-            let contents = std::fs::read_to_string(name.clone()).unwrap();
-            write!(test_file, "{contents}\n\n").expect("Cannot write to {test_file}");
-        }
     }
 
     // Make a file for documentation
-    let mut doc_file = std::fs::File::create("docs/rhai-lab-docs.md").unwrap();
+    let mut doc_file = std::fs::File::create("docs/rhai-sci-docs.md").unwrap();
 
     // Build an engine for doctests
     let mut engine = Engine::new();
-    let ast = engine.compile(std::fs::read_to_string("scripts/rhai-lab-compiled.txt").unwrap()).unwrap();
+    let ast = engine.compile(std::fs::read_to_string("scripts/rhai-sci-compiled.txt").unwrap()).unwrap();
     engine.register_global_module(RandomPackage::new().as_shared_module());
     engine.register_global_module(rhai::Shared::new(Module::eval_ast_as_new(rhai::Scope::new(), &ast, &engine).unwrap()));
 

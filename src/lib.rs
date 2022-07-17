@@ -3,7 +3,7 @@
 #![warn(rustdoc::missing_doc_code_examples)]
 #![warn(clippy::missing_docs_in_private_items)]
 #![doc = include_str!("../README.md")]
-#![doc = include_str!("../docs/rhai-lab-docs.md")]
+#![doc = include_str!("../docs/rhai-sci-docs.md")]
 #![doc = include_str!("../docs/highlight.html")]
 
 use rhai::{Engine, def_package, packages::Package, plugin::*, EvalAltResult};
@@ -18,7 +18,7 @@ def_package! {
 
         // Load scripts
         let engine = Engine::new();
-        let ast = engine.compile(include_str!("../scripts/rhai-lab-compiled.txt")).unwrap();
+        let ast = engine.compile(include_str!("../scripts/rhai-sci-compiled.txt")).unwrap();
         let my_module = Module::eval_ast_as_new(rhai::Scope::new(), &ast, &engine).unwrap();
         lib.fill_with(&my_module);
     }
