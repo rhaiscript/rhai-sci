@@ -1,6 +1,37 @@
-/** Create an matrix filled with ones. Can be called with either one int argument (creating a square
-    matrix), on array argument (indicating the dimensions, such as that which is returned by `[size]`)
-    or two arguments (specifying the number of rows and columns separately).
+/**
+Create an matrix filled with ones. Can be called with either one integer argument (creating a square
+matrix) or one array argument (indicating the dimensions, such as that which is returned by `size`)
+or two arguments (specifying the number of rows and columns separately).
+```javascript
+let matrix = zeros(3);
+assert_eq(matrix, [[0.0, 0.0, 0.0],
+                   [0.0, 0.0, 0.0],
+                   [0.0, 0.0, 0.0]]);
+```
+```javascript
+let matrix = zeros([3, 3]);
+assert_eq(matrix, [[0.0, 0.0, 0.0],
+                   [0.0, 0.0, 0.0],
+                   [0.0, 0.0, 0.0]]);
+```
+**/
+fn zeros(n) {
+    if type_of(n) == "array" {
+        zeros(n[0], n[1])
+    } else {
+        zeros(n, n)
+    }
+};
+
+
+/**
+Create an matrix filled with ones. Can be called with two arguments (specifying the number of rows and columns separately).
+```javascript
+let matrix = zeros(3, 3);
+assert_eq(matrix, [[0.0, 0.0, 0.0],
+                   [0.0, 0.0, 0.0],
+                   [0.0, 0.0, 0.0]]);
+```
 **/
 fn zeros(nx, ny) {
     let row = [];
@@ -10,12 +41,4 @@ fn zeros(nx, ny) {
     matrix.pad(nx, row);
 
     matrix
-};
-
-fn zeros(n) {
-    if type_of(n) == "array" {
-        zeros(n[0], n[1])
-    } else {
-        zeros(n, n)
-    }
 };

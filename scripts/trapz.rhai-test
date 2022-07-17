@@ -1,3 +1,0 @@
-// Test trapz
-assert_eq(trapz([1.0, 1.5, 2.0], [1, 2, 3]), 1.0);
-assert_eq(trapz([1, 2, 3]), 2.0);

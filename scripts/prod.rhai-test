@@ -1,2 +1,0 @@
-// Test prod
-assert_eq(prod([1, 2, 3, 4, 10]), 240);

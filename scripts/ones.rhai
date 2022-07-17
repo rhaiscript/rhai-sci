@@ -1,6 +1,35 @@
-/** Create an matrix filled with ones. Can be called with either one int argument (creating a square
-   matrix), on array argument (indicating the dimensions, such as that which is returned by `[size]`)
-   or two arguments (specifying the number of rows and columns separately).
+/**
+Create an matrix filled with ones. Can be called with either one integer argument (creating a square
+matrix) or one array argument (indicating the dimensions, such as that which is returned by `size`).
+```javascript
+let matrix = ones(3);
+assert_eq(matrix, [[1.0, 1.0, 1.0],
+                   [1.0, 1.0, 1.0],
+                   [1.0, 1.0, 1.0]]);
+```
+```javascript
+let matrix = ones([3, 3]);
+assert_eq(matrix, [[1.0, 1.0, 1.0],
+                   [1.0, 1.0, 1.0],
+                   [1.0, 1.0, 1.0]]);
+```
+**/
+fn ones(n) {
+    if type_of(n) == "array" {
+        ones(n[0], n[1])
+    } else {
+        ones(n, n)
+    }
+};
+
+/**
+Create an matrix filled with ones. Can be called with two integer arguments (specifying the number of rows and columns separately).
+```javascript
+let matrix = ones(3, 3);
+assert_eq(matrix, [[1.0, 1.0, 1.0],
+                   [1.0, 1.0, 1.0],
+                   [1.0, 1.0, 1.0]]);
+```
 **/
 
 fn ones(nx, ny) {
@@ -11,12 +40,4 @@ fn ones(nx, ny) {
     matrix.pad(nx, row);
 
     matrix
-};
-
-fn ones(n) {
-    if type_of(n) == "array" {
-        ones(n[0], n[1])
-    } else {
-        ones(n, n)
-    }
 };

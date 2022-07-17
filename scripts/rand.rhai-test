@@ -1,5 +1,0 @@
-// Test rand
-assert(rand() < 1 && rand() > 0);
-assert_eq(size(rand(3)), [3, 3]);
-assert_eq(size(rand(3, 3)), [3, 3]);
-assert_eq(size(rand([3, 3])), [3, 3]);

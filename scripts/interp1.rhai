@@ -1,4 +1,13 @@
-/// Given reference data, perform linear interpolation.
+/**
+Given reference data, perform linear interpolation.
+```javascript
+let x = [0, 1];
+let y = [1, 2];
+let xq = 0.5;
+let yq = interp1(x, y, xq);
+assert_eq(yq, 1.5);
+```
+**/
 fn interp1(x, y, xq) {
     x.sort();
     let b = 0;

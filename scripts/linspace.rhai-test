@@ -1,2 +1,0 @@
-// Test linspace
-assert_eq(linspace(1, 2, 5), [1.0, 1.25, 1.5, 1.75, 2.0]);

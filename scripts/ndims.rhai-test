@@ -1,2 +1,1 @@
 // Test ndims
-assert_eq(ndims(ones(4, 6)), 2);

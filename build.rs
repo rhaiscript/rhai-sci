@@ -52,16 +52,16 @@ fn main() {
             // Check if there are multiple arities, and if so add a header and indent
             if idx < good_iter.len()-1 {
                 if name == good_iter[idx + 1].name && !indented {
-                    write!(doc_file, "## {name}\n").expect("Cannot write to {doc_file}");
+                    write!(doc_file, "## `{name}`\n").expect("Cannot write to {doc_file}");
                     indented = true;
                 }
             }
 
             // Print definition with right level of indentation
             if indented {
-                write!(doc_file, "### {name}({params})\n{comments}\n").expect("Cannot write to {doc_file}");
+                write!(doc_file, "### `{name}({params})`\n{comments}\n").expect("Cannot write to {doc_file}");
             } else {
-                write!(doc_file, "## {name}({params})\n{comments}\n").expect("Cannot write to {doc_file}");
+                write!(doc_file, "## `{name}({params})`\n{comments}\n").expect("Cannot write to {doc_file}");
             }
 
             // End indentation when its time

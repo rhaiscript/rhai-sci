@@ -1,4 +1,11 @@
-/// Returns the mode of a 1-D array.
+/**
+Returns the mode of a 1-D array.
+```javascript
+let data = [1, 2, 2, 2, 2, 3];
+let m = mode(data);
+assert_eq(m, 2);
+```
+**/
 fn mode(arr) {
     arr.sort();
     let unique = arr;

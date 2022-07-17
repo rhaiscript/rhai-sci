@@ -1,2 +1,0 @@
-// Test numel
-assert_eq(numel(ones(4, 6)), 24);
