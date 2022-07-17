@@ -7,5 +7,5 @@ assert_eq(n, 24);
 ```
 **/
 fn numel(arr) {
-    size(arr).reduce(|sum, v| sum*v, 1)
+    len(flatten(arr))
 };
