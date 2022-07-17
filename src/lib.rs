@@ -6,7 +6,7 @@
 #![doc = include_str!(concat!(env!("OUT_DIR"), "/rhai-sci-docs.md"))]
 #![doc = include_str!("../docs/highlight.html")]
 
-use rhai::{Engine, def_package, packages::Package, plugin::*, EvalAltResult};
+use rhai::{def_package, packages::Package, plugin::*, Engine, EvalAltResult};
 use rhai_rand::RandomPackage;
 
 def_package! {

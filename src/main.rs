@@ -1,13 +1,12 @@
 /// This REPL is borrowed almost verbatim from the main Rhai REPL.
-
 use rhai::plugin::*;
 use rhai::{Dynamic, Engine, EvalAltResult, Module, Scope, AST, INT};
 use rustyline::config::Builder;
 use rustyline::error::ReadlineError;
 use rustyline::{Cmd, Editor, Event, EventHandler, KeyCode, KeyEvent, Modifiers, Movement};
 
-use std::{env, fs::File, io::Read, path::Path, process::exit};
 use rhai::packages::Package;
+use std::{env, fs::File, io::Read, path::Path, process::exit};
 
 const HISTORY_FILE: &str = ".rhai-repl-history";
 
@@ -291,12 +290,11 @@ fn main() {
     println!("{0:=<1$}", "", title.len());
 
     #[cfg(not(feature = "no_optimize"))]
-        let mut optimize_level = rhai::OptimizationLevel::Simple;
+    let mut optimize_level = rhai::OptimizationLevel::Simple;
 
     // Initialize scripting engine
     let mut engine = Engine::new();
     engine.register_global_module(rhai_sci::SciPackage::new().as_shared_module());
-
 
     #[cfg(not(feature = "no_module"))]
     #[cfg(not(feature = "no_std"))]
@@ -332,7 +330,7 @@ fn main() {
 
     let mut main_ast = AST::empty();
     #[cfg(not(feature = "no_optimize"))]
-        let mut ast_u = AST::empty();
+    let mut ast_u = AST::empty();
     let mut ast = AST::empty();
 
     print_help();
