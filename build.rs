@@ -12,7 +12,9 @@ fn main() {
     let paths = std::fs::read_dir("scripts").unwrap();
 
     // Open file to write to
-    let mut func_file = std::fs::File::create("scripts/rhai-sci-compiled.txt").unwrap();
+    let mut func_file = std::fs::File::create(
+        std::env::var("OUT_DIR").unwrap() + "rhai-sci-compiled.txt"
+    ).unwrap();
 
     // Build library and test files
     for path in paths {
@@ -28,7 +30,9 @@ fn main() {
 
     // Build an engine for doctests
     let mut engine = Engine::new();
-    let ast = engine.compile(std::fs::read_to_string("scripts/rhai-sci-compiled.txt").unwrap()).unwrap();
+    let ast = engine.compile(std::fs::read_to_string(
+        std::env::var("OUT_DIR").unwrap() + "rhai-sci-compiled.txt"
+    ).unwrap()).unwrap();
     engine.register_global_module(RandomPackage::new().as_shared_module());
     engine.register_global_module(rhai::Shared::new(Module::eval_ast_as_new(rhai::Scope::new(), &ast, &engine).unwrap()));
 

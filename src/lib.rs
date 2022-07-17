@@ -18,7 +18,8 @@ def_package! {
 
         // Load scripts
         let engine = Engine::new();
-        let ast = engine.compile(include_str!("../scripts/rhai-sci-compiled.txt")).unwrap();
+        print!("{}", concat!(env!("OUT_DIR"), "docs/rhai-sci-compiled.txt"));
+        let ast = engine.compile(include_str!(concat!(env!("OUT_DIR"), "rhai-sci-compiled.txt"))).unwrap();
         let my_module = Module::eval_ast_as_new(rhai::Scope::new(), &ast, &engine).unwrap();
         lib.fill_with(&my_module);
     }

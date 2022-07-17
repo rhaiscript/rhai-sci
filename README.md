@@ -9,7 +9,7 @@ like MATLAB, Octave, and R. For a complete API reference, check [the docs](https
 # Install
 To use the latest released version of `rhai-sci`, add this to your `Cargo.toml`:
 ```toml
-rhai-sci = "0.1.3"
+rhai-sci = "0.1.4"
 ```
 To use the bleeding edge instead, add this:
 ```toml

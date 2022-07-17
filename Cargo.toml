@@ -1,6 +1,6 @@
 [package]
 name = "rhai-sci"
-version = "0.1.3"
+version = "0.1.4"
 edition = "2021"
 authors = ["Chris McComb <ccmcc2012@gmail.com>"]
 description = "Scientific computing in the Rhai scripting language"
