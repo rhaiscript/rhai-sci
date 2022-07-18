@@ -14,9 +14,25 @@ assert_eq(matrix, [[0.0, 0.0, 0.0],
                    [0.0, 0.0, 0.0],
                    [0.0, 0.0, 0.0]]);
 ```
+```javascript
+let matrix = zeros([3, 3, 3]);
+assert_eq(matrix, [[[0.0, 0.0, 0.0],
+                    [0.0, 0.0, 0.0],
+                    [0.0, 0.0, 0.0]],
+                   [[0.0, 0.0, 0.0],
+                    [0.0, 0.0, 0.0],
+                    [0.0, 0.0, 0.0]],
+                   [[0.0, 0.0, 0.0],
+                    [0.0, 0.0, 0.0],
+                    [0.0, 0.0, 0.0]]]);
+```
 **/
 fn zeros(n) {
-    if type_of(n) == "array" {
+    if type_of(n) == "array" && len(n) > 2 {
+        let matrix = [];
+        matrix.pad(n[0], zeros(n.drain(|v, i| i > 0)));
+        matrix
+    } else if type_of(n) == "array" && len(n) == 2 {
         zeros(n[0], n[1])
     } else {
         zeros(n, n)

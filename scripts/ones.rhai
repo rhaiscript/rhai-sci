@@ -13,9 +13,25 @@ assert_eq(matrix, [[1.0, 1.0, 1.0],
                    [1.0, 1.0, 1.0],
                    [1.0, 1.0, 1.0]]);
 ```
+```javascript
+let matrix = ones([3, 3, 3]);
+assert_eq(matrix, [[[1.0, 1.0, 1.0],
+                    [1.0, 1.0, 1.0],
+                    [1.0, 1.0, 1.0]],
+                   [[1.0, 1.0, 1.0],
+                    [1.0, 1.0, 1.0],
+                    [1.0, 1.0, 1.0]],
+                   [[1.0, 1.0, 1.0],
+                    [1.0, 1.0, 1.0],
+                    [1.0, 1.0, 1.0]]]);
+```
 **/
 fn ones(n) {
-    if type_of(n) == "array" {
+    if type_of(n) == "array" && len(n) > 2 {
+        let matrix = [];
+        matrix.pad(n[0], ones(n.drain(|v, i| i > 0)));
+        matrix
+    } else if type_of(n) == "array" && len(n) == 2{
         ones(n[0], n[1])
     } else {
         ones(n, n)
