@@ -8,6 +8,8 @@
 
 use rhai::{def_package, packages::Package, plugin::*, Engine, EvalAltResult};
 use rhai_rand::RandomPackage;
+mod linalg;
+use linalg::linalg_functions;
 
 def_package! {
     /// Package for scientific computing
@@ -38,5 +40,3 @@ pub fn eval<T: Clone + 'static>(script: &str) -> Result<T, Box<EvalAltResult>> {
     engine.register_global_module(SciPackage::new().as_shared_module());
     engine.eval::<T>(script)
 }
-
-include!("linalg.rs");
