@@ -1,5 +1,5 @@
 use std::io::Write;
-use rhai::{packages::Package, plugin::*, ScriptFnMetadata};
+use rhai::{packages::Package, plugin::*, ScriptFnMetadata, Engine};
 use itertools::Itertools;
 use rhai_rand::RandomPackage;
 
@@ -33,6 +33,7 @@ fn main() {
     let ast = engine.compile(std::fs::read_to_string(
         std::env::var("OUT_DIR").unwrap() + "/rhai-sci-compiled.txt"
     ).unwrap()).unwrap();
+    engine.register_result_fn("invert_matrix", linalg_functions::invert_matrix);
     engine.register_global_module(RandomPackage::new().as_shared_module());
     engine.register_global_module(rhai::Shared::new(Module::eval_ast_as_new(rhai::Scope::new(), &ast, &engine).unwrap()));
 
@@ -88,3 +89,5 @@ fn main() {
     write!(doc_file, "</table>").expect("Cannot write to {doc_file}");
 
 }
+
+include!("src/linalg.rs");
