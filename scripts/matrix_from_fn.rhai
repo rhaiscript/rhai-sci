@@ -13,6 +13,7 @@ fn matrix_from_fn(s, function) {
     matrix_from_fn_internal(matrix, function, [])
 }
 
+// TODO Better tests and making sure closure function takes true array as input
 private fn matrix_from_fn_internal(matrix, function, indices_so_far) {
     if type_of(matrix[0]) == "array" {
         for idx in 0..len(matrix) {
