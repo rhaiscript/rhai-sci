@@ -1,7 +1,7 @@
-use std::io::Write;
-use rhai::{packages::Package, plugin::*, ScriptFnMetadata, Engine};
 use itertools::Itertools;
+use rhai::{packages::Package, plugin::*, Engine, ScriptFnMetadata};
 use rhai_rand::RandomPackage;
+use std::io::Write;
 
 fn main() {
     // Update if needed
@@ -12,9 +12,9 @@ fn main() {
     let paths = std::fs::read_dir("scripts").unwrap();
 
     // Open file to write to
-    let mut func_file = std::fs::File::create(
-        std::env::var("OUT_DIR").unwrap() + "/rhai-sci-compiled.txt"
-    ).unwrap();
+    let mut func_file =
+        std::fs::File::create(std::env::var("OUT_DIR").unwrap() + "/rhai-sci-compiled.txt")
+            .unwrap();
 
     // Build library and test files
     for path in paths {
@@ -26,16 +26,23 @@ fn main() {
     }
 
     // Make a file for documentation
-    let mut doc_file = std::fs::File::create(std::env::var("OUT_DIR").unwrap() + "/rhai-sci-docs.md").unwrap();
+    let mut doc_file =
+        std::fs::File::create(std::env::var("OUT_DIR").unwrap() + "/rhai-sci-docs.md").unwrap();
 
     // Build an engine for doctests
     let mut engine = Engine::new();
-    let ast = engine.compile(std::fs::read_to_string(
-        std::env::var("OUT_DIR").unwrap() + "/rhai-sci-compiled.txt"
-    ).unwrap()).unwrap();
+    let ast = engine
+        .compile(
+            std::fs::read_to_string(std::env::var("OUT_DIR").unwrap() + "/rhai-sci-compiled.txt")
+                .unwrap(),
+        )
+        .unwrap();
     engine.register_result_fn("invert_matrix", linalg_functions::invert_matrix);
+    engine.register_result_fn("validate_and_read", io_functions::validate_and_read);
     engine.register_global_module(RandomPackage::new().as_shared_module());
-    engine.register_global_module(rhai::Shared::new(Module::eval_ast_as_new(rhai::Scope::new(), &ast, &engine).unwrap()));
+    engine.register_global_module(rhai::Shared::new(
+        Module::eval_ast_as_new(rhai::Scope::new(), &ast, &engine).unwrap(),
+    ));
 
     // Write functions
     write!(doc_file, "# Functions\n This package provides a large variety of functions to help with scientific computing. Each one of these is written in Rhai itself! The source code is here.\n").expect("Cannot write to {test_file}");
@@ -47,10 +54,15 @@ fn main() {
             // Pull out basic info
             let name = function.name;
             let params = function.params.join(", ");
-            let comments = function.comments.join("\n").replace("///", "").replace("/**", "").replace("**/", "");
+            let comments = function
+                .comments
+                .join("\n")
+                .replace("///", "")
+                .replace("/**", "")
+                .replace("**/", "");
 
             // Check if there are multiple arities, and if so add a header and indent
-            if idx < good_iter.len()-1 {
+            if idx < good_iter.len() - 1 {
                 if name == good_iter[idx + 1].name && !indented {
                     write!(doc_file, "## `{name}`\n").expect("Cannot write to {doc_file}");
                     indented = true;
@@ -59,13 +71,15 @@ fn main() {
 
             // Print definition with right level of indentation
             if indented {
-                write!(doc_file, "### `{name}({params})`\n{comments}\n").expect("Cannot write to {doc_file}");
+                write!(doc_file, "### `{name}({params})`\n{comments}\n")
+                    .expect("Cannot write to {doc_file}");
             } else {
-                write!(doc_file, "## `{name}({params})`\n{comments}\n").expect("Cannot write to {doc_file}");
+                write!(doc_file, "## `{name}({params})`\n{comments}\n")
+                    .expect("Cannot write to {doc_file}");
             }
 
             // End indentation when its time
-            if idx != 0 && idx < good_iter.len()-1 {
+            if idx != 0 && idx < good_iter.len() - 1 {
                 if name == good_iter[idx - 1].name && name != good_iter[idx + 1].name {
                     indented = false;
                 }
@@ -82,12 +96,20 @@ fn main() {
     }
 
     // Write the constants
-    write!(doc_file, "# Constants\n<table><tr><th>Name</th><th>Value</th></tr>").expect("Cannot write to {doc_file}");
+    write!(
+        doc_file,
+        "# Constants\n<table><tr><th>Name</th><th>Value</th></tr>"
+    )
+    .expect("Cannot write to {doc_file}");
     for (name, _, value) in ast.iter_literal_variables(true, false) {
-        write!(doc_file, "<tr><td><code>{name}<code></td><td><code>{value}<code></td></tr>").expect("Cannot write to {doc_file}");
+        write!(
+            doc_file,
+            "<tr><td><code>{name}<code></td><td><code>{value}<code></td></tr>"
+        )
+        .expect("Cannot write to {doc_file}");
     }
     write!(doc_file, "</table>").expect("Cannot write to {doc_file}");
-
 }
 
 include!("src/linalg.rs");
+include!("src/io.rs");

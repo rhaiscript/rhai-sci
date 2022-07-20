@@ -10,6 +10,8 @@ use rhai::{def_package, packages::Package, plugin::*, Engine, EvalAltResult};
 use rhai_rand::RandomPackage;
 mod linalg;
 use linalg::linalg_functions;
+mod io;
+use io::io_functions;
 
 def_package! {
     /// Package for scientific computing
@@ -19,6 +21,7 @@ def_package! {
         RandomPackage::init(lib);
 
         combine_with_exported_module!(lib, "linalg", linalg_functions);
+        combine_with_exported_module!(lib, "io", io_functions);
 
         // Load scripts
         let engine = Engine::new();
@@ -39,66 +42,4 @@ pub fn eval<T: Clone + 'static>(script: &str) -> Result<T, Box<EvalAltResult>> {
     let mut engine = Engine::new();
     engine.register_global_module(SciPackage::new().as_shared_module());
     engine.eval::<T>(script)
-}
-
-use polars::prelude::{
-    BooleanChunked, BooleanChunkedBuilder, CsvReader, DataFrame, DataType, NamedFrom, PolarsError,
-    SerReader, Series,
-};
-
-///
-/// ```
-/// print!("{:?}", rhai_sci::validate_and_read("https://raw.githubusercontent.com/plotly/datasets/master/diabetes.csv"));
-/// ```
-pub fn validate_and_read<P>(file_path: P) -> Vec<Vec<f64>>
-where
-    P: AsRef<std::path::Path>,
-{
-    let file_path_as_str = file_path.as_ref().to_str().unwrap();
-
-    match CsvReader::from_path(file_path_as_str) {
-        Ok(csv) => {
-            let x = csv
-                .infer_schema(Some(10))
-                .has_header(
-                    csv_sniffer::Sniffer::new()
-                        .sniff_path(file_path_as_str.clone())
-                        .expect("Cannot sniff file")
-                        .dialect
-                        .header
-                        .has_header_row,
-                )
-                .finish()
-                .expect("Cannot read file as CSV")
-                .drop_nulls(None)
-                .expect("Cannot remove null values");
-            let mut final_output = vec![];
-            for series in x.get_columns() {
-                let col: Vec<f64> = series
-                    .cast(&DataType::Float64)
-                    .expect("TODO: panic message")
-                    .f64()
-                    .unwrap()
-                    .into_no_null_iter()
-                    .collect();
-                final_output.push(col);
-            }
-            final_output
-        }
-        Err(_) => {
-            if let Ok(_) = url::Url::parse(file_path_as_str) {
-                let file_contents = minreq::get(file_path_as_str)
-                    .send()
-                    .expect("Could not open URL");
-                let temp = temp_file::with_contents(file_contents.as_bytes());
-
-                validate_and_read(temp.path().to_str().unwrap())
-            } else {
-                panic!(
-                    "The string {} is not a valid URL or file path.",
-                    file_path_as_str
-                )
-            }
-        }
-    }
 }
