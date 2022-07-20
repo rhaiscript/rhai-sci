@@ -4,7 +4,7 @@ use rhai::plugin::*;
 pub mod linalg_functions {
     use nalgebra::DMatrix;
     use rhai::serde::{from_dynamic, to_dynamic};
-    use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT};
+    use rhai::{Array, Dynamic, EvalAltResult, Position};
 
     #[rhai_fn(return_raw)]
     pub fn invert_matrix(matrix: Array) -> Result<Array, Box<EvalAltResult>> {
