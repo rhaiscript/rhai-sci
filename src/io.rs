@@ -32,7 +32,7 @@ pub mod io_functions {
                 for series in x.get_columns() {
                     let col: Vec<f64> = series
                         .cast(&DataType::Float64)
-                        .expect("TODO: panic message")
+                        .expect("Cannot cast to f64")
                         .f64()
                         .unwrap()
                         .into_no_null_iter()
