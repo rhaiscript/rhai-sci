@@ -11,7 +11,9 @@ use rhai_rand::RandomPackage;
 mod linalg;
 use linalg::linalg_functions;
 mod io;
-use io::io_functions;
+pub use io::io_functions;
+mod basic_statistics;
+pub use basic_statistics::stats;
 
 def_package! {
     /// Package for scientific computing
@@ -22,6 +24,7 @@ def_package! {
 
         combine_with_exported_module!(lib, "linalg", linalg_functions);
         combine_with_exported_module!(lib, "io", io_functions);
+        combine_with_exported_module!(lib, "stats", stats);
 
         // Load scripts
         let engine = Engine::new();

@@ -37,6 +37,13 @@ fn main() {
                 .unwrap(),
         )
         .unwrap();
+    engine.register_fn("max", stats::gen_max);
+    engine.register_result_fn("max", stats::array_max);
+    engine.register_fn("min", stats::gen_min);
+    engine.register_result_fn("min", stats::array_min);
+    engine.register_result_fn("maxk", stats::maxk);
+    engine.register_result_fn("mink", stats::mink);
+    engine.register_fn("bounds", stats::bounds);
     engine.register_result_fn("invert_matrix", linalg_functions::invert_matrix);
     engine.register_result_fn("validate_and_read", io_functions::validate_and_read);
     engine.register_global_module(RandomPackage::new().as_shared_module());
@@ -113,3 +120,4 @@ fn main() {
 
 include!("src/linalg.rs");
 include!("src/io.rs");
+include!("src/basic_statistics.rs");
