@@ -37,9 +37,9 @@ fn main() {
                 .unwrap(),
         )
         .unwrap();
-    engine.register_fn("max", stats::gen_max);
+    engine.register_result_fn("max", stats::gen_max);
     engine.register_result_fn("max", stats::array_max);
-    engine.register_fn("min", stats::gen_min);
+    engine.register_result_fn("min", stats::gen_min);
     engine.register_result_fn("min", stats::array_min);
     engine.register_result_fn("maxk", stats::maxk);
     engine.register_result_fn("mink", stats::mink);
@@ -47,7 +47,7 @@ fn main() {
     engine.register_result_fn("mean", stats::mean);
     engine.register_result_fn("argmin", stats::argmin);
     engine.register_result_fn("argmax", stats::argmax);
-    engine.register_fn("bounds", stats::bounds);
+    engine.register_result_fn("bounds", stats::bounds);
     engine.register_result_fn("inv", matrix_functions::invert_matrix);
     engine.register_result_fn("read_matrix", matrix_functions::read_matrix);
     engine.register_fn("transpose", matrix_functions::transpose);

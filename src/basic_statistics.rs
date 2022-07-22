@@ -17,9 +17,9 @@ pub mod stats {
     /// let the_higher_number = max(2.0, 3.0);
     /// assert_eq(the_higher_number, 3.0);
     /// ```
-    #[rhai_fn(name = "max")]
-    pub fn gen_max(a: Dynamic, b: Dynamic) -> Dynamic {
-        array_max(vec![a, b]).unwrap()
+    #[rhai_fn(name = "max", return_raw)]
+    pub fn gen_max(a: Dynamic, b: Dynamic) -> Result<Dynamic, Box<EvalAltResult>> {
+        array_max(vec![a, b])
     }
 
     /// Return the highest value from an array.
@@ -67,9 +67,9 @@ pub mod stats {
     /// let the_higher_number = max(2.0, 3.0);
     /// assert_eq(the_higher_number, 2.0);
     /// ```
-    #[rhai_fn(name = "min")]
-    pub fn gen_min(a: Dynamic, b: Dynamic) -> Dynamic {
-        array_min(vec![a, b]).unwrap()
+    #[rhai_fn(name = "min", return_raw)]
+    pub fn gen_min(a: Dynamic, b: Dynamic) -> Result<Dynamic, Box<EvalAltResult>> {
+        array_min(vec![a, b])
     }
 
     /// Return the lowest value from an array.
@@ -113,12 +113,14 @@ pub mod stats {
     /// let high_and_low = bounds([2, 3, 4, 5]);
     /// assert_eq(high_and_low, [2, 5]);
     /// ```
-    #[rhai_fn(name = "bounds")]
-    pub fn bounds(arr: Array) -> Array {
-        vec![
-            Dynamic::from(array_min(arr.clone()).unwrap()),
-            Dynamic::from(array_max(arr.clone()).unwrap()),
-        ]
+    #[rhai_fn(name = "bounds", return_raw)]
+    pub fn bounds(arr: Array) -> Result<Array, Box<EvalAltResult>> {
+        match (array_min(arr.clone()), array_max(arr.clone())) {
+            (Ok(low), Ok(high)) => Ok(vec![low, high]),
+            (Ok(_), Err(high)) => Err(high),
+            (Err(low), Ok(_)) => Err(low),
+            (Err(low), Err(_)) => Err(low),
+        }
     }
 
     /// Returns the `k` highest values from an array.
