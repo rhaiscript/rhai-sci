@@ -34,3 +34,11 @@ assert_eq(column, [[1],
 let row = [1, 2, 3, 4];
 let column = transpose(eye(3));
 assert_eq(column, eye(3));
+
+// Size a matrix 1
+let matrix = ones(3, 5);
+assert_eq(size(matrix), [3, 5]);
+
+// Size a matrix 2
+let matrix = [[[1, 2]]];
+assert_eq(size(matrix), [1, 1, 2]);

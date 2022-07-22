@@ -4,7 +4,7 @@ use rhai::plugin::*;
 pub mod matrix_functions {
     use nalgebra::DMatrix;
     use polars::prelude::{CsvReader, DataType, SerReader};
-    use rhai::{Array, Dynamic, EvalAltResult, ImmutableString, Position};
+    use rhai::{Array, Dynamic, EvalAltResult, ImmutableString, Position, INT};
 
     #[rhai_fn(name = "inv", return_raw)]
     pub fn invert_matrix(matrix: Array) -> Result<Array, Box<EvalAltResult>> {
@@ -93,6 +93,23 @@ pub mod matrix_functions {
             out.push(Dynamic::from_array(new_row));
         }
         out
+    }
+
+    #[rhai_fn(name = "size")]
+    pub fn matrix_size(matrix: Array) -> Array {
+        let mut new_matrix = matrix.clone();
+
+        let mut shape = vec![Dynamic::from_int(new_matrix.len() as INT)];
+        loop {
+            if new_matrix[0].is::<Array>() {
+                new_matrix = new_matrix[0].clone().into_array().unwrap();
+                shape.push(Dynamic::from_int(new_matrix.len() as INT));
+            } else {
+                break;
+            }
+        }
+
+        shape
     }
 
     #[rhai_fn(name = "read_matrix", return_raw)]
