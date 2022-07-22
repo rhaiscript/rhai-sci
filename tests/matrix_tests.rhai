@@ -42,3 +42,93 @@ assert_eq(size(matrix), [3, 5]);
 // Size a matrix 2
 let matrix = [[[1, 2]]];
 assert_eq(size(matrix), [1, 1, 2]);
+
+// Number of dimensions in matrix
+let matrix = ones(4, 6);
+let n = ndims(matrix);
+assert_eq(n, 2);
+
+// Number of matrix elements
+let matrix = ones(4, 6);
+let n = numel(matrix);
+assert_eq(n, 24);
+
+// Test zeros
+let matrix = zeros(3);
+assert_eq(matrix, [[0.0, 0.0, 0.0],
+                   [0.0, 0.0, 0.0],
+                   [0.0, 0.0, 0.0]]);
+
+
+// Test zeros
+let matrix = zeros([3, 3]);
+assert_eq(matrix, [[0.0, 0.0, 0.0],
+                   [0.0, 0.0, 0.0],
+                   [0.0, 0.0, 0.0]]);
+
+// Test zeros
+let matrix = zeros([3, 3, 3]);
+assert_eq(matrix, [[[0.0, 0.0, 0.0],
+                    [0.0, 0.0, 0.0],
+                    [0.0, 0.0, 0.0]],
+                   [[0.0, 0.0, 0.0],
+                    [0.0, 0.0, 0.0],
+                    [0.0, 0.0, 0.0]],
+                   [[0.0, 0.0, 0.0],
+                    [0.0, 0.0, 0.0],
+                    [0.0, 0.0, 0.0]]]);
+
+// Test zeros
+let matrix = zeros(3, 3);
+assert_eq(matrix, [[0.0, 0.0, 0.0],
+                   [0.0, 0.0, 0.0],
+                   [0.0, 0.0, 0.0]]);
+
+// Test ones
+let matrix = ones(3);
+assert_eq(matrix, [[1.0, 1.0, 1.0],
+                   [1.0, 1.0, 1.0],
+                   [1.0, 1.0, 1.0]]);
+
+// Test ones
+let matrix = ones([3, 3]);
+assert_eq(matrix, [[1.0, 1.0, 1.0],
+                   [1.0, 1.0, 1.0],
+                   [1.0, 1.0, 1.0]]);
+
+// Test ones
+let matrix = ones([3, 3, 3]);
+assert_eq(matrix, [[[1.0, 1.0, 1.0],
+                    [1.0, 1.0, 1.0],
+                    [1.0, 1.0, 1.0]],
+                   [[1.0, 1.0, 1.0],
+                    [1.0, 1.0, 1.0],
+                    [1.0, 1.0, 1.0]],
+                   [[1.0, 1.0, 1.0],
+                    [1.0, 1.0, 1.0],
+                    [1.0, 1.0, 1.0]]]);
+
+
+// Test ones
+let matrix = ones(3, 3);
+assert_eq(matrix, [[1.0, 1.0, 1.0],
+                   [1.0, 1.0, 1.0],
+                   [1.0, 1.0, 1.0]]);
+
+
+// Create a rand value
+let r = rand();
+assert(r < 1 && r > 0);
+
+// Create a matrix of rands
+let matrix = rand(3);
+assert_eq(size(matrix), [3, 3]);
+
+// Create a matrix of rands
+let matrix = rand([3, 3]);
+ assert_eq(size(matrix), [3, 3]);
+
+// Create a matrix of rands
+let matrix = rand(3, 3);
+assert_eq(size(matrix), [3, 3]);
+

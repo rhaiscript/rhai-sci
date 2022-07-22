@@ -4,7 +4,7 @@ use rhai::plugin::*;
 pub mod matrix_functions {
     use nalgebra::DMatrix;
     use polars::prelude::{CsvReader, DataType, SerReader};
-    use rhai::{Array, Dynamic, EvalAltResult, ImmutableString, Position, INT};
+    use rhai::{Array, Dynamic, EvalAltResult, ImmutableString, Position, FLOAT, INT};
 
     #[rhai_fn(name = "inv", return_raw)]
     pub fn invert_matrix(matrix: Array) -> Result<Array, Box<EvalAltResult>> {
@@ -112,6 +112,21 @@ pub mod matrix_functions {
         shape
     }
 
+    #[rhai_fn(name = "ndims")]
+    pub fn ndims(matrix: Array) -> INT {
+        matrix_size(matrix).len() as i64
+    }
+
+    #[rhai_fn(name = "numel")]
+    pub fn numel(matrix: Array) -> INT {
+        let s = matrix_size(matrix);
+        let mut prod = 1_i64;
+        for el in s {
+            prod *= el.as_int().unwrap();
+        }
+        prod
+    }
+
     #[rhai_fn(name = "read_matrix", return_raw)]
     pub fn read_matrix(file_path: ImmutableString) -> Result<Array, Box<EvalAltResult>> {
         let file_path_as_str = file_path.as_str();
@@ -178,5 +193,155 @@ pub mod matrix_functions {
                 }
             }
         }
+    }
+
+    #[rhai_fn(name = "zeros", return_raw)]
+    pub fn zeros_single_input(n: Dynamic) -> Result<Array, Box<EvalAltResult>> {
+        if n.is::<i64>() {
+            Ok(zeros_two_input(n.as_int().unwrap(), n.as_int().unwrap()))
+        } else if n.is::<Array>() {
+            let mut m = n.into_array().unwrap();
+            if m.len() == 2 {
+                Ok(zeros_two_input(
+                    m[0].as_int().unwrap(),
+                    m[1].as_int().unwrap(),
+                ))
+            } else if m.len() > 2 {
+                let l = m[0].clone();
+                m.remove(0);
+                Ok(vec![
+                    Dynamic::from_array(
+                        zeros_single_input(Dynamic::from_array(m)).unwrap()
+                    );
+                    l.as_int().unwrap() as usize
+                ])
+            } else {
+                Err(EvalAltResult::ErrorMismatchDataType(
+                    format!("Input must be INT or Array"),
+                    format!(""),
+                    Position::NONE,
+                )
+                .into())
+            }
+        } else {
+            Err(EvalAltResult::ErrorMismatchDataType(
+                format!("Input must be INT or Array"),
+                format!(""),
+                Position::NONE,
+            )
+            .into())
+        }
+    }
+
+    #[rhai_fn(name = "zeros")]
+    pub fn zeros_two_input(nx: INT, ny: INT) -> Array {
+        let mut output = vec![];
+        for i in 0..nx {
+            output.push(Dynamic::from_array(vec![Dynamic::FLOAT_ZERO; ny as usize]))
+        }
+        output
+    }
+
+    #[rhai_fn(name = "ones", return_raw)]
+    pub fn ones_single_input(n: Dynamic) -> Result<Array, Box<EvalAltResult>> {
+        if n.is::<i64>() {
+            Ok(ones_two_input(n.as_int().unwrap(), n.as_int().unwrap()))
+        } else if n.is::<Array>() {
+            let mut m = n.into_array().unwrap();
+            if m.len() == 2 {
+                Ok(ones_two_input(
+                    m[0].as_int().unwrap(),
+                    m[1].as_int().unwrap(),
+                ))
+            } else if m.len() > 2 {
+                let l = m[0].clone();
+                m.remove(0);
+                Ok(vec![
+                    Dynamic::from_array(
+                        ones_single_input(Dynamic::from_array(m)).unwrap()
+                    );
+                    l.as_int().unwrap() as usize
+                ])
+            } else {
+                Err(EvalAltResult::ErrorMismatchDataType(
+                    format!("Input must be INT or Array"),
+                    format!(""),
+                    Position::NONE,
+                )
+                .into())
+            }
+        } else {
+            Err(EvalAltResult::ErrorMismatchDataType(
+                format!("Input must be INT or Array"),
+                format!(""),
+                Position::NONE,
+            )
+            .into())
+        }
+    }
+
+    #[rhai_fn(name = "ones")]
+    pub fn ones_two_input(nx: INT, ny: INT) -> Array {
+        let mut output = vec![];
+        for i in 0..nx {
+            output.push(Dynamic::from_array(vec![Dynamic::FLOAT_ONE; ny as usize]))
+        }
+        output
+    }
+
+    #[rhai_fn(name = "rand")]
+    pub fn rand_float() -> FLOAT {
+        rand::random()
+    }
+
+    #[rhai_fn(name = "rand", return_raw)]
+    pub fn rand_single_input(n: Dynamic) -> Result<Array, Box<EvalAltResult>> {
+        if n.is::<i64>() {
+            Ok(rand_two_input(n.as_int().unwrap(), n.as_int().unwrap()))
+        } else if n.is::<Array>() {
+            let mut m = n.into_array().unwrap();
+            if m.len() == 2 {
+                Ok(rand_two_input(
+                    m[0].as_int().unwrap(),
+                    m[1].as_int().unwrap(),
+                ))
+            } else if m.len() > 2 {
+                let l = m[0].clone();
+                m.remove(0);
+                Ok(vec![
+                    Dynamic::from_array(
+                        rand_single_input(Dynamic::from_array(m)).unwrap()
+                    );
+                    l.as_int().unwrap() as usize
+                ])
+            } else {
+                Err(EvalAltResult::ErrorMismatchDataType(
+                    format!("Input must be INT or Array"),
+                    format!(""),
+                    Position::NONE,
+                )
+                .into())
+            }
+        } else {
+            Err(EvalAltResult::ErrorMismatchDataType(
+                format!("Input must be INT or Array"),
+                format!(""),
+                Position::NONE,
+            )
+            .into())
+        }
+    }
+
+    #[rhai_fn(name = "rand")]
+    pub fn rand_two_input(nx: INT, ny: INT) -> Array {
+        let mut output = vec![];
+        for i in 0..nx {
+            let mut row = vec![];
+            for j in 0..ny {
+                row.push(Dynamic::from_float(rand_float()));
+            }
+            output.push(Dynamic::from_array(row))
+        }
+        output
     }
 }

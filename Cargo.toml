@@ -23,7 +23,7 @@ url = {version = "2.2.2"}
 temp-file = {version = "0.1.6"}
 csv-sniffer = { version = "0.1.1" }
 minreq = {version = "2.6.0", features = ["json-using-serde", "https"]}
-
+rand = { version = "0.8" }
 
 [build-dependencies]
 rhai = { version = "1.5", features = ["unchecked", "serde", "metadata"]}
@@ -35,4 +35,4 @@ url = {version = "2.2.2"}
 temp-file = {version = "0.1.6"}
 csv-sniffer = { version = "0.1.1" }
 minreq = {version = "2.6.0", features = ["json-using-serde", "https"]}
-
+rand = { version = "0.8" }
