@@ -44,8 +44,8 @@ fn main() {
     engine.register_result_fn("maxk", stats::maxk);
     engine.register_result_fn("mink", stats::mink);
     engine.register_fn("bounds", stats::bounds);
-    engine.register_result_fn("invert_matrix", linalg_functions::invert_matrix);
-    engine.register_result_fn("validate_and_read", io_functions::validate_and_read);
+    engine.register_result_fn("inv", linalg_functions::invert_matrix);
+    engine.register_result_fn("read_matrix", io_functions::read_matrix);
     engine.register_global_module(RandomPackage::new().as_shared_module());
     engine.register_global_module(rhai::Shared::new(
         Module::eval_ast_as_new(rhai::Scope::new(), &ast, &engine).unwrap(),

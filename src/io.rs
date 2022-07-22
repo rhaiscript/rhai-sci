@@ -3,11 +3,24 @@ use rhai::plugin::*;
 #[export_module]
 pub mod io_functions {
     use polars::prelude::{CsvReader, DataType, SerReader};
-    use rhai::serde::to_dynamic;
     use rhai::{Array, Dynamic, EvalAltResult, ImmutableString};
 
-    #[rhai_fn(return_raw)]
-    pub fn validate_and_read(file_path: ImmutableString) -> Result<Array, Box<EvalAltResult>> {
+    fn transpose2<T>(v: Vec<Vec<T>>) -> Vec<Vec<T>> {
+        assert!(!v.is_empty());
+        let len = v[0].len();
+        let mut iters: Vec<_> = v.into_iter().map(|n| n.into_iter()).collect();
+        (0..len)
+            .map(|_| {
+                iters
+                    .iter_mut()
+                    .map(|n| n.next().unwrap())
+                    .collect::<Vec<T>>()
+            })
+            .collect()
+    }
+
+    #[rhai_fn(name = "read_matrix", return_raw)]
+    pub fn read_matrix(file_path: ImmutableString) -> Result<Array, Box<EvalAltResult>> {
         let file_path_as_str = file_path.as_str();
 
         match CsvReader::from_path(file_path_as_str) {
@@ -40,14 +53,16 @@ pub mod io_functions {
                     final_output.push(col);
                 }
 
+                final_output = transpose2(final_output);
+
                 let matrix_as_array = final_output
                     .into_iter()
                     .map(|x| {
                         let mut y = vec![];
                         for el in &x {
-                            y.push(*el as f64);
+                            y.push(Dynamic::from_float(*el));
                         }
-                        to_dynamic(&y).unwrap()
+                        Dynamic::from_array(y)
                     })
                     .collect::<Vec<Dynamic>>();
 
@@ -61,7 +76,7 @@ pub mod io_functions {
                     let temp = temp_file::with_contents(file_contents.as_bytes());
 
                     let temp_file_name: ImmutableString = temp.path().to_str().unwrap().into();
-                    validate_and_read(temp_file_name)
+                    read_matrix(temp_file_name)
                 } else {
                     panic!(
                         "The string {} is not a valid URL or file path.",
