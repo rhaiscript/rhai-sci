@@ -18,12 +18,7 @@ fn polyfit(x, Y, n) {
     let X = [x0];
     for i in 1..=n {
         let xinc = x.map(|el| el ** i);
-        print(n);
-        print(xinc);
         X.push(xinc);
     }
-    print(X.transpose());
-    print(Y.transpose());
-
-    regress(X.transpose(), Y.transpose()).transpose()[0]
+    transpose(regress(transpose(X), transpose(Y)))[0]
 };

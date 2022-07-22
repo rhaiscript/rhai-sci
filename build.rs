@@ -50,6 +50,7 @@ fn main() {
     engine.register_fn("bounds", stats::bounds);
     engine.register_result_fn("inv", matrix_functions::invert_matrix);
     engine.register_result_fn("read_matrix", matrix_functions::read_matrix);
+    engine.register_fn("transpose", matrix_functions::transpose);
     engine.register_global_module(RandomPackage::new().as_shared_module());
     engine.register_global_module(rhai::Shared::new(
         Module::eval_ast_as_new(rhai::Scope::new(), &ast, &engine).unwrap(),

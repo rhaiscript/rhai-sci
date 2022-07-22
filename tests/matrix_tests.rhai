@@ -20,3 +20,17 @@ assert_eq(x_inverted, [[-2.0, 1.0],
 let url = "https://raw.githubusercontent.com/plotly/datasets/master/diabetes.csv";
 let x = read_matrix(url);
 assert_eq(size(x), [768, 9]);
+
+// Transposes a matrix 1
+let row = [1, 2, 3, 4];
+let column = transpose(row);
+assert_eq(column, [[1],
+                   [2],
+                   [3],
+                   [4]]);
+
+
+// Transposes a matrix 2
+let row = [1, 2, 3, 4];
+let column = transpose(eye(3));
+assert_eq(column, eye(3));

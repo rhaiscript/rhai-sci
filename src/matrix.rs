@@ -47,7 +47,7 @@ pub mod matrix_functions {
         }
     }
 
-    fn transpose2<T>(v: Vec<Vec<T>>) -> Vec<Vec<T>> {
+    fn transpose_internal<T>(v: Vec<Vec<T>>) -> Vec<Vec<T>> {
         assert!(!v.is_empty());
         let len = v[0].len();
         let mut iters: Vec<_> = v.into_iter().map(|n| n.into_iter()).collect();
@@ -59,6 +59,40 @@ pub mod matrix_functions {
                     .collect::<Vec<T>>()
             })
             .collect()
+    }
+
+    #[rhai_fn(name = "transpose")]
+    pub fn transpose(matrix: Array) -> Array {
+        let new_matrix = if !matrix[0].is::<Array>() {
+            vec![Dynamic::from_array(matrix.clone())]
+        } else {
+            matrix.clone()
+        };
+        // Turn into Vec<Vec<f64>>
+        let matrix_as_vec = new_matrix
+            .into_iter()
+            .map(|x| x.into_array().unwrap())
+            .collect::<Vec<Array>>();
+
+        let mat = DMatrix::from_fn(matrix_as_vec.len(), matrix_as_vec[0].len(), |i, j| {
+            if matrix_as_vec[0][0].is::<f64>() {
+                matrix_as_vec[i][j].as_float().unwrap()
+            } else {
+                matrix_as_vec[i][j].as_int().unwrap() as f64
+            }
+        })
+        .transpose();
+
+        // Turn into Vec<Dynamic>
+        let mut out = vec![];
+        for idx in 0..mat.shape().0 {
+            let mut new_row = vec![];
+            for jdx in 0..mat.shape().1 {
+                new_row.push(Dynamic::from_float(mat[(idx, jdx)]));
+            }
+            out.push(Dynamic::from_array(new_row));
+        }
+        out
     }
 
     #[rhai_fn(name = "read_matrix", return_raw)]
@@ -95,7 +129,7 @@ pub mod matrix_functions {
                     final_output.push(col);
                 }
 
-                final_output = transpose2(final_output);
+                final_output = transpose_internal(final_output);
 
                 let matrix_as_array = final_output
                     .into_iter()
