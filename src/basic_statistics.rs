@@ -202,4 +202,102 @@ pub mod stats {
             .into())
         }
     }
+
+    ///
+    /// ```rhai
+    /// let data = [1, 2, 3];
+    /// let m = sum(data, 3);
+    /// assert_eq(m, 6);
+    /// ```
+    #[rhai_fn(name = "sum", return_raw)]
+    pub fn sum(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
+        if arr[0].is::<f64>() {
+            let y = arr
+                .iter()
+                .map(|el| el.as_float().unwrap())
+                .collect::<Vec<f64>>();
+            Ok(Dynamic::from_float(y.iter().sum()))
+        } else if arr[0].is::<i64>() {
+            let y = arr
+                .iter()
+                .map(|el| el.as_int().unwrap())
+                .collect::<Vec<i64>>();
+            Ok(Dynamic::from_int(y.iter().sum()))
+        } else {
+            Err(EvalAltResult::ErrorArithmetic(
+                format!("The elements of the input must either be INT or FLOAT."),
+                Position::NONE,
+            )
+            .into())
+        }
+    }
+
+    ///
+    /// ```rhai
+    /// let data = [1, 2, 3];
+    /// let m = mean(data, 3);
+    /// assert_eq(m, 2.0);
+    /// ```
+    #[rhai_fn(name = "mean", return_raw)]
+    pub fn mean(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
+        let L = arr.len() as f64;
+        match sum(arr) {
+            Ok(s) => Ok(Dynamic::from_float(if s.is::<f64>() {
+                s.as_float().unwrap() / L
+            } else {
+                (s.as_int().unwrap() as f64) / L
+            })),
+            Err(e) => Err(e),
+        }
+    }
+
+    ///
+    /// ```rhai
+    /// let data = [1, 2, 3];
+    /// let m = argmax(data);
+    /// assert_eq(m, 2);
+    /// ```
+    #[rhai_fn(name = "argmax", return_raw)]
+    pub fn argmax(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
+        let mm = array_max(arr.clone());
+        match mm {
+            Ok(m) => Ok(Dynamic::from_int(
+                arr.iter()
+                    .position(|r| {
+                        if r.is::<f64>() {
+                            r.clone().as_float() == m.clone().as_float()
+                        } else {
+                            r.clone().as_int() == m.clone().as_int()
+                        }
+                    })
+                    .unwrap() as i64,
+            )),
+            Err(e) => Err(e),
+        }
+    }
+
+    ///
+    /// ```rhai
+    /// let data = [1, 2, 3];
+    /// let m = argmax(data);
+    /// assert_eq(m, 0);
+    /// ```
+    #[rhai_fn(name = "argmin", return_raw)]
+    pub fn argmin(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
+        let mm = array_min(arr.clone());
+        match mm {
+            Ok(m) => Ok(Dynamic::from_int(
+                arr.iter()
+                    .position(|r| {
+                        if r.is::<f64>() {
+                            r.clone().as_float() == m.clone().as_float()
+                        } else {
+                            r.clone().as_int() == m.clone().as_int()
+                        }
+                    })
+                    .unwrap() as i64,
+            )),
+            Err(e) => Err(e),
+        }
+    }
 }

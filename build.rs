@@ -43,9 +43,13 @@ fn main() {
     engine.register_result_fn("min", stats::array_min);
     engine.register_result_fn("maxk", stats::maxk);
     engine.register_result_fn("mink", stats::mink);
+    engine.register_result_fn("sum", stats::sum);
+    engine.register_result_fn("mean", stats::mean);
+    engine.register_result_fn("argmin", stats::argmin);
+    engine.register_result_fn("argmax", stats::argmax);
     engine.register_fn("bounds", stats::bounds);
-    engine.register_result_fn("inv", linalg_functions::invert_matrix);
-    engine.register_result_fn("read_matrix", io_functions::read_matrix);
+    engine.register_result_fn("inv", matrix_functions::invert_matrix);
+    engine.register_result_fn("read_matrix", matrix_functions::read_matrix);
     engine.register_global_module(RandomPackage::new().as_shared_module());
     engine.register_global_module(rhai::Shared::new(
         Module::eval_ast_as_new(rhai::Scope::new(), &ast, &engine).unwrap(),
@@ -118,6 +122,5 @@ fn main() {
     write!(doc_file, "</table>").expect("Cannot write to {doc_file}");
 }
 
-include!("src/linalg.rs");
-include!("src/io.rs");
+include!("src/matrix.rs");
 include!("src/basic_statistics.rs");

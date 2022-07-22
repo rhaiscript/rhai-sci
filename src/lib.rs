@@ -8,10 +8,8 @@
 
 use rhai::{def_package, packages::Package, plugin::*, Engine, EvalAltResult};
 use rhai_rand::RandomPackage;
-mod linalg;
-use linalg::linalg_functions;
-mod io;
-pub use io::io_functions;
+mod matrix;
+use matrix::matrix_functions;
 mod basic_statistics;
 pub use basic_statistics::stats;
 
@@ -22,8 +20,7 @@ def_package! {
         // Load random package
         RandomPackage::init(lib);
 
-        combine_with_exported_module!(lib, "linalg", linalg_functions);
-        combine_with_exported_module!(lib, "io", io_functions);
+        combine_with_exported_module!(lib, "matrix", matrix_functions);
         combine_with_exported_module!(lib, "stats", stats);
 
         // Load scripts
