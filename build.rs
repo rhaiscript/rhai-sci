@@ -75,6 +75,7 @@ fn main() {
     engine.register_result_fn("mtimes", matrix_functions::mtimes);
     engine.register_result_fn("horzcat", matrix_functions::horzcat);
     engine.register_result_fn("vertcat", matrix_functions::vertcat);
+    engine.register_result_fn("diag", matrix_functions::diag);
 
     // Add rand and create engine
     engine.register_global_module(RandomPackage::new().as_shared_module());

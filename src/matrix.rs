@@ -702,4 +702,50 @@ pub mod matrix_functions {
         }
         Ok(out)
     }
+
+    /// This function can be used in two distinct ways.
+    /// 1. If the argument is an 2-D array, `diag` returns an array containing the diagonal of the array.
+    /// 2. If the argument is a 1-D array, `diag` returns a matrix containing the argument along the
+    /// diagonal and zeros elsewhere.
+    #[rhai_fn(name = "diag", return_raw)]
+    pub fn diag(matrix: Array) -> Result<Array, Box<EvalAltResult>> {
+        if ndims(matrix.clone()) == 2 {
+            // Turn into Vec<Vec<Dynamic>>
+            let matrix_as_vec = matrix
+                .into_iter()
+                .map(|x| x.into_array().unwrap())
+                .collect::<Vec<Array>>();
+
+            let mut out = vec![];
+            for i in 0..matrix_as_vec.len() {
+                out.push(matrix_as_vec[i][i].clone());
+            }
+
+            Ok(out)
+        } else if ndims(matrix.clone()) == 1 {
+            let mut out = vec![];
+            for idx in 0..matrix.len() {
+                let mut new_row = vec![];
+                for jdx in 0..matrix.len() {
+                    if idx == jdx {
+                        new_row.push(matrix[idx].clone());
+                    } else {
+                        if matrix[idx].is::<i64>() {
+                            new_row.push(Dynamic::ZERO);
+                        } else {
+                            new_row.push(Dynamic::FLOAT_ZERO);
+                        }
+                    }
+                }
+                out.push(Dynamic::from_array(new_row));
+            }
+            Ok(out)
+        } else {
+            return Err(EvalAltResult::ErrorArithmetic(
+                format!("Argument must be a 2-D matrix (to extract the diagonal) or a 1-D array (to create a matrix with that diagonal."),
+                Position::NONE,
+            )
+                .into());
+        }
+    }
 }

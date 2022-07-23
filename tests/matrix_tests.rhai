@@ -202,3 +202,17 @@ let arr1 = rand(3);
 let arr2 = rand(3);
 let combined = horzcat(arr1, arr2);
 assert_eq(size(combined), [3, 6]);
+
+// Test diag
+ let matrix = [[1, 2, 3],
+               [4, 5, 6],
+               [7, 8, 9]];
+ let d = diag(matrix);
+ assert_eq(d, [1, 5, 9]);
+
+// Test diag
+ let diagonal = [1, 2, 3];
+ let matrix = diag(diagonal);
+ assert_eq(matrix, [[1.0, 0.0, 0.0],
+                    [0.0, 2.0, 0.0],
+                    [0.0, 0.0, 3.0]]);

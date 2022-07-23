@@ -20,7 +20,7 @@ This function can be used in two distinct ways.
  ```
 **/
 
-fn diag(arr) {
+fn xdiag(arr) {
     if ndims(arr) == 2 {
         let n = min(len(arr[0]), len(arr));
         let v = [];

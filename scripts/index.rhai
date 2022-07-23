@@ -1,7 +1,7 @@
 /**
 asdf
 ```javascript
-assert_eq(diag([1.0, 2.0]).index([1, 1]), 2.0)
+assert_eq(ones(2).index([1, 1]), 1.0)
 ```
 **/
 fn index(indices) {
