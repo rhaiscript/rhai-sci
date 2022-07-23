@@ -171,3 +171,15 @@ let matrix = flipud([[1.0, 0.0],
                      [0.0, 2.0]]);
 assert_eq(matrix, [[0.0, 2.0],
                    [1.0, 0.0]]);
+
+// Rotates a matrix 90 degrees counterclockwise.
+let matrix = rot90([[1.0, 0.0],
+                   [0.0, 2.0]]);
+assert_eq(matrix, [[0.0, 2.0],
+                  [1.0, 0.0]]);
+
+// Rotates a matrix 90 degrees counterclockwise by `k` increments.
+let matrix = rot90([[1.0, 0.0],
+                    [0.0, 2.0]], 2);
+assert_eq(matrix, [[2.0, 0.0],
+                   [0.0, 1.0]]);

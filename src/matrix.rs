@@ -405,7 +405,7 @@ pub mod matrix_functions {
     pub fn fliplr(matrix: Array) -> Result<Array, Box<EvalAltResult>> {
         if ndims(matrix.clone()) > 2 {
             Err(EvalAltResult::ErrorArithmetic(
-                format!("Matrix cannot be inverted"),
+                format!("Matrix cannot be flipped - too many dims"),
                 Position::NONE,
             )
             .into())
@@ -438,7 +438,7 @@ pub mod matrix_functions {
     pub fn flipud(matrix: Array) -> Result<Array, Box<EvalAltResult>> {
         if ndims(matrix.clone()) > 2 {
             Err(EvalAltResult::ErrorArithmetic(
-                format!("Matrix cannot be inverted"),
+                format!("Matrix cannot be flipped - too many dims"),
                 Position::NONE,
             )
             .into())
@@ -463,6 +463,60 @@ pub mod matrix_functions {
                 out.push(Dynamic::from_array(new_row));
             }
             Ok(out)
+        }
+    }
+
+    /// Flip a counterclockwise once
+    #[rhai_fn(name = "rot90", return_raw)]
+    pub fn rot90_once(matrix: Array) -> Result<Array, Box<EvalAltResult>> {
+        if ndims(matrix.clone()) == 1 {
+            Err(EvalAltResult::ErrorArithmetic(
+                format!("Matrix cannot be rotated - not enough dimensions"),
+                Position::NONE,
+            )
+            .into())
+        } else if ndims(matrix.clone()) > 2 {
+            Err(EvalAltResult::ErrorArithmetic(
+                format!("Matrix cannot be rotated - too many dimensions"),
+                Position::NONE,
+            )
+            .into())
+        } else {
+            // Turn into Vec<Vec<f64>>
+            let matrix_as_vec = matrix
+                .clone()
+                .into_iter()
+                .map(|x| x.into_array().unwrap())
+                .collect::<Vec<Array>>();
+
+            let w = matrix_as_vec[0].len();
+            let h = matrix_as_vec.len();
+
+            // Turn into Vec<Dynamic>
+            let mut out = vec![];
+            for idx in 0..w {
+                let mut new_row = vec![];
+                for jdx in 0..h {
+                    new_row.push(matrix_as_vec[jdx][w - idx - 1].clone());
+                }
+
+                out.push(Dynamic::from_array(new_row));
+            }
+            Ok(out)
+        }
+    }
+
+    /// Flip a counterclockwise `k` times
+    #[rhai_fn(name = "rot90", return_raw)]
+    pub fn rot90_ktimes(matrix: Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
+        if k > 1 {
+            let new_matrix = rot90_once(matrix);
+            match new_matrix {
+                Ok(mat) => rot90_ktimes(mat, k - 1),
+                Err(e) => Err(e),
+            }
+        } else {
+            rot90_once(matrix)
         }
     }
 }

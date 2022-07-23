@@ -70,6 +70,8 @@ fn main() {
     engine.register_fn("flatten", matrix_functions::flatten);
     engine.register_result_fn("fliplr", matrix_functions::fliplr);
     engine.register_result_fn("flipud", matrix_functions::flipud);
+    engine.register_result_fn("rot90", matrix_functions::rot90_once);
+    engine.register_result_fn("rot90", matrix_functions::rot90_ktimes);
 
     // Add rand and create engine
     engine.register_global_module(RandomPackage::new().as_shared_module());
