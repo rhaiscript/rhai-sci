@@ -15,10 +15,10 @@ pub mod matrix_functions {
             .collect::<Vec<Array>>();
 
         let dm = DMatrix::from_fn(matrix_as_vec.len(), matrix_as_vec[0].len(), |i, j| {
-            if matrix_as_vec[0][0].is::<f64>() {
+            if matrix_as_vec[0][0].is::<FLOAT>() {
                 matrix_as_vec[i][j].as_float().unwrap()
             } else {
-                matrix_as_vec[i][j].as_int().unwrap() as f64
+                matrix_as_vec[i][j].as_int().unwrap() as FLOAT
             }
         });
 
@@ -75,10 +75,10 @@ pub mod matrix_functions {
             .collect::<Vec<Array>>();
 
         let mat = DMatrix::from_fn(matrix_as_vec.len(), matrix_as_vec[0].len(), |i, j| {
-            if matrix_as_vec[0][0].is::<f64>() {
+            if matrix_as_vec[0][0].is::<FLOAT>() {
                 matrix_as_vec[i][j].as_float().unwrap()
             } else {
-                matrix_as_vec[i][j].as_int().unwrap() as f64
+                matrix_as_vec[i][j].as_int().unwrap() as FLOAT
             }
         })
         .transpose();
@@ -114,17 +114,12 @@ pub mod matrix_functions {
 
     #[rhai_fn(name = "ndims")]
     pub fn ndims(matrix: Array) -> INT {
-        matrix_size(matrix).len() as i64
+        matrix_size(matrix).len() as INT
     }
 
     #[rhai_fn(name = "numel")]
     pub fn numel(matrix: Array) -> INT {
-        let s = matrix_size(matrix);
-        let mut prod = 1_i64;
-        for el in s {
-            prod *= el.as_int().unwrap();
-        }
-        prod
+        flatten(matrix).len() as INT
     }
 
     #[rhai_fn(name = "read_matrix", return_raw)]
@@ -362,7 +357,7 @@ pub mod matrix_functions {
                     format!(""),
                     Position::NONE,
                 )
-                    .into())
+                .into())
             }
         } else {
             Err(EvalAltResult::ErrorMismatchDataType(
@@ -370,7 +365,7 @@ pub mod matrix_functions {
                 format!(""),
                 Position::NONE,
             )
-                .into())
+            .into())
         }
     }
 
@@ -380,7 +375,7 @@ pub mod matrix_functions {
         for i in 0..nx {
             let mut row = vec![];
             for j in 0..ny {
-                if i==j {
+                if i == j {
                     row.push(Dynamic::FLOAT_ONE);
                 } else {
                     row.push(Dynamic::FLOAT_ZERO);
@@ -389,5 +384,19 @@ pub mod matrix_functions {
             output.push(Dynamic::from_array(row))
         }
         output
+    }
+
+    /// Returns the contents of an multidimensional array as a 1-D array.
+    #[rhai_fn(name = "flatten")]
+    pub fn flatten(matrix: Array) -> Array {
+        let mut flat: Vec<Dynamic> = vec![];
+        for el in matrix {
+            if el.is::<Array>() {
+                flat.extend(flatten(el.into_array().unwrap()))
+            } else {
+                flat.push(el);
+            }
+        }
+        flat
     }
 }

@@ -149,3 +149,13 @@ let matrix = eye([3, 4]);
 assert_eq(matrix, [[1.0, 0.0, 0.0, 0.0],
                    [0.0, 1.0, 0.0, 0.0],
                    [0.0, 0.0, 1.0, 0.0]]);
+
+// Test flatten
+let matrix = rand(3, 5);
+let flat = flatten(matrix);
+assert_eq(len(flat), 15);
+
+// Test flatten
+let matrix = [[1.0, 2.0, 3.0], [1.0]];
+let flat = flatten(matrix);
+assert_eq(len(flat), 4);

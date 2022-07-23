@@ -67,6 +67,7 @@ fn main() {
     engine.register_fn("rand", matrix_functions::rand_double_input);
     engine.register_result_fn("eye", matrix_functions::eye_single_input);
     engine.register_fn("eye", matrix_functions::eye_double_input);
+    engine.register_fn("flatten", matrix_functions::flatten);
 
     // Add rand and create engine
     engine.register_global_module(RandomPackage::new().as_shared_module());
