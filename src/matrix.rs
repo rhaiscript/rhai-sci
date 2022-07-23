@@ -198,11 +198,11 @@ pub mod matrix_functions {
     #[rhai_fn(name = "zeros", return_raw)]
     pub fn zeros_single_input(n: Dynamic) -> Result<Array, Box<EvalAltResult>> {
         if n.is::<i64>() {
-            Ok(zeros_two_input(n.as_int().unwrap(), n.as_int().unwrap()))
+            Ok(zeros_double_input(n.as_int().unwrap(), n.as_int().unwrap()))
         } else if n.is::<Array>() {
             let mut m = n.into_array().unwrap();
             if m.len() == 2 {
-                Ok(zeros_two_input(
+                Ok(zeros_double_input(
                     m[0].as_int().unwrap(),
                     m[1].as_int().unwrap(),
                 ))
@@ -234,7 +234,7 @@ pub mod matrix_functions {
     }
 
     #[rhai_fn(name = "zeros")]
-    pub fn zeros_two_input(nx: INT, ny: INT) -> Array {
+    pub fn zeros_double_input(nx: INT, ny: INT) -> Array {
         let mut output = vec![];
         for i in 0..nx {
             output.push(Dynamic::from_array(vec![Dynamic::FLOAT_ZERO; ny as usize]))
@@ -245,11 +245,11 @@ pub mod matrix_functions {
     #[rhai_fn(name = "ones", return_raw)]
     pub fn ones_single_input(n: Dynamic) -> Result<Array, Box<EvalAltResult>> {
         if n.is::<i64>() {
-            Ok(ones_two_input(n.as_int().unwrap(), n.as_int().unwrap()))
+            Ok(ones_double_input(n.as_int().unwrap(), n.as_int().unwrap()))
         } else if n.is::<Array>() {
             let mut m = n.into_array().unwrap();
             if m.len() == 2 {
-                Ok(ones_two_input(
+                Ok(ones_double_input(
                     m[0].as_int().unwrap(),
                     m[1].as_int().unwrap(),
                 ))
@@ -281,7 +281,7 @@ pub mod matrix_functions {
     }
 
     #[rhai_fn(name = "ones")]
-    pub fn ones_two_input(nx: INT, ny: INT) -> Array {
+    pub fn ones_double_input(nx: INT, ny: INT) -> Array {
         let mut output = vec![];
         for i in 0..nx {
             output.push(Dynamic::from_array(vec![Dynamic::FLOAT_ONE; ny as usize]))
@@ -297,11 +297,11 @@ pub mod matrix_functions {
     #[rhai_fn(name = "rand", return_raw)]
     pub fn rand_single_input(n: Dynamic) -> Result<Array, Box<EvalAltResult>> {
         if n.is::<i64>() {
-            Ok(rand_two_input(n.as_int().unwrap(), n.as_int().unwrap()))
+            Ok(rand_double_input(n.as_int().unwrap(), n.as_int().unwrap()))
         } else if n.is::<Array>() {
             let mut m = n.into_array().unwrap();
             if m.len() == 2 {
-                Ok(rand_two_input(
+                Ok(rand_double_input(
                     m[0].as_int().unwrap(),
                     m[1].as_int().unwrap(),
                 ))
@@ -333,12 +333,58 @@ pub mod matrix_functions {
     }
 
     #[rhai_fn(name = "rand")]
-    pub fn rand_two_input(nx: INT, ny: INT) -> Array {
+    pub fn rand_double_input(nx: INT, ny: INT) -> Array {
         let mut output = vec![];
         for i in 0..nx {
             let mut row = vec![];
             for j in 0..ny {
                 row.push(Dynamic::from_float(rand_float()));
+            }
+            output.push(Dynamic::from_array(row))
+        }
+        output
+    }
+
+    #[rhai_fn(name = "eye", return_raw)]
+    pub fn eye_single_input(n: Dynamic) -> Result<Array, Box<EvalAltResult>> {
+        if n.is::<i64>() {
+            Ok(eye_double_input(n.as_int().unwrap(), n.as_int().unwrap()))
+        } else if n.is::<Array>() {
+            let mut m = n.into_array().unwrap();
+            if m.len() == 2 {
+                Ok(eye_double_input(
+                    m[0].as_int().unwrap(),
+                    m[1].as_int().unwrap(),
+                ))
+            } else {
+                Err(EvalAltResult::ErrorMismatchDataType(
+                    format!("Input must be INT or Array"),
+                    format!(""),
+                    Position::NONE,
+                )
+                    .into())
+            }
+        } else {
+            Err(EvalAltResult::ErrorMismatchDataType(
+                format!("Input must be INT or Array"),
+                format!(""),
+                Position::NONE,
+            )
+                .into())
+        }
+    }
+
+    #[rhai_fn(name = "eye")]
+    pub fn eye_double_input(nx: INT, ny: INT) -> Array {
+        let mut output = vec![];
+        for i in 0..nx {
+            let mut row = vec![];
+            for j in 0..ny {
+                if i==j {
+                    row.push(Dynamic::FLOAT_ONE);
+                } else {
+                    row.push(Dynamic::FLOAT_ZERO);
+                }
             }
             output.push(Dynamic::from_array(row))
         }

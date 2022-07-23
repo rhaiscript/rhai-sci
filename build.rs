@@ -37,6 +37,8 @@ fn main() {
                 .unwrap(),
         )
         .unwrap();
+
+    // Statistics functions
     engine.register_result_fn("max", stats::gen_max);
     engine.register_result_fn("max", stats::array_max);
     engine.register_result_fn("min", stats::gen_min);
@@ -48,6 +50,8 @@ fn main() {
     engine.register_result_fn("argmin", stats::argmin);
     engine.register_result_fn("argmax", stats::argmax);
     engine.register_result_fn("bounds", stats::bounds);
+
+    // Matrix functions
     engine.register_result_fn("inv", matrix_functions::invert_matrix);
     engine.register_result_fn("read_matrix", matrix_functions::read_matrix);
     engine.register_fn("transpose", matrix_functions::transpose);
@@ -55,12 +59,16 @@ fn main() {
     engine.register_fn("ndims", matrix_functions::ndims);
     engine.register_fn("numel", matrix_functions::numel);
     engine.register_result_fn("zeros", matrix_functions::zeros_single_input);
-    engine.register_fn("zeros", matrix_functions::zeros_two_input);
+    engine.register_fn("zeros", matrix_functions::zeros_double_input);
     engine.register_result_fn("ones", matrix_functions::ones_single_input);
-    engine.register_fn("ones", matrix_functions::ones_two_input);
+    engine.register_fn("ones", matrix_functions::ones_double_input);
     engine.register_fn("rand", matrix_functions::rand_float);
     engine.register_result_fn("rand", matrix_functions::rand_single_input);
-    engine.register_fn("rand", matrix_functions::rand_two_input);
+    engine.register_fn("rand", matrix_functions::rand_double_input);
+    engine.register_result_fn("eye", matrix_functions::eye_single_input);
+    engine.register_fn("eye", matrix_functions::eye_double_input);
+
+    // Add rand and create engine
     engine.register_global_module(RandomPackage::new().as_shared_module());
     engine.register_global_module(rhai::Shared::new(
         Module::eval_ast_as_new(rhai::Scope::new(), &ast, &engine).unwrap(),
