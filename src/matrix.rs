@@ -399,4 +399,70 @@ pub mod matrix_functions {
         }
         flat
     }
+
+    /// Flip a matrix left-to-right
+    #[rhai_fn(name = "fliplr", return_raw)]
+    pub fn fliplr(matrix: Array) -> Result<Array, Box<EvalAltResult>> {
+        if ndims(matrix.clone()) > 2 {
+            Err(EvalAltResult::ErrorArithmetic(
+                format!("Matrix cannot be inverted"),
+                Position::NONE,
+            )
+            .into())
+        } else {
+            // Turn into Vec<Vec<f64>>
+            let matrix_as_vec = matrix
+                .clone()
+                .into_iter()
+                .map(|x| x.into_array().unwrap())
+                .collect::<Vec<Array>>();
+
+            let w = matrix_as_vec[0].len();
+            let h = matrix_as_vec.len();
+
+            // Turn into Vec<Dynamic>
+            let mut out = vec![];
+            for idx in 0..h {
+                let mut new_row = vec![];
+                for jdx in 0..w {
+                    new_row.push(matrix_as_vec[idx][w - jdx - 1].clone());
+                }
+                out.push(Dynamic::from_array(new_row));
+            }
+            Ok(out)
+        }
+    }
+
+    /// Flip a matrix up-down
+    #[rhai_fn(name = "flipud", return_raw)]
+    pub fn flipud(matrix: Array) -> Result<Array, Box<EvalAltResult>> {
+        if ndims(matrix.clone()) > 2 {
+            Err(EvalAltResult::ErrorArithmetic(
+                format!("Matrix cannot be inverted"),
+                Position::NONE,
+            )
+            .into())
+        } else {
+            // Turn into Vec<Vec<f64>>
+            let matrix_as_vec = matrix
+                .clone()
+                .into_iter()
+                .map(|x| x.into_array().unwrap())
+                .collect::<Vec<Array>>();
+
+            let w = matrix_as_vec[0].len();
+            let h = matrix_as_vec.len();
+
+            // Turn into Vec<Dynamic>
+            let mut out = vec![];
+            for idx in 0..h {
+                let mut new_row = vec![];
+                for jdx in 0..w {
+                    new_row.push(matrix_as_vec[h - idx - 1][jdx].clone());
+                }
+                out.push(Dynamic::from_array(new_row));
+            }
+            Ok(out)
+        }
+    }
 }

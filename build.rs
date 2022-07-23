@@ -68,6 +68,8 @@ fn main() {
     engine.register_result_fn("eye", matrix_functions::eye_single_input);
     engine.register_fn("eye", matrix_functions::eye_double_input);
     engine.register_fn("flatten", matrix_functions::flatten);
+    engine.register_result_fn("fliplr", matrix_functions::fliplr);
+    engine.register_result_fn("flipud", matrix_functions::flipud);
 
     // Add rand and create engine
     engine.register_global_module(RandomPackage::new().as_shared_module());

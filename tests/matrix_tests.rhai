@@ -159,3 +159,15 @@ assert_eq(len(flat), 15);
 let matrix = [[1.0, 2.0, 3.0], [1.0]];
 let flat = flatten(matrix);
 assert_eq(len(flat), 4);
+
+// Flip left-to-right
+let matrix = fliplr([[1.0, 0.0],
+                     [0.0, 2.0]]);
+assert_eq(matrix, [[0.0, 1.0],
+                   [2.0, 0.0]]);
+
+// Flip up-down
+let matrix = flipud([[1.0, 0.0],
+                     [0.0, 2.0]]);
+assert_eq(matrix, [[0.0, 2.0],
+                   [1.0, 0.0]]);
