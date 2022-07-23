@@ -7,9 +7,8 @@
 #![doc = include_str!("../docs/highlight.html")]
 
 use rhai::{def_package, packages::Package, plugin::*, Engine, EvalAltResult};
-use rhai_rand::RandomPackage;
 mod matrix;
-use matrix::matrix_functions;
+pub use matrix::matrix_functions;
 mod basic_statistics;
 pub use basic_statistics::stats;
 mod utils;
@@ -18,9 +17,6 @@ pub use utils::util_functions;
 def_package! {
     /// Package for scientific computing
     pub SciPackage(lib) {
-
-        // Load random package
-        RandomPackage::init(lib);
 
         combine_with_exported_module!(lib, "matrix", matrix_functions);
         combine_with_exported_module!(lib, "stats", stats);

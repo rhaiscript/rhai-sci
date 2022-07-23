@@ -15,7 +15,6 @@ build = "build.rs"
 
 [dependencies]
 rhai = { version = "1.5", features = ["unchecked", "serde", "metadata"]}
-rhai-rand = "0.1.3"
 rustyline = "10.0.0"
 nalgebra = "0.30.1"
 polars = {version = "0.17.0"}
@@ -28,7 +27,6 @@ rand = { version = "0.8" }
 [build-dependencies]
 rhai = { version = "1.5", features = ["unchecked", "serde", "metadata"]}
 itertools = "0.10.3"
-rhai-rand = "0.1.3"
 nalgebra = "0.30.1"
 polars = {version = "0.17.0"}
 url = {version = "2.2.2"}
