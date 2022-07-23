@@ -132,3 +132,20 @@ let matrix = rand([3, 3]);
 let matrix = rand(3, 3);
 assert_eq(size(matrix), [3, 3]);
 
+// Test eye
+let matrix = eye(3, 3);
+assert_eq(matrix, [[1.0, 0.0, 0.0],
+                   [0.0, 1.0, 0.0],
+                   [0.0, 0.0, 1.0]]);
+
+// Test eye
+let matrix = eye(3);
+assert_eq(matrix, [[1.0, 0.0, 0.0],
+                   [0.0, 1.0, 0.0],
+                   [0.0, 0.0, 1.0]]);
+
+// Test eye
+let matrix = eye([3, 4]);
+assert_eq(matrix, [[1.0, 0.0, 0.0, 0.0],
+                   [0.0, 1.0, 0.0, 0.0],
+                   [0.0, 0.0, 1.0, 0.0]]);
