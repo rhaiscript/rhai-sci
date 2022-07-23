@@ -22,6 +22,12 @@ pub mod util_functions {
     // The Planck constant in Joules per Hertz (J/Hz)
     pub const h: f64 = 6.62607015e-34;
 
+    // The golden ratio
+    pub const phi: f64 = 1.61803398874989484820;
+
+    // Newtonian gravitational constnat
+    pub const G: f64 = 6.6743015e-11;
+
     #[rhai_fn(name = "pprint")]
     pub fn pprint(matrix: Array) {
         if ndims(matrix.clone()) > 1 {
