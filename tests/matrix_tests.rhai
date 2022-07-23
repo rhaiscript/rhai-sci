@@ -183,3 +183,22 @@ let matrix = rot90([[1.0, 0.0],
                     [0.0, 2.0]], 2);
 assert_eq(matrix, [[2.0, 0.0],
                    [0.0, 1.0]]);
+
+
+// Test mtimes
+let a = eye(3);
+let b = ones(3);
+let c = mtimes(a, b);
+assert_eq(b, c);
+
+// Test vertcat
+let arr1 = rand(3);
+let arr2 = rand(3);
+let combined = vertcat(arr1, arr2);
+assert_eq(size(combined), [6, 3]);
+
+// Test horzcat
+let arr1 = rand(3);
+let arr2 = rand(3);
+let combined = horzcat(arr1, arr2);
+assert_eq(size(combined), [3, 6]);

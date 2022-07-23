@@ -12,6 +12,8 @@ mod matrix;
 use matrix::matrix_functions;
 mod basic_statistics;
 pub use basic_statistics::stats;
+mod utils;
+pub use utils::util_functions;
 
 def_package! {
     /// Package for scientific computing
@@ -22,6 +24,7 @@ def_package! {
 
         combine_with_exported_module!(lib, "matrix", matrix_functions);
         combine_with_exported_module!(lib, "stats", stats);
+        combine_with_exported_module!(lib, "utils", util_functions);
 
         // Load scripts
         let engine = Engine::new();

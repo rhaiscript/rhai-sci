@@ -519,4 +519,187 @@ pub mod matrix_functions {
             rot90_once(matrix)
         }
     }
+
+    #[rhai_fn(name = "mtimes", return_raw)]
+    pub fn mtimes(matrix1: Array, matrix2: Array) -> Result<Array, Box<EvalAltResult>> {
+        if matrix_size(matrix1.clone())[1].as_int().unwrap()
+            != matrix_size(matrix2.clone())[0].as_int().unwrap()
+        {
+            return Err(EvalAltResult::ErrorArithmetic(
+                format!("The width of the first matrix must be equal to the height of the second matrix"),
+                Position::NONE,
+            )
+                .into());
+        }
+        // Turn into Vec<Vec<Dynamic>>
+        let matrix_as_vec1 = matrix1
+            .into_iter()
+            .map(|x| x.into_array().unwrap())
+            .collect::<Vec<Array>>();
+
+        let dm1 = DMatrix::from_fn(matrix_as_vec1.len(), matrix_as_vec1[0].len(), |i, j| {
+            if matrix_as_vec1[0][0].is::<FLOAT>() {
+                matrix_as_vec1[i][j].as_float().unwrap()
+            } else {
+                matrix_as_vec1[i][j].as_int().unwrap() as FLOAT
+            }
+        });
+
+        // Turn into Vec<Vec<Dynamic>>
+        let matrix_as_vec2 = matrix2
+            .into_iter()
+            .map(|x| x.into_array().unwrap())
+            .collect::<Vec<Array>>();
+
+        let dm2 = DMatrix::from_fn(matrix_as_vec2.len(), matrix_as_vec2[0].len(), |i, j| {
+            if matrix_as_vec2[0][0].is::<FLOAT>() {
+                matrix_as_vec2[i][j].as_float().unwrap()
+            } else {
+                matrix_as_vec2[i][j].as_int().unwrap() as FLOAT
+            }
+        });
+
+        // Try to multiple
+        let mat = dm1 * dm2;
+
+        // Turn into Vec<Dynamic>
+        let mut out = vec![];
+        for idx in 0..mat.shape().0 {
+            let mut new_row = vec![];
+            for jdx in 0..mat.shape().1 {
+                new_row.push(Dynamic::from_float(mat[(idx, jdx)]));
+            }
+            out.push(Dynamic::from_array(new_row));
+        }
+        Ok(out)
+    }
+
+    #[rhai_fn(name = "horzcat", return_raw)]
+    pub fn horzcat(matrix1: Array, matrix2: Array) -> Result<Array, Box<EvalAltResult>> {
+        if matrix_size(matrix1.clone())[0].as_int().unwrap()
+            != matrix_size(matrix2.clone())[0].as_int().unwrap()
+        {
+            return Err(EvalAltResult::ErrorArithmetic(
+                format!("Matrices must have the same height"),
+                Position::NONE,
+            )
+            .into());
+        }
+
+        // Turn into Vec<Vec<Dynamic>>
+        let matrix_as_vec1 = matrix1
+            .into_iter()
+            .map(|x| x.into_array().unwrap())
+            .collect::<Vec<Array>>();
+
+        let dm1 = DMatrix::from_fn(matrix_as_vec1.len(), matrix_as_vec1[0].len(), |i, j| {
+            if matrix_as_vec1[0][0].is::<FLOAT>() {
+                matrix_as_vec1[i][j].as_float().unwrap()
+            } else {
+                matrix_as_vec1[i][j].as_int().unwrap() as FLOAT
+            }
+        });
+
+        // Turn into Vec<Vec<Dynamic>>
+        let matrix_as_vec2 = matrix2
+            .into_iter()
+            .map(|x| x.into_array().unwrap())
+            .collect::<Vec<Array>>();
+
+        let dm2 = DMatrix::from_fn(matrix_as_vec2.len(), matrix_as_vec2[0].len(), |i, j| {
+            if matrix_as_vec2[0][0].is::<FLOAT>() {
+                matrix_as_vec2[i][j].as_float().unwrap()
+            } else {
+                matrix_as_vec2[i][j].as_int().unwrap() as FLOAT
+            }
+        });
+
+        // Try to multiple
+        let w0 = dm1.shape().1;
+        let w = dm1.shape().1 + dm2.shape().1;
+        let h = dm1.shape().0;
+        let mat = DMatrix::from_fn(h, w, |i, j| {
+            if j >= w0 {
+                dm2[(i, j - w0)]
+            } else {
+                dm1[(i, j)]
+            }
+        });
+
+        // Turn into Vec<Dynamic>
+        let mut out = vec![];
+        for idx in 0..h {
+            let mut new_row = vec![];
+            for jdx in 0..w {
+                new_row.push(Dynamic::from_float(mat[(idx, jdx)]));
+            }
+            out.push(Dynamic::from_array(new_row));
+        }
+        Ok(out)
+    }
+
+    #[rhai_fn(name = "vertcat", return_raw)]
+    pub fn vertcat(matrix1: Array, matrix2: Array) -> Result<Array, Box<EvalAltResult>> {
+        if matrix_size(matrix1.clone())[1].as_int().unwrap()
+            != matrix_size(matrix2.clone())[1].as_int().unwrap()
+        {
+            return Err(EvalAltResult::ErrorArithmetic(
+                format!("Matrices must have the same width"),
+                Position::NONE,
+            )
+            .into());
+        }
+
+        // Turn into Vec<Vec<Dynamic>>
+        let matrix_as_vec1 = matrix1
+            .into_iter()
+            .map(|x| x.into_array().unwrap())
+            .collect::<Vec<Array>>();
+
+        let dm1 = DMatrix::from_fn(matrix_as_vec1.len(), matrix_as_vec1[0].len(), |i, j| {
+            if matrix_as_vec1[0][0].is::<FLOAT>() {
+                matrix_as_vec1[i][j].as_float().unwrap()
+            } else {
+                matrix_as_vec1[i][j].as_int().unwrap() as FLOAT
+            }
+        });
+
+        // Turn into Vec<Vec<Dynamic>>
+        let matrix_as_vec2 = matrix2
+            .into_iter()
+            .map(|x| x.into_array().unwrap())
+            .collect::<Vec<Array>>();
+
+        let dm2 = DMatrix::from_fn(matrix_as_vec2.len(), matrix_as_vec2[0].len(), |i, j| {
+            if matrix_as_vec2[0][0].is::<FLOAT>() {
+                matrix_as_vec2[i][j].as_float().unwrap()
+            } else {
+                matrix_as_vec2[i][j].as_int().unwrap() as FLOAT
+            }
+        });
+
+        // Try to multiple
+        let h0 = dm1.shape().0;
+        let w = dm1.shape().1;
+        let h = dm1.shape().0 + dm2.shape().0;
+        let mat = DMatrix::from_fn(h, w, |i, j| {
+            println!("{} {} {} ", i, j, h0);
+            if i >= h0 {
+                dm2[(i - h0, j)]
+            } else {
+                dm1[(i, j)]
+            }
+        });
+
+        // Turn into Vec<Dynamic>
+        let mut out = vec![];
+        for idx in 0..h {
+            let mut new_row = vec![];
+            for jdx in 0..w {
+                new_row.push(Dynamic::from_float(mat[(idx, jdx)]));
+            }
+            out.push(Dynamic::from_array(new_row));
+        }
+        Ok(out)
+    }
 }
