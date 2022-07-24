@@ -60,12 +60,12 @@ pub mod stats {
     /// # Example
     ///
     /// ```rhai
-    /// let the_higher_number = max(2, 3);
-    /// assert_eq(the_higher_number, 2);
+    /// let the_lower_number = min(2, 3);
+    /// assert_eq(the_lower_number, 2);
     /// ```
     /// ```rhai
-    /// let the_higher_number = max(2.0, 3.0);
-    /// assert_eq(the_higher_number, 2.0);
+    /// let the_lower_number = min(2.0, 3.0);
+    /// assert_eq(the_lower_number, 2.0);
     /// ```
     #[rhai_fn(name = "min", return_raw)]
     pub fn gen_min(a: Dynamic, b: Dynamic) -> Result<Dynamic, Box<EvalAltResult>> {
@@ -77,7 +77,7 @@ pub mod stats {
     /// # Example
     ///
     /// ```rhai
-    /// let the_lowest_number = max([2, 3, 4, 5]);
+    /// let the_lowest_number = min([2, 3, 4, 5]);
     /// assert_eq(the_lowest_number, 2);
     /// ```
     #[rhai_fn(name = "min", return_raw)]
@@ -208,7 +208,7 @@ pub mod stats {
     ///
     /// ```rhai
     /// let data = [1, 2, 3];
-    /// let m = sum(data, 3);
+    /// let m = sum(data);
     /// assert_eq(m, 6);
     /// ```
     #[rhai_fn(name = "sum", return_raw)]
@@ -237,7 +237,7 @@ pub mod stats {
     ///
     /// ```rhai
     /// let data = [1, 2, 3];
-    /// let m = mean(data, 3);
+    /// let m = mean(data);
     /// assert_eq(m, 2.0);
     /// ```
     #[rhai_fn(name = "mean", return_raw)]
@@ -281,7 +281,7 @@ pub mod stats {
     ///
     /// ```rhai
     /// let data = [1, 2, 3];
-    /// let m = argmax(data);
+    /// let m = argmin(data);
     /// assert_eq(m, 0);
     /// ```
     #[rhai_fn(name = "argmin", return_raw)]

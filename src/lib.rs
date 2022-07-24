@@ -8,11 +8,11 @@
 
 use rhai::{def_package, packages::Package, plugin::*, Engine, EvalAltResult};
 mod matrix;
-pub use matrix::matrix_functions;
+use matrix::matrix_functions;
 mod basic_statistics;
-pub use basic_statistics::stats;
+use basic_statistics::stats;
 mod utils;
-pub use utils::util_functions;
+use utils::util_functions;
 
 def_package! {
     /// Package for scientific computing

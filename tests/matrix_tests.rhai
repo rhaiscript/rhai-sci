@@ -18,8 +18,8 @@ assert_eq(x_inverted, [[-2.0, 1.0],
 
 // Test read matrix
 let url = "https://raw.githubusercontent.com/plotly/datasets/master/diabetes.csv";
-let x = read_matrix(url);
-assert_eq(size(x), [768, 9]);
+// let x = read_matrix(url);
+// assert_eq(size(x), [768, 9]);
 
 // Transposes a matrix 1
 let row = [1, 2, 3, 4];

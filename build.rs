@@ -40,50 +40,19 @@ fn main() {
         )
         .unwrap();
 
-    // Statistics functions
-    engine.register_result_fn("max", stats::gen_max);
-    engine.register_result_fn("max", stats::array_max);
-    engine.register_result_fn("min", stats::gen_min);
-    engine.register_result_fn("min", stats::array_min);
-    engine.register_result_fn("maxk", stats::maxk);
-    engine.register_result_fn("mink", stats::mink);
-    engine.register_result_fn("sum", stats::sum);
-    engine.register_result_fn("mean", stats::mean);
-    engine.register_result_fn("argmin", stats::argmin);
-    engine.register_result_fn("argmax", stats::argmax);
-    engine.register_result_fn("bounds", stats::bounds);
-
-    // Matrix functions
-    engine.register_result_fn("inv", matrix_functions::invert_matrix);
-    engine.register_result_fn("read_matrix", matrix_functions::read_matrix);
-    engine.register_fn("transpose", matrix_functions::transpose);
-    engine.register_fn("size", matrix_functions::matrix_size);
-    engine.register_fn("ndims", matrix_functions::ndims);
-    engine.register_fn("numel", matrix_functions::numel);
-    engine.register_result_fn("zeros", matrix_functions::zeros_single_input);
-    engine.register_fn("zeros", matrix_functions::zeros_double_input);
-    engine.register_result_fn("ones", matrix_functions::ones_single_input);
-    engine.register_fn("ones", matrix_functions::ones_double_input);
-    engine.register_fn("rand", matrix_functions::rand_float);
-    engine.register_result_fn("rand", matrix_functions::rand_single_input);
-    engine.register_fn("rand", matrix_functions::rand_double_input);
-    engine.register_result_fn("eye", matrix_functions::eye_single_input);
-    engine.register_fn("eye", matrix_functions::eye_double_input);
-    engine.register_fn("flatten", matrix_functions::flatten);
-    engine.register_result_fn("fliplr", matrix_functions::fliplr);
-    engine.register_result_fn("flipud", matrix_functions::flipud);
-    engine.register_result_fn("rot90", matrix_functions::rot90_once);
-    engine.register_result_fn("rot90", matrix_functions::rot90_ktimes);
-    engine.register_result_fn("mtimes", matrix_functions::mtimes);
-    engine.register_result_fn("horzcat", matrix_functions::horzcat);
-    engine.register_result_fn("vertcat", matrix_functions::vertcat);
-    engine.register_result_fn("diag", matrix_functions::diag);
-
     // Add rand and create engine
     engine.register_global_module(rhai::Shared::new(
         Module::eval_ast_as_new(rhai::Scope::new(), &ast, &engine).unwrap(),
     ));
 
+    // Add custom functions from Rust
+    let mut lib = Module::new();
+    combine_with_exported_module!(&mut lib, "rhai_sci_matrix_function", matrix_functions);
+    combine_with_exported_module!(&mut lib, "rhai_sci_utility_functions", util_functions);
+    combine_with_exported_module!(&mut lib, "rhai_sci_basic_stats", stats);
+    engine.register_global_module(rhai::Shared::new(lib));
+
+    // Extract metadata
     let mut json_fns = engine.gen_fn_metadata_to_json(false).unwrap();
     println!("{json_fns}");
     let v: HashMap<String, Vec<Function>> = serde_json::from_str(&json_fns).unwrap();
@@ -147,7 +116,10 @@ fn main() {
             // Run doc tests
             let code = comments.split("```").collect::<Vec<&str>>();
             for i in (1..code.len()).step_by(2) {
-                let clean_code = code[i].replace("javascript", "").replace("\n", "");
+                let clean_code = code[i]
+                    .replace("javascript", "")
+                    .replace("rhai", "")
+                    .replace("\n", "");
                 println!("{clean_code}");
                 assert!(engine.eval::<bool>(&clean_code).unwrap());
             }
