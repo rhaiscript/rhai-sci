@@ -135,4 +135,69 @@ pub mod cum_functions {
             .into())
         }
     }
+
+    /// Returns the cumulative approximate integral of the curve defined by Y and x using the trapezoidal method.
+    /// ```typescript
+    /// let y = [1, 2, 3];
+    /// let x = [1, 2, 3];
+    /// let c = cumtrapz(x, y);
+    /// assert_eq(c, [0.0, 1.5, 4.0]);    
+    /// ```
+    #[rhai_fn(name = "cumtrapz", return_raw)]
+    pub fn cumtrapz(x: Array, y: Array) -> Result<Array, Box<EvalAltResult>> {
+        if x.len() != y.len() {
+            return Err(EvalAltResult::ErrorArithmetic(
+                format!("The arrays must have the same length"),
+                Position::NONE,
+            )
+            .into());
+        }
+
+        // Convert if needed
+        let mut X: Vec<FLOAT> = if x[0].is::<INT>() {
+            x.iter().map(|el| el.as_int().unwrap() as FLOAT).collect()
+        } else {
+            x.iter().map(|el| el.as_float().unwrap()).collect()
+        };
+
+        // Convert if needed
+        let mut Y: Vec<FLOAT> = if y[0].is::<INT>() {
+            y.iter().map(|el| el.as_int().unwrap() as FLOAT).collect()
+        } else {
+            y.iter().map(|el| el.as_float().unwrap()).collect()
+        };
+
+        let mut trapsum = 0.0;
+        let mut cumtrapsum = vec![Dynamic::FLOAT_ZERO];
+        for i in 1..x.len() {
+            trapsum += (Y[i] + Y[i - 1]) * (X[i] - X[i - 1]) / 2.0;
+            cumtrapsum.push(Dynamic::from_float(trapsum));
+        }
+        Ok(cumtrapsum)
+    }
+
+    /// Returns the cumulative approximate integral of the curve defined by Y and x using the
+    /// trapezoidal method. Assumes unit spacing in the x direction.
+    /// ```typescript
+    /// let y = [1, 2, 3];
+    /// let c = cumtrapz(y);
+    /// assert_eq(c, [0.0, 1.5, 4.0]);    
+    /// ```
+    #[rhai_fn(name = "cumtrapz", return_raw)]
+    pub fn cumtrapz_unit(y: Array) -> Result<Array, Box<EvalAltResult>> {
+        // Convert if needed
+        let mut Y: Vec<FLOAT> = if y[0].is::<INT>() {
+            y.iter().map(|el| el.as_int().unwrap() as FLOAT).collect()
+        } else {
+            y.iter().map(|el| el.as_float().unwrap()).collect()
+        };
+
+        let mut trapsum = 0.0;
+        let mut cumtrapsum = vec![Dynamic::FLOAT_ZERO];
+        for i in 1..y.len() {
+            trapsum += (Y[i] + Y[i - 1]) / 2.0;
+            cumtrapsum.push(Dynamic::from_float(trapsum));
+        }
+        Ok(cumtrapsum)
+    }
 }

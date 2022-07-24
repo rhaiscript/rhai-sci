@@ -337,27 +337,27 @@ pub mod stats {
         }
     }
 
-    /// Returns the approximate integral of the curve defined by `y` and `y` using the trapezoidal method.
+    /// Returns the approximate integral of the curve defined by `y` and `x` using the trapezoidal method.
     /// ```typescript
     /// let y = [1.0, 1.5, 2.0];
     /// let x = [1.0, 2.0, 3.0];
     /// let A = trapz(x, y);
-    /// assert_eq(A, 1.0);
+    /// assert_eq(A, 3.0);
     /// ```
     /// ```typescript
     /// let y = [1, 2, 3];
     /// let x = [1, 2, 3];
     /// let A = trapz(x, y);
-    /// assert_eq(A, 2.0);
+    /// assert_eq(A, 4.0);
     /// ```
     #[rhai_fn(name = "trapz", return_raw)]
     pub fn trapz(x: Array, y: Array) -> Result<Dynamic, Box<EvalAltResult>> {
         if x.len() != y.len() {
             return Err(EvalAltResult::ErrorArithmetic(
-                format!("The width of the first matrix must be equal to the height of the second matrix"),
+                format!("The arrays must have the same length"),
                 Position::NONE,
             )
-                .into());
+            .into());
         }
 
         // Convert if needed
@@ -376,8 +376,80 @@ pub mod stats {
 
         let mut trapsum = 0.0;
         for i in 1..x.len() {
-            trapsum += (Y[i] - Y[i - 1]) * (X[i] - X[i - 1]);
+            trapsum += (Y[i] + Y[i - 1]) * (X[i] - X[i - 1]) / 2.0;
         }
         Ok(Dynamic::from_float(trapsum))
+    }
+
+    /// Returns the approximate integral of the curve defined by `y` using the trapezoidal method.
+    /// Assumes that x-values have unit spacing.
+    /// ```typescript
+    /// let y = [1.0, 1.5, 2.0];
+    /// let A = trapz(y);
+    /// assert_eq(A, 3.0);
+    /// ```
+    /// ```typescript
+    /// let y = [1, 2, 3];
+    /// let A = trapz(y);
+    /// assert_eq(A, 4.0);
+    /// ```
+    #[rhai_fn(name = "trapz", return_raw)]
+    pub fn trapz_unit(y: Array) -> Result<Dynamic, Box<EvalAltResult>> {
+        // Convert if needed
+        let mut Y: Vec<FLOAT> = if y[0].is::<INT>() {
+            y.iter().map(|el| el.as_int().unwrap() as FLOAT).collect()
+        } else {
+            y.iter().map(|el| el.as_float().unwrap()).collect()
+        };
+
+        let mut trapsum = 0.0;
+        for i in 1..y.len() {
+            trapsum += (Y[i] + Y[i - 1]) / 2.0;
+        }
+        Ok(Dynamic::from_float(trapsum))
+    }
+
+    /// Returns the variance of a 1-D array.
+    /// ```typescript
+    /// let data = [1, 2, 3];
+    /// let v = variance(data);
+    /// assert_eq(v, 1.0);
+    /// ```
+    #[rhai_fn(name = "variance", return_raw)]
+    pub fn variance(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
+        let mut m = 0.0 as FLOAT;
+        match mean(arr.clone()) {
+            Ok(raw_mean) => m = raw_mean.as_float().unwrap(),
+            Err(e) => return Err(e),
+        }
+        let mut sum = 0.0 as FLOAT;
+
+        // Convert if needed
+        let mut x: Vec<FLOAT> = if arr[0].is::<INT>() {
+            arr.iter().map(|el| el.as_int().unwrap() as FLOAT).collect()
+        } else {
+            arr.iter().map(|el| el.as_float().unwrap()).collect()
+        };
+        for v in x {
+            sum += (v - m).powi(2)
+        }
+        let d = sum / (arr.len() as FLOAT - 1.0);
+        Ok(Dynamic::from_float(d))
+    }
+
+    /// Returns the standard deviation of a 1-D array.
+    /// ```typescript
+    /// let data = [1, 2, 3];
+    /// let v = std(data);
+    /// assert_eq(v, 1.0);
+    /// ```
+    #[rhai_fn(name = "std", return_raw)]
+    pub fn std(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
+        let mut s = Dynamic::FLOAT_ZERO;
+        match variance(arr) {
+            Ok(v) => s = v,
+            Err(e) => return Err(e),
+        }
+        Ok(Dynamic::from_float(s.as_float().unwrap().sqrt()))
     }
 }
