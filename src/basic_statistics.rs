@@ -318,11 +318,15 @@ pub mod stats {
     pub fn prod(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
         if arr[0].is::<f64>() {
             let mut p = 1.0_f64;
-            arr.iter().map(|el| p *= el.as_float().unwrap());
+            for el in arr {
+                p *= el.as_float().unwrap()
+            }
             Ok(Dynamic::from_float(p))
         } else if arr[0].is::<i64>() {
             let mut p = 1_i64;
-            arr.iter().map(|el| p *= el.as_int().unwrap());
+            for el in arr {
+                p *= el.as_int().unwrap()
+            }
             Ok(Dynamic::from_int(p))
         } else {
             Err(EvalAltResult::ErrorArithmetic(
@@ -331,5 +335,49 @@ pub mod stats {
             )
             .into())
         }
+    }
+
+    /// Returns the approximate integral of the curve defined by `y` and `y` using the trapezoidal method.
+    /// ```typescript
+    /// let y = [1.0, 1.5, 2.0];
+    /// let x = [1.0, 2.0, 3.0];
+    /// let A = trapz(x, y);
+    /// assert_eq(A, 1.0);
+    /// ```
+    /// ```typescript
+    /// let y = [1, 2, 3];
+    /// let x = [1, 2, 3];
+    /// let A = trapz(x, y);
+    /// assert_eq(A, 2.0);
+    /// ```
+    #[rhai_fn(name = "trapz", return_raw)]
+    pub fn trapz(x: Array, y: Array) -> Result<Dynamic, Box<EvalAltResult>> {
+        if x.len() != y.len() {
+            return Err(EvalAltResult::ErrorArithmetic(
+                format!("The width of the first matrix must be equal to the height of the second matrix"),
+                Position::NONE,
+            )
+                .into());
+        }
+
+        // Convert if needed
+        let mut X: Vec<FLOAT> = if x[0].is::<INT>() {
+            x.iter().map(|el| el.as_int().unwrap() as FLOAT).collect()
+        } else {
+            x.iter().map(|el| el.as_float().unwrap()).collect()
+        };
+
+        // Convert if needed
+        let mut Y: Vec<FLOAT> = if y[0].is::<INT>() {
+            y.iter().map(|el| el.as_int().unwrap() as FLOAT).collect()
+        } else {
+            y.iter().map(|el| el.as_float().unwrap()).collect()
+        };
+
+        let mut trapsum = 0.0;
+        for i in 1..x.len() {
+            trapsum += (Y[i] - Y[i - 1]) * (X[i] - X[i - 1]);
+        }
+        Ok(Dynamic::from_float(trapsum))
     }
 }

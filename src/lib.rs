@@ -13,6 +13,8 @@ mod basic_statistics;
 use basic_statistics::stats;
 mod utils;
 use utils::util_functions;
+mod cumulative;
+use cumulative::cum_functions;
 
 def_package! {
     /// Package for scientific computing
@@ -21,6 +23,7 @@ def_package! {
         combine_with_exported_module!(lib, "matrix", matrix_functions);
         combine_with_exported_module!(lib, "stats", stats);
         combine_with_exported_module!(lib, "utils", util_functions);
+        combine_with_exported_module!(lib, "cumulative", cum_functions);
 
         // Load scripts - TODO: Remove this block once rust->Rhai updates are done
         let engine = Engine::new();

@@ -50,6 +50,7 @@ fn main() {
     combine_with_exported_module!(&mut lib, "rhai_sci_matrix_function", matrix_functions);
     combine_with_exported_module!(&mut lib, "rhai_sci_utility_functions", util_functions);
     combine_with_exported_module!(&mut lib, "rhai_sci_basic_stats", stats);
+    combine_with_exported_module!(&mut lib, "rhai_sci_cumulative", cum_functions);
     engine.register_global_module(rhai::Shared::new(lib));
 
     // Extract metadata
@@ -145,3 +146,4 @@ struct Function {
 include!("src/matrix.rs");
 include!("src/basic_statistics.rs");
 include!("src/utils.rs");
+include!("src/cumulative.rs");
