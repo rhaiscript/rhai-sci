@@ -22,7 +22,7 @@ def_package! {
         combine_with_exported_module!(lib, "stats", stats);
         combine_with_exported_module!(lib, "utils", util_functions);
 
-        // Load scripts
+        // Load scripts - TODO: Remove this block once rust->Rhai updates are done
         let engine = Engine::new();
         let ast = engine.compile(include_str!(concat!(env!("OUT_DIR"), "/rhai-sci-compiled.txt"))).unwrap();
         let my_module = Module::eval_ast_as_new(rhai::Scope::new(), &ast, &engine).unwrap();

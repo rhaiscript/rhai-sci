@@ -301,4 +301,35 @@ pub mod stats {
             Err(e) => Err(e),
         }
     }
+
+    /// Compute the produce of an array. Fails if the input is not an array, or if
+    /// it is an array with elements other than INT or FLOAT.
+    /// ```typescript
+    /// let data = [1, 2, 3];
+    /// let m = prod(data);
+    /// assert_eq(m, 6);
+    /// ```
+    /// ```typescript
+    /// let data = [3, 6, 10];
+    /// let m = prod(data);
+    /// assert_eq(m, 180);
+    /// ```
+    #[rhai_fn(name = "prod", return_raw)]
+    pub fn prod(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
+        if arr[0].is::<f64>() {
+            let mut p = 1.0_f64;
+            arr.iter().map(|el| p *= el.as_float().unwrap());
+            Ok(Dynamic::from_float(p))
+        } else if arr[0].is::<i64>() {
+            let mut p = 1_i64;
+            arr.iter().map(|el| p *= el.as_int().unwrap());
+            Ok(Dynamic::from_int(p))
+        } else {
+            Err(EvalAltResult::ErrorArithmetic(
+                format!("The elements of the input must either be INT or FLOAT."),
+                Position::NONE,
+            )
+            .into())
+        }
+    }
 }
