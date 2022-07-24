@@ -167,6 +167,12 @@ pub mod matrix_functions {
         flatten(matrix).len() as INT
     }
 
+    /// Reads a numeric csv file from a url
+    /// ```typescript
+    /// let url = "https://raw.githubusercontent.com/plotly/datasets/master/diabetes.csv";
+    /// // let x = read_matrix(url);
+    /// // assert_eq(size(x), [768, 9]);
+    /// ```
     #[rhai_fn(name = "read_matrix", return_raw)]
     pub fn read_matrix(file_path: ImmutableString) -> Result<Array, Box<EvalAltResult>> {
         let file_path_as_str = file_path.as_str();
