@@ -683,7 +683,6 @@ pub mod matrix_functions {
         let w = dm1.shape().1;
         let h = dm1.shape().0 + dm2.shape().0;
         let mat = DMatrix::from_fn(h, w, |i, j| {
-            println!("{} {} {} ", i, j, h0);
             if i >= h0 {
                 dm2[(i - h0, j)]
             } else {

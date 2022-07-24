@@ -1,5 +1,4 @@
 use rhai::plugin::*;
-use rhai::EvalAltResult;
 
 #[export_module]
 pub mod stats {
@@ -9,11 +8,11 @@ pub mod stats {
     ///
     /// # Example
     ///
-    /// ```rhai
+    /// ```typescript
     /// let the_higher_number = max(2, 3);
     /// assert_eq(the_higher_number, 3);
     /// ```
-    /// ```rhai
+    /// ```typescript
     /// let the_higher_number = max(2.0, 3.0);
     /// assert_eq(the_higher_number, 3.0);
     /// ```
@@ -26,7 +25,7 @@ pub mod stats {
     ///
     /// # Example
     ///
-    /// ```rhai
+    /// ```typescript
     /// let the_highest_number = max([2, 3, 4, 5]);
     /// assert_eq(the_highest_number, 5);
     /// ```
@@ -59,11 +58,11 @@ pub mod stats {
     ///
     /// # Example
     ///
-    /// ```rhai
+    /// ```typescript
     /// let the_lower_number = min(2, 3);
     /// assert_eq(the_lower_number, 2);
     /// ```
-    /// ```rhai
+    /// ```typescript
     /// let the_lower_number = min(2.0, 3.0);
     /// assert_eq(the_lower_number, 2.0);
     /// ```
@@ -76,7 +75,7 @@ pub mod stats {
     ///
     /// # Example
     ///
-    /// ```rhai
+    /// ```typescript
     /// let the_lowest_number = min([2, 3, 4, 5]);
     /// assert_eq(the_lowest_number, 2);
     /// ```
@@ -109,7 +108,7 @@ pub mod stats {
     ///
     /// # Example
     ///
-    /// ```rhai
+    /// ```typescript
     /// let high_and_low = bounds([2, 3, 4, 5]);
     /// assert_eq(high_and_low, [2, 5]);
     /// ```
@@ -165,7 +164,7 @@ pub mod stats {
     }
 
     ///
-    /// ```rhai
+    /// ```typescript
     /// let data = [32, 15, -7, 10, 1000, 41, 42];
     /// let mk = mink(data, 3);
     /// assert_eq(mk, [-7, 10, 15]);
@@ -206,7 +205,7 @@ pub mod stats {
     }
 
     ///
-    /// ```rhai
+    /// ```typescript
     /// let data = [1, 2, 3];
     /// let m = sum(data);
     /// assert_eq(m, 6);
@@ -235,7 +234,7 @@ pub mod stats {
     }
 
     ///
-    /// ```rhai
+    /// ```typescript
     /// let data = [1, 2, 3];
     /// let m = mean(data);
     /// assert_eq(m, 2.0);
@@ -254,7 +253,7 @@ pub mod stats {
     }
 
     ///
-    /// ```rhai
+    /// ```typescript
     /// let data = [1, 2, 3];
     /// let m = argmax(data);
     /// assert_eq(m, 2);
@@ -279,7 +278,7 @@ pub mod stats {
     }
 
     ///
-    /// ```rhai
+    /// ```typescript
     /// let data = [1, 2, 3];
     /// let m = argmin(data);
     /// assert_eq(m, 0);

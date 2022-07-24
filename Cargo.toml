@@ -14,7 +14,7 @@ documentation = "https://docs.rs/rhai-sci"
 build = "build.rs"
 
 [dependencies]
-rhai = { version = "1.5", features = ["unchecked", "serde", "metadata"]}
+rhai = { version = "1.5", features = ["unchecked", "metadata"]}
 rustyline = "10.0.0"
 nalgebra = "0.30.1"
 polars = {version = "0.17.0"}
@@ -25,7 +25,7 @@ minreq = {version = "2.6.0", features = ["json-using-serde", "https"]}
 rand = { version = "0.8" }
 
 [build-dependencies]
-rhai = { version = "1.5", features = ["unchecked", "serde", "metadata"]}
+rhai = { version = "1.5", features = ["unchecked", "metadata"]}
 itertools = "0.10.3"
 nalgebra = "0.30.1"
 polars = {version = "0.17.0"}

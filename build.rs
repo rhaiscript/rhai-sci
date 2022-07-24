@@ -7,18 +7,18 @@ use std::io::Write;
 fn main() {
     // Update if needed
     println!("cargo:rerun-if-changed=scripts");
-    println!("cargo:rerun-if-changed=src");
+    println!("cargo:rerun-if-changed=src"); // TODO: Remove this block once functions are no longer in Rhai
     println!("cargo:rerun-if-changed=build.rs");
 
-    // Read directory of paths
+    // Read directory of paths - TODO: Remove this block once functions are no longer in Rhai
     let paths = std::fs::read_dir("scripts").unwrap();
 
-    // Open file to write to
+    // Open file to write to - TODO: Remove this block once functions are no longer in Rhai
     let mut func_file =
         std::fs::File::create(std::env::var("OUT_DIR").unwrap() + "/rhai-sci-compiled.txt")
             .unwrap();
 
-    // Build library and test files
+    // Build library and test files - TODO: Remove this block once functions are no longer in Rhai
     for path in paths {
         let name = path.unwrap().path();
         if name.clone().to_str().unwrap().ends_with(".rhai") {
@@ -118,6 +118,7 @@ fn main() {
             for i in (1..code.len()).step_by(2) {
                 let clean_code = code[i]
                     .replace("javascript", "")
+                    .replace("typescript", "")
                     .replace("rhai", "")
                     .replace("\n", "");
                 println!("{clean_code}");
