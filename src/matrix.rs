@@ -405,6 +405,16 @@ pub mod matrix_functions {
         rand::random()
     }
 
+    /// Returns a matrix of random values, each between zero and one. Can be called with a single integer argument (indicating the
+    /// square matrix of that size) or with an array argument (indicating the size for each dimension).
+    /// ```typescript
+    /// let matrix = rand(3);
+    /// assert_eq(size(matrix), [3, 3]);
+    /// ```
+    /// ```typescript
+    /// let matrix = rand([3, 3]);
+    /// assert_eq(size(matrix), [3, 3]);
+    /// ```
     #[rhai_fn(name = "rand", return_raw)]
     pub fn rand_single_input(n: Dynamic) -> Result<Array, Box<EvalAltResult>> {
         if n.is::<i64>() {
@@ -443,6 +453,12 @@ pub mod matrix_functions {
         }
     }
 
+    /// Return a matrix of random values, each between zero and one. Arguments indicate the number
+    /// of rows and columns in the matrix.
+    /// ```typescript
+    /// let matrix = rand(3, 3);
+    /// assert_eq(size(matrix), [3, 3]);
+    /// ```
     #[rhai_fn(name = "rand")]
     pub fn rand_double_input(nx: INT, ny: INT) -> Array {
         let mut output = vec![];
@@ -456,6 +472,20 @@ pub mod matrix_functions {
         output
     }
 
+    /// Returns an identity matrix. If argument is a single number, then the output is
+    /// a square matrix. The argument can also be an array specifying the dimensions separately.
+    /// ```typescript
+    /// let matrix = eye(3);
+    /// assert_eq(matrix, [[1.0, 0.0, 0.0],
+    ///                    [0.0, 1.0, 0.0],
+    ///                    [0.0, 0.0, 1.0]]);
+    /// ```
+    /// ```typescript
+    /// let matrix = eye([3, 4]);
+    /// assert_eq(matrix, [[1.0, 0.0, 0.0, 0.0],
+    ///                    [0.0, 1.0, 0.0, 0.0],
+    ///                    [0.0, 0.0, 1.0, 0.0]]);
+    /// ```
     #[rhai_fn(name = "eye", return_raw)]
     pub fn eye_single_input(n: Dynamic) -> Result<Array, Box<EvalAltResult>> {
         if n.is::<i64>() {
@@ -485,6 +515,13 @@ pub mod matrix_functions {
         }
     }
 
+    /// Returns the identity matrix, specifying the number of rows and columns separately.
+    /// ```typescript
+    /// let matrix = eye(3, 4);
+    /// assert_eq(matrix, [[1.0, 0.0, 0.0, 0.0],
+    ///                    [0.0, 1.0, 0.0, 0.0],
+    ///                    [0.0, 0.0, 1.0, 0.0]]);
+    /// ```
     #[rhai_fn(name = "eye")]
     pub fn eye_double_input(nx: INT, ny: INT) -> Array {
         let mut output = vec![];
@@ -503,6 +540,16 @@ pub mod matrix_functions {
     }
 
     /// Returns the contents of an multidimensional array as a 1-D array.
+    /// ```typescript
+    /// let matrix = rand(3, 5);
+    /// let flat = flatten(matrix);
+    /// assert_eq(len(flat), 15);
+    /// ```
+    /// ```typescript
+    /// let matrix = [[1.0, 2.0, 3.0], [1.0]];
+    /// let flat = flatten(matrix);
+    /// assert_eq(len(flat), 4);
+    /// ```
     #[rhai_fn(name = "flatten")]
     pub fn flatten(matrix: Array) -> Array {
         let mut flat: Vec<Dynamic> = vec![];
@@ -517,6 +564,12 @@ pub mod matrix_functions {
     }
 
     /// Flip a matrix left-to-right
+    /// ```typescript
+    /// let matrix = fliplr([[1.0, 0.0],
+    ///                      [0.0, 2.0]]);
+    /// assert_eq(matrix, [[0.0, 1.0],
+    ///                    [2.0, 0.0]]);
+    /// ```
     #[rhai_fn(name = "fliplr", return_raw)]
     pub fn fliplr(matrix: Array) -> Result<Array, Box<EvalAltResult>> {
         if ndims(matrix.clone()) > 2 {
@@ -550,6 +603,12 @@ pub mod matrix_functions {
     }
 
     /// Flip a matrix up-down
+    /// ```typescript
+    /// let matrix = flipud([[1.0, 0.0],
+    ///                      [0.0, 2.0]]);
+    /// assert_eq(matrix, [[0.0, 2.0],
+    ///                    [1.0, 0.0]]);
+    /// ```
     #[rhai_fn(name = "flipud", return_raw)]
     pub fn flipud(matrix: Array) -> Result<Array, Box<EvalAltResult>> {
         if ndims(matrix.clone()) > 2 {
@@ -582,7 +641,13 @@ pub mod matrix_functions {
         }
     }
 
-    /// Flip a counterclockwise once
+    /// Rotate a matrix counterclockwise once
+    /// ```typescript
+    /// let matrix = rot90([[1.0, 0.0],
+    ///                    [0.0, 2.0]]);
+    /// assert_eq(matrix, [[0.0, 2.0],
+    ///                   [1.0, 0.0]]);
+    /// ```
     #[rhai_fn(name = "rot90", return_raw)]
     pub fn rot90_once(matrix: Array) -> Result<Array, Box<EvalAltResult>> {
         if ndims(matrix.clone()) == 1 {
@@ -622,7 +687,13 @@ pub mod matrix_functions {
         }
     }
 
-    /// Flip a counterclockwise `k` times
+    /// Rotate a matrix counterclockwise `k` times
+    /// ```typescript
+    /// let matrix = rot90([[1.0, 0.0],
+    ///                     [0.0, 2.0]], 2);
+    /// assert_eq(matrix, [[2.0, 0.0],
+    ///                    [0.0, 1.0]]);
+    /// ```
     #[rhai_fn(name = "rot90", return_raw)]
     pub fn rot90_ktimes(matrix: Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
         if k > 1 {
@@ -636,6 +707,13 @@ pub mod matrix_functions {
         }
     }
 
+    /// Perform matrix multiplication.
+    /// ```typescript
+    /// let a = eye(3);
+    /// let b = ones(3);
+    /// let c = mtimes(a, b);
+    /// assert_eq(b, c);
+    /// ```
     #[rhai_fn(name = "mtimes", return_raw)]
     pub fn mtimes(matrix1: Array, matrix2: Array) -> Result<Array, Box<EvalAltResult>> {
         if matrix_size(matrix1.clone())[1].as_int().unwrap()
@@ -690,6 +768,13 @@ pub mod matrix_functions {
         Ok(out)
     }
 
+    /// Concatenate two arrays horizontally.
+    /// ```typescript
+    /// let arr1 = rand(3);
+    /// let arr2 = rand(3);
+    /// let combined = horzcat(arr1, arr2);
+    /// assert_eq(size(combined), [3, 6]);
+    /// ```
     #[rhai_fn(name = "horzcat", return_raw)]
     pub fn horzcat(matrix1: Array, matrix2: Array) -> Result<Array, Box<EvalAltResult>> {
         if matrix_size(matrix1.clone())[0].as_int().unwrap()
@@ -754,6 +839,13 @@ pub mod matrix_functions {
         Ok(out)
     }
 
+    /// Concatenates two array vertically.
+    /// ```typescript
+    /// let arr1 = rand(3);
+    /// let arr2 = rand(3);
+    /// let combined = vertcat(arr1, arr2);
+    /// assert_eq(size(combined), [6, 3]);
+    /// ```
     #[rhai_fn(name = "vertcat", return_raw)]
     pub fn vertcat(matrix1: Array, matrix2: Array) -> Result<Array, Box<EvalAltResult>> {
         if matrix_size(matrix1.clone())[1].as_int().unwrap()
@@ -822,6 +914,20 @@ pub mod matrix_functions {
     /// 1. If the argument is an 2-D array, `diag` returns an array containing the diagonal of the array.
     /// 2. If the argument is a 1-D array, `diag` returns a matrix containing the argument along the
     /// diagonal and zeros elsewhere.
+    /// ```typescript
+    ///  let matrix = [[1, 2, 3],
+    ///                [4, 5, 6],
+    ///                [7, 8, 9]];
+    ///  let d = diag(matrix);
+    ///  assert_eq(d, [1, 5, 9]);
+    /// ```
+    /// ```typescript
+    ///  let diagonal = [1, 2, 3];
+    ///  let matrix = diag(diagonal);
+    ///  assert_eq(matrix, [[1.0, 0.0, 0.0],
+    ///                     [0.0, 2.0, 0.0],
+    ///                     [0.0, 0.0, 3.0]]);
+    /// ```
     #[rhai_fn(name = "diag", return_raw)]
     pub fn diag(matrix: Array) -> Result<Array, Box<EvalAltResult>> {
         if ndims(matrix.clone()) == 2 {
@@ -862,6 +968,31 @@ pub mod matrix_functions {
             )
                 .into());
         }
+    }
+
+    /// Repeats copies of a matrix
+    /// ```javascript
+    /// let matrix = rand(3);
+    /// let combined = repmat(matrix, 2, 2);
+    /// assert_eq(size(combined), [6, 6]);
+    /// ```
+    #[rhai_fn(name = "repmat", return_raw)]
+    pub fn repmat(matrix: Array, nx: INT, ny: INT) -> Result<Array, Box<EvalAltResult>> {
+        let mut row_matrix = matrix.clone();
+        for i in 1..ny {
+            match horzcat(row_matrix, matrix.clone()) {
+                Ok(mat) => row_matrix = mat,
+                Err(e) => return Err(e),
+            };
+        }
+        let mut new_matrix = row_matrix.clone();
+        for i in 1..nx {
+            match vertcat(new_matrix, row_matrix.clone()) {
+                Ok(mat) => new_matrix = mat,
+                Err(e) => return Err(e),
+            }
+        }
+        Ok(new_matrix)
     }
 }
 

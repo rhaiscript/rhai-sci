@@ -16,16 +16,4 @@ mod rhai_tests {
         // Now run your code
         engine.run_file("tests/matrix_tests.rhai".into()).unwrap();
     }
-
-    #[test]
-    fn test_utils() {
-        // Create a new Rhai engine
-        let mut engine = Engine::new();
-
-        // Add the rhai-sci package to the new engine
-        engine.register_global_module(SciPackage::new().as_shared_module());
-
-        // Now run your code
-        engine.run_file("tests/util_tests.rhai".into()).unwrap();
-    }
 }
