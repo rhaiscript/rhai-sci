@@ -119,8 +119,7 @@ fn main() {
                 let clean_code = code[i]
                     .replace("javascript", "")
                     .replace("typescript", "")
-                    .replace("rhai", "")
-                    .replace("\n", "");
+                    .replace("rhai", "");
                 println!("{clean_code}");
                 assert!(engine.eval::<bool>(&clean_code).unwrap());
             }

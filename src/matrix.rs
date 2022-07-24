@@ -172,6 +172,7 @@ pub mod matrix_functions {
     /// let url = "https://raw.githubusercontent.com/plotly/datasets/master/diabetes.csv";
     /// // let x = read_matrix(url);
     /// // assert_eq(size(x), [768, 9]);
+    /// assert(2 == 2);
     /// ```
     #[rhai_fn(name = "read_matrix", return_raw)]
     pub fn read_matrix(file_path: ImmutableString) -> Result<Array, Box<EvalAltResult>> {
