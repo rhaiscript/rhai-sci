@@ -452,4 +452,79 @@ pub mod stats {
         }
         Ok(Dynamic::from_float(s.as_float().unwrap().sqrt()))
     }
+
+    /// Returns the variance of a 1-D array.
+    /// ```typescript
+    /// let data = [1, 2, 3, 4, 5];
+    /// let r = rms(data);
+    /// assert_eq(r, 3.3166247903554);
+    /// ```
+    #[rhai_fn(name = "rms", return_raw)]
+    pub fn rms(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
+        let mut sum = 0.0 as FLOAT;
+
+        // Convert if needed
+        let mut x: Vec<FLOAT> = if arr[0].is::<INT>() {
+            arr.iter().map(|el| el.as_int().unwrap() as FLOAT).collect()
+        } else {
+            arr.iter().map(|el| el.as_float().unwrap()).collect()
+        };
+        for v in x {
+            sum += v.powi(2)
+        }
+        let d = sum / (arr.len() as FLOAT);
+        Ok(Dynamic::from_float(d.sqrt()))
+    }
+
+    /// Returns the variance of a 1-D array.
+    /// ```typescript
+    /// let data = [1, 1, 1, 1, 2, 5, 6, 7, 8];
+    /// let m = median(data);
+    /// assert_eq(m, 2.0);
+    /// ```
+    #[rhai_fn(name = "median", return_raw)]
+    pub fn median(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
+        // Convert if needed
+        let mut x: Vec<FLOAT> = if arr[0].is::<INT>() {
+            arr.iter().map(|el| el.as_int().unwrap() as FLOAT).collect()
+        } else {
+            arr.iter().map(|el| el.as_float().unwrap()).collect()
+        };
+
+        x.sort_by(|a, b| a.partial_cmp(b).unwrap());
+
+        let med = if x.len() % 2 == 1 {
+            x[(x.len() - 1) / 2]
+        } else {
+            (x[x.len() / 2] + x[x.len() / 2 - 1]) / 2.0
+        };
+
+        Ok(Dynamic::from_float(med))
+    }
+
+    /// Returns the median absolute deviation of a 1-D array.
+    /// ```typescript
+    /// let data = [1.0, 2.0, 3.0, 3.0, 4.0, 4.0, 4.0, 5.0, 5.5, 6.0, 6.0, 6.5, 7.0, 7.0, 7.5, 8.0, 9.0, 12.0, 52.0, 90.0];
+    /// let m = mad(data);
+    /// assert_eq(m, 2.0);
+    /// ```
+    #[rhai_fn(name = "mad", return_raw)]
+    pub fn mad(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
+        let mut m = 0.0 as FLOAT;
+        match median(arr.clone()) {
+            Ok(raw_median) => m = raw_median.as_float().unwrap(),
+            Err(e) => return Err(e),
+        }
+        // Convert if needed
+        let mut x: Vec<FLOAT> = if arr[0].is::<INT>() {
+            arr.iter().map(|el| el.as_int().unwrap() as FLOAT).collect()
+        } else {
+            arr.iter().map(|el| el.as_float().unwrap()).collect()
+        };
+        let mut dev = vec![];
+        for v in x {
+            dev.push(Dynamic::from_float((v - m).abs()));
+        }
+        Ok(median(dev).unwrap())
+    }
 }
