@@ -4,9 +4,8 @@ use rhai::plugin::*;
 pub mod stats {
     use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT, INT};
 
-    /// Return the highest value from a pair of numbers.
-    ///
-    /// # Example
+    /// Return the highest value from a pair of numbers. Fails if the numbers are anything other
+    /// than INT or FLOAT.
     ///
     /// ```typescript
     /// let the_higher_number = max(2, 3);
@@ -21,9 +20,8 @@ pub mod stats {
         array_max(vec![a, b])
     }
 
-    /// Return the highest value from an array.
-    ///
-    /// # Example
+    /// Return the highest value from an array. Fails if the input is not an array, or if
+    /// it is an array with elements other than INT or FLOAT.
     ///
     /// ```typescript
     /// let the_highest_number = max([2, 3, 4, 5]);
@@ -54,9 +52,8 @@ pub mod stats {
         }
     }
 
-    /// Return the lowest value from a pair of numbers.
-    ///
-    /// # Example
+    /// Return the lowest value from a pair of numbers. Fails if the numbers are anything other
+    /// than INT or FLOAT.
     ///
     /// ```typescript
     /// let the_lower_number = min(2, 3);
@@ -71,9 +68,8 @@ pub mod stats {
         array_min(vec![a, b])
     }
 
-    /// Return the lowest value from an array.
-    ///
-    /// # Example
+    /// Return the lowest value from an array. Fails if the input is not an array, or if
+    /// it is an array with elements other than INT or FLOAT.
     ///
     /// ```typescript
     /// let the_lowest_number = min([2, 3, 4, 5]);
@@ -104,10 +100,8 @@ pub mod stats {
         }
     }
 
-    /// Return the highest value from an array.
-    ///
-    /// # Example
-    ///
+    /// Return the highest value from an array. Fails if the input is not an array, or if
+    /// it is an array with elements other than INT or FLOAT.
     /// ```typescript
     /// let high_and_low = bounds([2, 3, 4, 5]);
     /// assert_eq(high_and_low, [2, 5]);
@@ -122,8 +116,9 @@ pub mod stats {
         }
     }
 
-    /// Returns the `k` highest values from an array.
-    /// ```javascript
+    /// Returns the `k` highest values from an array. Fails if the input is not an array, or if
+    /// it is an array with elements other than INT or FLOAT.
+    /// ```typescript
     /// let data = [32, 15, -7, 10, 1000, 41, 42];
     /// let mk = maxk(data, 3);
     /// assert_eq(mk, [41, 42, 1000]);
@@ -163,7 +158,8 @@ pub mod stats {
         }
     }
 
-    ///
+    /// Return the `k` lowest values in an array. Fails if the input is not an array, or if
+    /// it is an array with elements other than INT or FLOAT.
     /// ```typescript
     /// let data = [32, 15, -7, 10, 1000, 41, 42];
     /// let mk = mink(data, 3);
@@ -204,7 +200,8 @@ pub mod stats {
         }
     }
 
-    ///
+    /// Sum an array. Fails if the input is not an array, or if
+    /// it is an array with elements other than INT or FLOAT.
     /// ```typescript
     /// let data = [1, 2, 3];
     /// let m = sum(data);
@@ -233,7 +230,8 @@ pub mod stats {
         }
     }
 
-    ///
+    /// Return the average of an array.Fails if the input is not an array, or if
+    /// it is an array with elements other than INT or FLOAT.
     /// ```typescript
     /// let data = [1, 2, 3];
     /// let m = mean(data);
@@ -252,7 +250,8 @@ pub mod stats {
         }
     }
 
-    ///
+    /// Return the index of the largest array element. Fails if the input is not an array, or if
+    /// it is an array with elements other than INT or FLOAT.
     /// ```typescript
     /// let data = [1, 2, 3];
     /// let m = argmax(data);
@@ -277,7 +276,8 @@ pub mod stats {
         }
     }
 
-    ///
+    /// Return the index of the smallest array element. Fails if the input is not an array, or if
+    /// it is an array with elements other than INT or FLOAT.
     /// ```typescript
     /// let data = [1, 2, 3];
     /// let m = argmin(data);

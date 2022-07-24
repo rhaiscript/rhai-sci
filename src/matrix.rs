@@ -6,6 +6,26 @@ pub mod matrix_functions {
     use polars::prelude::{CsvReader, DataType, SerReader};
     use rhai::{Array, Dynamic, EvalAltResult, ImmutableString, Position, FLOAT, INT};
 
+    /// Calculates the inverse of a matrix. Fails if the matrix if not invertible, or if the
+    /// elements of the matrix aren't FLOAT or INT.
+    /// ```typescript
+    /// let x = [[ 1.0,  0.0,  2.0],
+    ///          [-1.0,  5.0,  0.0],
+    ///          [ 0.0,  3.0, -9.0]];
+    /// let x_inverted = inv(x);
+    /// assert_eq(x_inverted, [[0.8823529411764706,  -0.11764705882352941,   0.19607843137254902],
+    ///                        [0.17647058823529413,  0.17647058823529413,   0.0392156862745098 ],
+    ///                        [0.058823529411764705, 0.058823529411764705, -0.09803921568627451]]
+    /// );
+    /// ```
+    /// ```typescript
+    /// let x = [[1, 2],
+    ///          [3, 4]];
+    /// let x_inverted = inv(x);
+    /// assert_eq(x_inverted, [[-2.0, 1.0],
+    ///                        [1.5, -0.5]]
+    /// );
+    /// ```
     #[rhai_fn(name = "inv", return_raw)]
     pub fn invert_matrix(matrix: Array) -> Result<Array, Box<EvalAltResult>> {
         // Turn into Vec<Vec<f64>>
@@ -47,20 +67,19 @@ pub mod matrix_functions {
         }
     }
 
-    fn transpose_internal<T>(v: Vec<Vec<T>>) -> Vec<Vec<T>> {
-        assert!(!v.is_empty());
-        let len = v[0].len();
-        let mut iters: Vec<_> = v.into_iter().map(|n| n.into_iter()).collect();
-        (0..len)
-            .map(|_| {
-                iters
-                    .iter_mut()
-                    .map(|n| n.next().unwrap())
-                    .collect::<Vec<T>>()
-            })
-            .collect()
-    }
-
+    /// Transposes a matrix.
+    /// ```typescript
+    /// let row = [1, 2, 3, 4];
+    /// let column = transpose(row);
+    /// assert_eq(column, [[1],
+    ///                    [2],
+    ///                    [3],
+    ///                    [4]]);
+    /// ```
+    /// ```typescript
+    /// let matrix = transpose(eye(3));
+    /// assert_eq(matrix, eye(3));
+    /// ```
     #[rhai_fn(name = "transpose")]
     pub fn transpose(matrix: Array) -> Array {
         let new_matrix = if !matrix[0].is::<Array>() {
@@ -95,6 +114,15 @@ pub mod matrix_functions {
         out
     }
 
+    /// Returns an array indicating the size of the matrix along each dimension.
+    /// ```typescript
+    /// let matrix = ones(3, 5);
+    /// assert_eq(size(matrix), [3, 5]);
+    /// ```
+    /// ```typescript
+    /// let matrix = [[[1, 2]]];
+    /// assert_eq(size(matrix), [1, 1, 2]);
+    /// ```
     #[rhai_fn(name = "size")]
     pub fn matrix_size(matrix: Array) -> Array {
         let mut new_matrix = matrix.clone();
@@ -112,11 +140,28 @@ pub mod matrix_functions {
         shape
     }
 
+    /// Return the number of dimensions in matrix
+    /// ```typescript
+    /// let matrix = ones(4, 6);
+    /// let n = ndims(matrix);
+    /// assert_eq(n, 2);
+    /// ```
     #[rhai_fn(name = "ndims")]
     pub fn ndims(matrix: Array) -> INT {
         matrix_size(matrix).len() as INT
     }
 
+    /// Returns the number of elements in a matrix
+    /// ```typescript
+    /// let matrix = ones(4, 6);
+    /// let n = numel(matrix);
+    /// assert_eq(n, 24);
+    /// ```
+    /// ```typescript
+    /// let matrix = [1, [1, 2, 3]];
+    /// let n = numel(matrix);
+    /// assert_eq(n, 4);
+    /// ```
     #[rhai_fn(name = "numel")]
     pub fn numel(matrix: Array) -> INT {
         flatten(matrix).len() as INT
@@ -190,6 +235,32 @@ pub mod matrix_functions {
         }
     }
 
+    /// Return a matrix of zeros. Can be called with a single integer argument (indicating the
+    /// square matrix of that size) or with an array argument (indicating the size for each dimension).
+    /// ```typescript
+    /// let matrix = zeros(3);
+    /// assert_eq(matrix, [[0.0, 0.0, 0.0],
+    ///                    [0.0, 0.0, 0.0],
+    ///                    [0.0, 0.0, 0.0]]);
+    /// ```
+    /// ```typescript
+    /// let matrix = zeros([3, 3]);
+    /// assert_eq(matrix, [[0.0, 0.0, 0.0],
+    ///                    [0.0, 0.0, 0.0],
+    ///                    [0.0, 0.0, 0.0]]);
+    /// ```
+    /// ```typescript
+    /// let matrix = zeros([3, 3, 3]);
+    /// assert_eq(matrix, [[[0.0, 0.0, 0.0],
+    ///                     [0.0, 0.0, 0.0],
+    ///                     [0.0, 0.0, 0.0]],
+    ///                    [[0.0, 0.0, 0.0],
+    ///                     [0.0, 0.0, 0.0],
+    ///                     [0.0, 0.0, 0.0]],
+    ///                    [[0.0, 0.0, 0.0],
+    ///                     [0.0, 0.0, 0.0],
+    ///                    [0.0, 0.0, 0.0]]]);
+    /// ```
     #[rhai_fn(name = "zeros", return_raw)]
     pub fn zeros_single_input(n: Dynamic) -> Result<Array, Box<EvalAltResult>> {
         if n.is::<i64>() {
@@ -228,6 +299,13 @@ pub mod matrix_functions {
         }
     }
 
+    /// Return a matrix of zeros. Arguments indicate the number of rows and columns in the matrix.
+    /// ```typescript
+    /// let matrix = zeros(3, 3);
+    /// assert_eq(matrix, [[0.0, 0.0, 0.0],
+    ///                    [0.0, 0.0, 0.0],
+    ///                    [0.0, 0.0, 0.0]]);
+    /// ```
     #[rhai_fn(name = "zeros")]
     pub fn zeros_double_input(nx: INT, ny: INT) -> Array {
         let mut output = vec![];
@@ -237,6 +315,32 @@ pub mod matrix_functions {
         output
     }
 
+    /// Return a matrix of ones. Can be called with a single integer argument (indicating the
+    /// square matrix of that size) or with an array argument (indicating the size for each dimension).
+    /// ```typescript
+    /// let matrix = ones(3);
+    /// assert_eq(matrix, [[1.0, 1.0, 1.0],
+    ///                    [1.0, 1.0, 1.0],
+    ///                    [1.0, 1.0, 1.0]]);
+    /// ```
+    /// ```typescript
+    /// let matrix = ones([3, 3]);
+    /// assert_eq(matrix, [[1.0, 1.0, 1.0],
+    ///                    [1.0, 1.0, 1.0],
+    ///                    [1.0, 1.0, 1.0]]);
+    /// ```
+    /// ```typescript
+    /// let matrix = ones([3, 3, 3]);
+    /// assert_eq(matrix, [[[1.0, 1.0, 1.0],
+    ///                     [1.0, 1.0, 1.0],
+    ///                     [1.0, 1.0, 1.0]],
+    ///                    [[1.0, 1.0, 1.0],
+    ///                     [1.0, 1.0, 1.0],
+    ///                     [1.0, 1.0, 1.0]],
+    ///                    [[1.0, 1.0, 1.0],
+    ///                     [1.0, 1.0, 1.0],
+    ///                     [1.0, 1.0, 1.0]]]);
+    /// ```
     #[rhai_fn(name = "ones", return_raw)]
     pub fn ones_single_input(n: Dynamic) -> Result<Array, Box<EvalAltResult>> {
         if n.is::<i64>() {
@@ -275,6 +379,13 @@ pub mod matrix_functions {
         }
     }
 
+    /// Return a matrix of ones. Arguments indicate the number of rows and columns in the matrix.
+    /// ```typescript
+    /// let matrix = ones(3, 3);
+    /// assert_eq(matrix, [[1.0, 1.0, 1.0],
+    ///                    [1.0, 1.0, 1.0],
+    ///                    [1.0, 1.0, 1.0]]);
+    /// ```
     #[rhai_fn(name = "ones")]
     pub fn ones_double_input(nx: INT, ny: INT) -> Array {
         let mut output = vec![];
@@ -284,6 +395,11 @@ pub mod matrix_functions {
         output
     }
 
+    /// Returns a random number between zero and one.
+    /// ```typescript
+    /// let r = rand();
+    /// assert(r >= 0.0 && r <= 1.0);
+    /// ```
     #[rhai_fn(name = "rand")]
     pub fn rand_float() -> FLOAT {
         rand::random()
@@ -747,4 +863,18 @@ pub mod matrix_functions {
                 .into());
         }
     }
+}
+
+fn transpose_internal<T>(v: Vec<Vec<T>>) -> Vec<Vec<T>> {
+    assert!(!v.is_empty());
+    let len = v[0].len();
+    let mut iters: Vec<_> = v.into_iter().map(|n| n.into_iter()).collect();
+    (0..len)
+        .map(|_| {
+            iters
+                .iter_mut()
+                .map(|n| n.next().unwrap())
+                .collect::<Vec<T>>()
+        })
+        .collect()
 }
