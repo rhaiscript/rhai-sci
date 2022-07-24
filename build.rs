@@ -1,10 +1,13 @@
 use itertools::Itertools;
 use rhai::{packages::Package, plugin::*, Engine, ScriptFnMetadata};
+use serde_json::Value;
+use std::collections::HashMap;
 use std::io::Write;
 
 fn main() {
     // Update if needed
     println!("cargo:rerun-if-changed=scripts");
+    println!("cargo:rerun-if-changed=src");
     println!("cargo:rerun-if-changed=build.rs");
 
     // Read directory of paths
@@ -81,56 +84,90 @@ fn main() {
         Module::eval_ast_as_new(rhai::Scope::new(), &ast, &engine).unwrap(),
     ));
 
+    let mut json_fns = engine.gen_fn_metadata_to_json(false).unwrap();
+    println!("{json_fns}");
+    let v: HashMap<String, Vec<Function>> = serde_json::from_str(&json_fns).unwrap();
+    for function in v["functions"].clone() {
+        println!("{:?}", function);
+    }
+
+    let function_list = v["functions"].clone();
+
     // Write functions
     write!(doc_file, "# Functions\n This package provides a large variety of functions to help with scientific computing. Each one of these is written in Rhai itself! The source code is here.\n").expect("Cannot write to {test_file}");
     let mut indented = false;
-    let good_iter: Vec<ScriptFnMetadata> = ast.iter_functions().sorted().collect();
-    for idx in 0..good_iter.len() {
-        let function = good_iter[idx].clone();
-        // if function.access == FnAccess::Public && !function.name.starts_with("anon") {
+    for (idx, function) in function_list.iter().enumerate() {
+        let mut function = function.clone();
         // Pull out basic info
         let name = function.name;
-        let params = function.params.join(", ");
-        let comments = function
-            .comments
-            .join("\n")
+        if !name.starts_with("anon") {
+            // let params = function.params.join(", ");
+
+            let comments = match function.docComments {
+                None => "".to_owned(),
+                Some(strings) => strings.join("\n"),
+            }
             .replace("///", "")
             .replace("/**", "")
             .replace("**/", "");
 
-        // Check if there are multiple arities, and if so add a header and indent
-        if idx < good_iter.len() - 1 {
-            if name == good_iter[idx + 1].name && !indented {
-                write!(doc_file, "## `{name}`\n").expect("Cannot write to {doc_file}");
-                indented = true;
+            let signature = function
+                .signature
+                .replace("core::result::", "")
+                .replace("rhai::types::dynamic::", "")
+                .replace("types::dynamic::", "")
+                .replace("alloc::boxed::", "")
+                .replace("alloc::vec::", "")
+                .replace("rhai::types::error::", "");
+
+            // Check if there are multiple arities, and if so add a header and indent
+            if idx < function_list.len() - 1 {
+                if name == function_list[idx + 1].name && !indented {
+                    write!(doc_file, "## `{name}`\n").expect("Cannot write to {doc_file}");
+                    indented = true;
+                }
+            }
+
+            // Print definition with right level of indentation
+            if indented {
+                write!(doc_file, "### `{signature}`\n{comments}\n")
+                    .expect("Cannot write to {doc_file}");
+            } else {
+                write!(doc_file, "## `{signature}`\n{comments}\n")
+                    .expect("Cannot write to {doc_file}");
+            }
+
+            // End indentation when its time
+            if idx != 0 && idx < function_list.len() - 1 {
+                if name == function_list[idx - 1].name && name != function_list[idx + 1].name {
+                    indented = false;
+                }
+            }
+
+            // Run doc tests
+            let code = comments.split("```").collect::<Vec<&str>>();
+            for i in (1..code.len()).step_by(2) {
+                let clean_code = code[i].replace("javascript", "").replace("\n", "");
+                println!("{clean_code}");
+                assert!(engine.eval::<bool>(&clean_code).unwrap());
             }
         }
-
-        // Print definition with right level of indentation
-        if indented {
-            write!(doc_file, "### `{name}({params})`\n{comments}\n")
-                .expect("Cannot write to {doc_file}");
-        } else {
-            write!(doc_file, "## `{name}({params})`\n{comments}\n")
-                .expect("Cannot write to {doc_file}");
-        }
-
-        // End indentation when its time
-        if idx != 0 && idx < good_iter.len() - 1 {
-            if name == good_iter[idx - 1].name && name != good_iter[idx + 1].name {
-                indented = false;
-            }
-        }
-
-        // Run doc tests
-        let code = comments.split("```").collect::<Vec<&str>>();
-        for i in (1..code.len()).step_by(2) {
-            let clean_code = code[i].replace("javascript", "").replace("\n", "");
-            println!("{clean_code}");
-            assert!(engine.eval::<bool>(&clean_code).unwrap());
-        }
-        // }
     }
+}
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+struct Function {
+    pub access: String,
+    pub baseHash: u128,
+    pub fullHash: u128,
+    pub name: String,
+    pub namespace: String,
+    pub numParams: usize,
+    pub params: Option<Vec<HashMap<String, String>>>,
+    pub signature: String,
+    pub returnType: Option<String>,
+    pub docComments: Option<Vec<String>>,
 }
 
 include!("src/matrix.rs");
