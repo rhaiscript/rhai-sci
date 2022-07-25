@@ -51,6 +51,7 @@ fn main() {
     combine_with_exported_module!(&mut lib, "rhai_sci_utility_functions", util_functions);
     combine_with_exported_module!(&mut lib, "rhai_sci_basic_stats", stats);
     combine_with_exported_module!(&mut lib, "rhai_sci_cumulative", cum_functions);
+    combine_with_exported_module!(&mut lib, "rhai_sci_int_and_diff", int_and_diff);
     engine.register_global_module(rhai::Shared::new(lib));
 
     // Extract metadata
@@ -147,3 +148,4 @@ include!("src/matrix.rs");
 include!("src/basic_statistics.rs");
 include!("src/utils.rs");
 include!("src/cumulative.rs");
+include!("src/integration_and_differentiation.rs");

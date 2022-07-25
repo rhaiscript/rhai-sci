@@ -15,6 +15,8 @@ mod utils;
 use utils::util_functions;
 mod cumulative;
 use cumulative::cum_functions;
+mod integration_and_differentiation;
+use integration_and_differentiation::int_and_diff;
 
 def_package! {
     /// Package for scientific computing
@@ -24,6 +26,7 @@ def_package! {
         combine_with_exported_module!(lib, "stats", stats);
         combine_with_exported_module!(lib, "utils", util_functions);
         combine_with_exported_module!(lib, "cumulative", cum_functions);
+        combine_with_exported_module!(lib, "int_and_diff", int_and_diff);
 
         // Load scripts - TODO: Remove this block once rust->Rhai updates are done
         let engine = Engine::new();
