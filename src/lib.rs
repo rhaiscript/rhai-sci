@@ -17,6 +17,8 @@ mod cumulative;
 use cumulative::cum_functions;
 mod integration_and_differentiation;
 use integration_and_differentiation::int_and_diff;
+mod assertions;
+use assertions::assert_functions;
 
 def_package! {
     /// Package for scientific computing
@@ -27,6 +29,7 @@ def_package! {
         combine_with_exported_module!(lib, "utils", util_functions);
         combine_with_exported_module!(lib, "cumulative", cum_functions);
         combine_with_exported_module!(lib, "int_and_diff", int_and_diff);
+        combine_with_exported_module!(lib, "assertion_functions", assert_functions);
 
         // Load scripts - TODO: Remove this block once rust->Rhai updates are done
         let engine = Engine::new();
