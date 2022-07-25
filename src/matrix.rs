@@ -93,21 +93,12 @@ pub mod matrix_functions {
             .map(|x| x.into_array().unwrap())
             .collect::<Vec<Array>>();
 
-        let mat = DMatrix::from_fn(matrix_as_vec.len(), matrix_as_vec[0].len(), |i, j| {
-            if matrix_as_vec[0][0].is::<FLOAT>() {
-                matrix_as_vec[i][j].as_float().unwrap()
-            } else {
-                matrix_as_vec[i][j].as_int().unwrap() as FLOAT
-            }
-        })
-        .transpose();
-
         // Turn into Vec<Dynamic>
         let mut out = vec![];
-        for idx in 0..mat.shape().0 {
+        for idx in 0..matrix_as_vec[0].len() {
             let mut new_row = vec![];
-            for jdx in 0..mat.shape().1 {
-                new_row.push(Dynamic::from_float(mat[(idx, jdx)]));
+            for jdx in 0..matrix_as_vec.len() {
+                new_row.push(matrix_as_vec[jdx][idx].clone());
             }
             out.push(Dynamic::from_array(new_row));
         }
@@ -929,7 +920,7 @@ pub mod matrix_functions {
     ///  assert_eq(d, [1, 5, 9]);
     /// ```
     /// ```typescript
-    ///  let diagonal = [1, 2, 3];
+    ///  let diagonal = [1.0, 2.0, 3.0];
     ///  let matrix = diag(diagonal);
     ///  assert_eq(matrix, [[1.0, 0.0, 0.0],
     ///                     [0.0, 2.0, 0.0],
