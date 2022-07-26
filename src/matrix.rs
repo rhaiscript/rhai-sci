@@ -2,6 +2,7 @@ use rhai::plugin::*;
 
 #[export_module]
 pub mod matrix_functions {
+    use crate::misc_functions::rand_float;
     use nalgebra::DMatrix;
     use polars::prelude::{CsvReader, DataType, SerReader};
     use rhai::{Array, Dynamic, EvalAltResult, ImmutableString, Position, FLOAT, INT};
@@ -391,16 +392,6 @@ pub mod matrix_functions {
             output.push(Dynamic::from_array(vec![Dynamic::FLOAT_ONE; ny as usize]))
         }
         output
-    }
-
-    /// Returns a random number between zero and one.
-    /// ```typescript
-    /// let r = rand();
-    /// assert(r >= 0.0 && r <= 1.0);
-    /// ```
-    #[rhai_fn(name = "rand")]
-    pub fn rand_float() -> FLOAT {
-        rand::random()
     }
 
     /// Returns a matrix of random values, each between zero and one. Can be called with a single integer argument (indicating the

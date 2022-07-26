@@ -1,7 +1,7 @@
 use rhai::plugin::*;
 
 #[export_module]
-pub mod util_functions {
+pub mod constant_definitions {
     use crate::matrix_functions::ndims;
     use nalgebra::DMatrix;
     use polars::prelude::{CsvReader, DataType, SerReader};
@@ -27,15 +27,4 @@ pub mod util_functions {
 
     // Newtonian gravitational constnat
     pub const G: f64 = 6.6743015e-11;
-
-    #[rhai_fn(name = "pprint")]
-    pub fn pprint(matrix: Array) {
-        if ndims(matrix.clone()) > 1 {
-            for row in matrix {
-                println!("{:?}", row);
-            }
-        } else {
-            println!("{:?}", matrix)
-        }
-    }
 }

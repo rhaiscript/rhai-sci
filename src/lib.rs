@@ -11,25 +11,29 @@ mod matrix;
 use matrix::matrix_functions;
 mod basic_statistics;
 use basic_statistics::stats;
-mod utils;
-use utils::util_functions;
+mod misc;
+use misc::misc_functions;
 mod cumulative;
 use cumulative::cum_functions;
 mod integration_and_differentiation;
 use integration_and_differentiation::int_and_diff;
 mod assertions;
 use assertions::assert_functions;
+mod constants;
+use constants::constant_definitions;
 
 def_package! {
     /// Package for scientific computing
     pub SciPackage(lib) {
 
-        combine_with_exported_module!(lib, "matrix", matrix_functions);
-        combine_with_exported_module!(lib, "stats", stats);
-        combine_with_exported_module!(lib, "utils", util_functions);
-        combine_with_exported_module!(lib, "cumulative", cum_functions);
-        combine_with_exported_module!(lib, "int_and_diff", int_and_diff);
-        combine_with_exported_module!(lib, "assertion_functions", assert_functions);
+
+    combine_with_exported_module!(lib, "rhai_sci_matrix_function", matrix_functions);
+    combine_with_exported_module!(lib, "rhai_sci_miscellaneous_functions", misc_functions);
+    combine_with_exported_module!(lib, "rhai_sci_basic_stats", stats);
+    combine_with_exported_module!(lib, "rhai_sci_cumulative", cum_functions);
+    combine_with_exported_module!(lib, "rhai_sci_int_and_diff", int_and_diff);
+    combine_with_exported_module!(lib, "rhai_sci_assertions", assert_functions);
+    combine_with_exported_module!(lib, "rhai_sci_constants", constant_definitions);
 
         // Load scripts - TODO: Remove this block once rust->Rhai updates are done
         let engine = Engine::new();
