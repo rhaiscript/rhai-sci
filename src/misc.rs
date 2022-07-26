@@ -3,8 +3,6 @@ use rhai::plugin::*;
 #[export_module]
 pub mod misc_functions {
     use crate::matrix_functions::ndims;
-    use nalgebra::DMatrix;
-    use polars::prelude::{CsvReader, DataType, SerReader};
     use rhai::{Array, Dynamic, EvalAltResult, ImmutableString, Position, FLOAT, INT};
 
     /// Pretty print arrays.
@@ -30,7 +28,7 @@ pub mod misc_functions {
     }
 
     /// Returns an array of the unique elements in an array.
-    /// ```javascript
+    /// ```typescript
     /// let data = [1, 2, 2, 2, 5, 4, 4, 2, 5, 8];
     /// let u = unique(data);
     /// assert_eq(u, [1, 2, 4, 5, 8]);

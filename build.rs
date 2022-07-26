@@ -54,6 +54,7 @@ fn main() {
     combine_with_exported_module!(&mut lib, "rhai_sci_int_and_diff", int_and_diff);
     combine_with_exported_module!(&mut lib, "rhai_sci_assertions", assert_functions);
     combine_with_exported_module!(&mut lib, "rhai_sci_constants", constant_definitions);
+    combine_with_exported_module!(&mut lib, "rhai_sci_sets", set_functions);
     engine.register_global_module(rhai::Shared::new(lib));
 
     // Extract metadata
@@ -153,3 +154,4 @@ include!("src/cumulative.rs");
 include!("src/integration_and_differentiation.rs");
 include!("src/assertions.rs");
 include!("src/constants.rs");
+include!("src/sets.rs");

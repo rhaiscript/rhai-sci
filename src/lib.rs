@@ -21,19 +21,21 @@ mod assertions;
 use assertions::assert_functions;
 mod constants;
 use constants::constant_definitions;
+mod sets;
+use sets::set_functions;
 
 def_package! {
     /// Package for scientific computing
     pub SciPackage(lib) {
 
-
-    combine_with_exported_module!(lib, "rhai_sci_matrix_function", matrix_functions);
-    combine_with_exported_module!(lib, "rhai_sci_miscellaneous_functions", misc_functions);
-    combine_with_exported_module!(lib, "rhai_sci_basic_stats", stats);
-    combine_with_exported_module!(lib, "rhai_sci_cumulative", cum_functions);
-    combine_with_exported_module!(lib, "rhai_sci_int_and_diff", int_and_diff);
-    combine_with_exported_module!(lib, "rhai_sci_assertions", assert_functions);
-    combine_with_exported_module!(lib, "rhai_sci_constants", constant_definitions);
+        combine_with_exported_module!(lib, "rhai_sci_matrix_function", matrix_functions);
+        combine_with_exported_module!(lib, "rhai_sci_miscellaneous_functions", misc_functions);
+        combine_with_exported_module!(lib, "rhai_sci_basic_stats", stats);
+        combine_with_exported_module!(lib, "rhai_sci_cumulative", cum_functions);
+        combine_with_exported_module!(lib, "rhai_sci_int_and_diff", int_and_diff);
+        combine_with_exported_module!(lib, "rhai_sci_assertions", assert_functions);
+        combine_with_exported_module!(lib, "rhai_sci_constants", constant_definitions);
+        combine_with_exported_module!(lib, "rhai_sci_sets", set_functions);
 
         // Load scripts - TODO: Remove this block once rust->Rhai updates are done
         let engine = Engine::new();
