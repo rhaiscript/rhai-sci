@@ -1000,16 +1000,16 @@ pub mod matrix_functions {
     fn meshgrid(x: Array, y: Array) -> Result<Map, Box<EvalAltResult>> {
         let nx = x.len();
         let ny = y.len();
-        let mut X: Vec<Dynamic> = vec![Dynamic::from_array(x); nx];
-        let mut Y: Vec<Dynamic> = vec![Dynamic::from_array(y); ny];
+        let mut x_dyn: Vec<Dynamic> = vec![Dynamic::from_array(x); nx];
+        let mut y_dyn: Vec<Dynamic> = vec![Dynamic::from_array(y); ny];
 
         let mut result = BTreeMap::new();
         let mut xid = smartstring::SmartString::new();
         xid.push_str("x");
         let mut yid = smartstring::SmartString::new();
         yid.push_str("y");
-        result.insert(xid, Dynamic::from_array(X));
-        result.insert(yid, Dynamic::from_array(Y));
+        result.insert(xid, Dynamic::from_array(x_dyn));
+        result.insert(yid, Dynamic::from_array(y_dyn));
         Ok(result)
     }
 }
