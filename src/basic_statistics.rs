@@ -301,7 +301,7 @@ pub mod stats {
         }
     }
 
-    /// Compute the produce of an array. Fails if the input is not an array, or if
+    /// Compute the product of an array. Fails if the input is not an array, or if
     /// it is an array with elements other than INT or FLOAT.
     /// ```typescript
     /// let data = [1, 2, 3];
@@ -316,13 +316,13 @@ pub mod stats {
     #[rhai_fn(name = "prod", return_raw)]
     pub fn prod(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
         if arr[0].is::<f64>() {
-            let mut p = 1.0_f64;
+            let mut p = 1.0 as FLOAT;
             for el in arr {
                 p *= el.as_float().unwrap()
             }
             Ok(Dynamic::from_float(p))
         } else if arr[0].is::<i64>() {
-            let mut p = 1_i64;
+            let mut p = 1 as INT;
             for el in arr {
                 p *= el.as_int().unwrap()
             }
