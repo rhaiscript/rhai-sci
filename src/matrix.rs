@@ -5,7 +5,8 @@ pub mod matrix_functions {
     use crate::misc_functions::rand_float;
     use nalgebra::DMatrix;
     use polars::prelude::{CsvReader, DataType, SerReader};
-    use rhai::{Array, Dynamic, EvalAltResult, ImmutableString, Position, FLOAT, INT};
+    use rhai::{Array, Dynamic, EvalAltResult, ImmutableString, Map, Position, FLOAT, INT};
+    use std::collections::BTreeMap;
 
     /// Calculates the inverse of a matrix. Fails if the matrix if not invertible, or if the
     /// elements of the matrix aren't FLOAT or INT.
@@ -982,6 +983,34 @@ pub mod matrix_functions {
             }
         }
         Ok(new_matrix)
+    }
+
+    /// Returns an object map containing 2-D grid coordinates based on the uni-axial coordinates
+    /// contained in arguments x and y.
+    /// ```javascript
+    /// let x = [1, 2];
+    /// let y = [3, 4];
+    /// let g = meshgrid(x, y);
+    /// assert_eq(g, #{"x": [[1, 2],
+    ///                      [1, 2]],
+    ///                "y": [[3, 3],
+    ///                      [4, 4]]});
+    /// ```
+    #[rhai_fn(name = "meshgrid", return_raw)]
+    fn meshgrid(x: Array, y: Array) -> Result<Map, Box<EvalAltResult>> {
+        let nx = x.len();
+        let ny = y.len();
+        let mut X: Vec<Dynamic> = vec![Dynamic::from_array(x); nx];
+        let mut Y: Vec<Dynamic> = vec![Dynamic::from_array(y); ny];
+
+        let mut result = BTreeMap::new();
+        let mut xid = smartstring::SmartString::new();
+        xid.push_str("x");
+        let mut yid = smartstring::SmartString::new();
+        yid.push_str("y");
+        result.insert(xid, Dynamic::from_array(X));
+        result.insert(yid, Dynamic::from_array(Y));
+        Ok(result)
     }
 }
 

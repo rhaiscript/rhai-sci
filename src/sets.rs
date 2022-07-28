@@ -19,7 +19,6 @@ pub mod set_functions {
         crate::misc_functions::unique(arr1)
     }
 
-
     /// Performs set intersection of two arrays
     /// ```typescript
     ///  let set1 = [7, 1, 7, 7, 4];
@@ -39,6 +38,6 @@ pub mod set_functions {
                 new_arr.push(el);
             }
         }
-        Ok(new_arr)
+        Ok(crate::misc_functions::unique(new_arr).unwrap())
     }
 }
