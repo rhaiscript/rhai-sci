@@ -147,7 +147,7 @@ struct Function {
     pub docComments: Option<Vec<String>>,
 }
 
-include!("src/matrix.rs");
+include!("src/matrices_and_arrays.rs");
 include!("src/basic_statistics.rs");
 include!("src/misc.rs");
 include!("src/cumulative.rs");

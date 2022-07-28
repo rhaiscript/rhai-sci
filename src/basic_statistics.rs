@@ -455,4 +455,67 @@ pub mod stats {
         }
         Ok(median(dev).unwrap())
     }
+
+    /// Returns a given percentile value for a 1-D array of data.
+    /// ```typescript
+    /// let data = [1, 2, 0, 3, 4];
+    /// let p = prctile(data, 50);
+    /// assert_eq(p, 2.0);
+    /// ```
+    #[rhai_fn(name = "prctile", return_raw)]
+    pub fn prctile(arr: Array, p: Dynamic) -> Result<FLOAT, Box<EvalAltResult>> {
+        let mut float_array = vec![];
+        if arr[0].is::<f64>() {
+            float_array = arr
+                .iter()
+                .map(|el| el.as_float().unwrap())
+                .collect::<Vec<FLOAT>>();
+        } else if arr[0].is::<i64>() {
+            float_array = arr
+                .iter()
+                .map(|el| el.as_int().unwrap() as FLOAT)
+                .collect::<Vec<FLOAT>>();
+        } else {
+            return Err(EvalAltResult::ErrorArithmetic(
+                format!("The elements of the input must either be INT or FLOAT."),
+                Position::NONE,
+            )
+            .into());
+        }
+
+        // Sort
+        float_array.sort_by(|a, b| a.partial_cmp(b).unwrap());
+
+        let sorted_array = float_array
+            .iter()
+            .map(|el| Dynamic::from_float(*el))
+            .collect::<Vec<Dynamic>>();
+
+        let x = crate::matrix_functions::linspace(
+            Dynamic::from_int(0),
+            Dynamic::from_int(100),
+            arr.len() as INT,
+        )
+        .unwrap();
+        crate::misc_functions::interp1(x, sorted_array, p)
+    }
+
+    /// Returns the inter-quartile range for a 1-D array.
+    /// ```typescript
+    /// let data = [1, 1, 1, 1, 1, 1, 1, 5, 6, 9, 9, 9, 9, 9, 9, 9, 9];
+    /// let inter_quartile_range = iqr(data);
+    /// assert_eq(inter_quartile_range, 8.0);
+    /// ```
+    #[rhai_fn(name = "iqr", return_raw)]
+    pub fn iqr(arr: Array) -> Result<FLOAT, Box<EvalAltResult>> {
+        match (
+            prctile(arr.clone(), Dynamic::from_int(25)),
+            prctile(arr.clone(), Dynamic::from_int(75)),
+        ) {
+            (Ok(low), Ok(high)) => Ok(high - low),
+            (Ok(_), Err(high)) => Err(high),
+            (Err(low), Ok(_)) => Err(low),
+            (Err(low), Err(_)) => Err(low),
+        }
+    }
 }

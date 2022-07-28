@@ -77,7 +77,7 @@ pub mod int_and_diff {
     }
 
     /// Returns the difference between successive elements of a 1-D array.
-    /// ```javascript
+    /// ```typescript
     /// let arr = [2, 5, 1, 7, 8];
     /// let d = diff(arr);
     /// assert_eq(d, [3, -4, 6, 1]);

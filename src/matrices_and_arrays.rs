@@ -961,7 +961,7 @@ pub mod matrix_functions {
     }
 
     /// Repeats copies of a matrix
-    /// ```javascript
+    /// ```typescript
     /// let matrix = rand(3);
     /// let combined = repmat(matrix, 2, 2);
     /// assert_eq(size(combined), [6, 6]);
@@ -987,7 +987,7 @@ pub mod matrix_functions {
 
     /// Returns an object map containing 2-D grid coordinates based on the uni-axial coordinates
     /// contained in arguments x and y.
-    /// ```javascript
+    /// ```typescript
     /// let x = [1, 2];
     /// let y = [3, 4];
     /// let g = meshgrid(x, y);
@@ -997,7 +997,7 @@ pub mod matrix_functions {
     ///                      [4, 4]]});
     /// ```
     #[rhai_fn(name = "meshgrid", return_raw)]
-    fn meshgrid(x: Array, y: Array) -> Result<Map, Box<EvalAltResult>> {
+    pub fn meshgrid(x: Array, y: Array) -> Result<Map, Box<EvalAltResult>> {
         let nx = x.len();
         let ny = y.len();
         let mut x_dyn: Vec<Dynamic> = vec![Dynamic::from_array(x); nx];
@@ -1009,8 +1009,73 @@ pub mod matrix_functions {
         let mut yid = smartstring::SmartString::new();
         yid.push_str("y");
         result.insert(xid, Dynamic::from_array(x_dyn));
-        result.insert(yid, Dynamic::from_array(y_dyn));
+        result.insert(yid, Dynamic::from_array(transpose(y_dyn)));
         Ok(result)
+    }
+
+    /// Returns an array containing a number of elements linearly spaced between two bounds.
+    /// ```typescript
+    /// let x = linspace(1, 2, 5);
+    /// assert_eq(x, [1.0, 1.25, 1.5, 1.75, 2.0]);
+    /// ```
+    #[rhai_fn(name = "linspace", return_raw)]
+    pub fn linspace(x1: Dynamic, x2: Dynamic, n: INT) -> Result<Array, Box<EvalAltResult>> {
+        let x1_type = x1.type_name();
+        let x2_type = x2.type_name();
+        if x1_type != x2_type {
+            return Err(EvalAltResult::ErrorArithmetic(
+                format!(
+                    "The left endpoint ({}) and right endpoint ({}) do not have the same type.",
+                    x1_type, x2_type
+                ),
+                Position::NONE,
+            )
+            .into());
+        }
+
+        let new_n = n as FLOAT;
+        let mut new_x1 = 0 as FLOAT;
+        let mut new_x2 = 0 as FLOAT;
+
+        if x1.is::<FLOAT>() {
+            new_x1 = x1.as_float().unwrap();
+            new_x2 = x2.as_float().unwrap();
+        } else if x1.is::<INT>() {
+            new_x1 = x1.as_int().unwrap() as FLOAT;
+            new_x2 = x2.as_int().unwrap() as FLOAT;
+        } else {
+            return Err(EvalAltResult::ErrorArithmetic(
+                format!("The elements of the input must either be INT or FLOAT."),
+                Position::NONE,
+            )
+            .into());
+        }
+
+        let mut arr = vec![Dynamic::from_float(new_x1)];
+        let mut counter = new_x1;
+        let interval = (new_x2 - new_x1) / (new_n - 1.0);
+        for i in 0..(n - 2) {
+            counter += interval;
+            arr.push(Dynamic::from_float(counter));
+        }
+        arr.push(Dynamic::from_float(new_x2));
+        Ok(arr)
+    }
+
+    /// Returns an array containing a number of elements logarithmically spaced between two bounds.
+    /// ```typescript
+    /// let x = logspace(1, 3, 3);
+    /// assert_eq(x, [10.0, 100.0, 1000.0]);
+    /// ```
+    #[rhai_fn(name = "logspace", return_raw)]
+    pub fn logspace(a: Dynamic, b: Dynamic, n: INT) -> Result<Array, Box<EvalAltResult>> {
+        match linspace(a, b, n) {
+            Ok(arr) => Ok(arr
+                .iter()
+                .map(|e| Dynamic::from_float((10 as FLOAT).powf(e.as_float().unwrap())))
+                .collect::<Vec<Dynamic>>()),
+            Err(e) => Err(e),
+        }
     }
 }
 

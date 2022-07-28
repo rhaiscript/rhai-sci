@@ -7,8 +7,8 @@
 #![doc = include_str!("../docs/highlight.html")]
 
 use rhai::{def_package, packages::Package, plugin::*, Engine, EvalAltResult};
-mod matrix;
-use matrix::matrix_functions;
+mod matrices_and_arrays;
+use matrices_and_arrays::matrix_functions;
 mod basic_statistics;
 use basic_statistics::stats;
 mod misc;
