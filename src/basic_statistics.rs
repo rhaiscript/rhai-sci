@@ -3,10 +3,10 @@ use rhai::plugin::*;
 #[export_module]
 pub mod stats {
     use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT, INT};
+    use std::collections::HashMap;
 
     /// Return the highest value from a pair of numbers. Fails if the numbers are anything other
     /// than INT or FLOAT.
-    ///
     /// ```typescript
     /// let the_higher_number = max(2, 3);
     /// assert_eq(the_higher_number, 3);
@@ -22,7 +22,6 @@ pub mod stats {
 
     /// Return the highest value from an array. Fails if the input is not an array, or if
     /// it is an array with elements other than INT or FLOAT.
-    ///
     /// ```typescript
     /// let the_highest_number = max([2, 3, 4, 5]);
     /// assert_eq(the_highest_number, 5);
@@ -516,6 +515,64 @@ pub mod stats {
             (Ok(_), Err(high)) => Err(high),
             (Err(low), Ok(_)) => Err(low),
             (Err(low), Err(_)) => Err(low),
+        }
+    }
+
+    /// Returns the mode of a 1-D array.
+    /// ```typescript
+    /// let data = [1, 2, 2, 2, 2, 3];
+    /// let m = mode(data);
+    /// assert_eq(m, 2);
+    /// ```
+    /// ```typescript
+    /// let data = [1.0, 2.0, 2.0, 2.0, 2.0, 3.0];
+    /// let m = mode(data);
+    /// assert_eq(m, 2.0);
+    /// ```
+    #[rhai_fn(name = "mode", return_raw)]
+    pub fn mode(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
+        if arr[0].is::<FLOAT>() {
+            let mut v = arr
+                .iter()
+                .map(|el| el.as_float().unwrap())
+                .collect::<Vec<FLOAT>>();
+
+            let mut counts: HashMap<String, usize> = HashMap::new();
+
+            Ok(Dynamic::from_float(
+                v.iter()
+                    .copied()
+                    .max_by_key(|&n| {
+                        let count = counts.entry(format!("{:?}", n)).or_insert(0);
+                        *count += 1;
+                        *count
+                    })
+                    .unwrap(),
+            ))
+        } else if arr[0].is::<INT>() {
+            let mut v = arr
+                .iter()
+                .map(|el| el.as_int().unwrap())
+                .collect::<Vec<INT>>();
+
+            let mut counts: HashMap<INT, usize> = HashMap::new();
+
+            Ok(Dynamic::from_int(
+                v.iter()
+                    .copied()
+                    .max_by_key(|&n| {
+                        let count = counts.entry(n).or_insert(0);
+                        *count += 1;
+                        *count
+                    })
+                    .unwrap(),
+            ))
+        } else {
+            Err(EvalAltResult::ErrorArithmetic(
+                format!("The elements of the input must either be INT or FLOAT."),
+                Position::NONE,
+            )
+            .into())
         }
     }
 }
