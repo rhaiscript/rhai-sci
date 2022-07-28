@@ -18,4 +18,27 @@ pub mod set_functions {
         x.extend(y);
         crate::misc_functions::unique(arr1)
     }
+
+
+    /// Performs set intersection of two arrays
+    /// ```typescript
+    ///  let set1 = [7, 1, 7, 7, 4];
+    ///  let set2 = [7, 0, 4, 4, 0];
+    /// let x = intersect(set1, set2);
+    /// assert_eq(x, [4, 7]);
+    /// ```
+    #[rhai_fn(name = "intersect", return_raw)]
+    pub fn intersect(arr1: Array, arr2: Array) -> Result<Array, Box<EvalAltResult>> {
+        let array2 = arr2
+            .into_iter()
+            .map(|x| format!("{:?}", x).to_string())
+            .collect::<Vec<String>>();
+        let mut new_arr = vec![];
+        for el in arr1 {
+            if array2.contains(&format!("{:?}", el).to_string()) {
+                new_arr.push(el);
+            }
+        }
+        Ok(new_arr)
+    }
 }
