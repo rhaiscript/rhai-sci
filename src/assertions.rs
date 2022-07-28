@@ -55,7 +55,7 @@ pub mod assert_functions {
         }
     }
 
-    /// Assert that two arguments are non-equal and throw an error if they are not.
+    /// Assert that two arguments are unequal and throw an error if they are not.
     /// ```typescript
     /// assert_ne(2, 1);
     /// ```

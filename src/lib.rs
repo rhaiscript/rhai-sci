@@ -21,8 +21,12 @@ mod assertions;
 use assertions::assert_functions;
 mod constants;
 use constants::constant_definitions;
+mod moving;
+use moving::moving_functions;
 mod sets;
 use sets::set_functions;
+mod validate;
+use validate::asdf;
 
 def_package! {
     /// Package for scientific computing
@@ -36,6 +40,7 @@ def_package! {
         combine_with_exported_module!(lib, "rhai_sci_assertions", assert_functions);
         combine_with_exported_module!(lib, "rhai_sci_constants", constant_definitions);
         combine_with_exported_module!(lib, "rhai_sci_sets", set_functions);
+        combine_with_exported_module!(lib, "rhai_sci_moving", moving_functions);
 
         // Load scripts - TODO: Remove this block once rust->Rhai updates are done
         let engine = Engine::new();

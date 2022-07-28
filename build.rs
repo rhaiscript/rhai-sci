@@ -55,6 +55,7 @@ fn main() {
     combine_with_exported_module!(&mut lib, "rhai_sci_assertions", assert_functions);
     combine_with_exported_module!(&mut lib, "rhai_sci_constants", constant_definitions);
     combine_with_exported_module!(&mut lib, "rhai_sci_sets", set_functions);
+    combine_with_exported_module!(&mut lib, "rhai_sci_moving", moving_functions);
     engine.register_global_module(rhai::Shared::new(lib));
 
     // Extract metadata
@@ -155,3 +156,5 @@ include!("src/integration_and_differentiation.rs");
 include!("src/assertions.rs");
 include!("src/constants.rs");
 include!("src/sets.rs");
+include!("src/moving.rs");
+include!("src/validate.rs");
