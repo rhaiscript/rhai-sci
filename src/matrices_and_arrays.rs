@@ -107,6 +107,32 @@ pub mod matrix_functions {
         out
     }
 
+    /// Returns an array indicating the size of the matrix along each dimension, called as a method and passed by reference.
+    /// ```typescript
+    /// let matrix = ones(3, 5);
+    /// assert_eq(matrix.size(), [3, 5]);
+    /// ```
+    /// ```typescript
+    /// let matrix = [[[1, 2]]];
+    /// assert_eq(matrix.size(), [1, 1, 2]);
+    /// ```
+    #[rhai_fn(name = "size")]
+    pub fn matrix_size_by_reference(matrix: &mut Array) -> Array {
+        let mut new_matrix = matrix.clone();
+
+        let mut shape = vec![Dynamic::from_int(new_matrix.len() as INT)];
+        loop {
+            if new_matrix[0].is::<Array>() {
+                new_matrix = new_matrix[0].clone().into_array().unwrap();
+                shape.push(Dynamic::from_int(new_matrix.len() as INT));
+            } else {
+                break;
+            }
+        }
+
+        shape
+    }
+
     /// Returns an array indicating the size of the matrix along each dimension.
     /// ```typescript
     /// let matrix = ones(3, 5);
@@ -144,6 +170,17 @@ pub mod matrix_functions {
         matrix_size(matrix).len() as INT
     }
 
+    /// Return the number of dimensions in matrix, called as a method and passed by reference.
+    /// ```typescript
+    /// let matrix = ones(4, 6);
+    /// let n = matrix.ndims();
+    /// assert_eq(n, 2);
+    /// ```
+    #[rhai_fn(name = "ndims")]
+    pub fn ndims_by_reference(matrix: &mut Array) -> INT {
+        matrix_size_by_reference(matrix).len() as INT
+    }
+
     /// Returns the number of elements in a matrix
     /// ```typescript
     /// let matrix = ones(4, 6);
@@ -158,6 +195,22 @@ pub mod matrix_functions {
     #[rhai_fn(name = "numel")]
     pub fn numel(matrix: Array) -> INT {
         flatten(matrix).len() as INT
+    }
+
+    /// Returns the number of elements in a matrix, called as a method and passed by reference.
+    /// ```typescript
+    /// let matrix = ones(4, 6);
+    /// let n = matrix.numel();
+    /// assert_eq(n, 24);
+    /// ```
+    /// ```typescript
+    /// let matrix = [1, [1, 2, 3]];
+    /// let n = matrix.numel();
+    /// assert_eq(n, 4);
+    /// ```
+    #[rhai_fn(name = "numel", pure)]
+    pub fn numel_by_reference(matrix: &mut Array) -> INT {
+        flatten(matrix.to_vec()).len() as INT
     }
 
     /// Reads a numeric csv file from a url

@@ -10,7 +10,7 @@ pub mod moving_functions {
         G: Fn(Array) -> Dynamic,
     {
         // First, validate the inputs
-        crate::asdf::is_int_list(arr.clone());
+        crate::asdf::is_int_or_float_list(arr.clone());
         let mut new_arr = vec![];
         let n = arr.len() as INT;
         for i in 0..n {
