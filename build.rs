@@ -149,7 +149,7 @@ struct Function {
 }
 
 include!("src/matrices_and_arrays.rs");
-include!("src/basic_statistics.rs");
+include!("src/statistics.rs");
 include!("src/misc.rs");
 include!("src/cumulative.rs");
 include!("src/integration_and_differentiation.rs");

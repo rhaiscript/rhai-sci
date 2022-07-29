@@ -9,8 +9,8 @@
 use rhai::{def_package, packages::Package, plugin::*, Engine, EvalAltResult};
 mod matrices_and_arrays;
 use matrices_and_arrays::matrix_functions;
-mod basic_statistics;
-use basic_statistics::stats;
+mod statistics;
+use statistics::stats;
 mod misc;
 use misc::misc_functions;
 mod cumulative;
