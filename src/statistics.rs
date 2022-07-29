@@ -575,4 +575,45 @@ pub mod stats {
             .into())
         }
     }
+
+    /// Performs ordinary least squares regression.
+    /// ```javascript
+    /// let x = [[1.0, 0.0], [1.0, 1.0]];
+    /// let y = [[0.1],
+    ///          [1.0]];
+    /// let b = regress(x, y);
+    /// assert_eq(b, [[0.1], [0.9]]);
+    /// ```
+    fn regress(X: Array, Y: Array) -> Result<Array, Box<EvalAltResult>> {
+        if crate::validation_functions::is_matrix(&mut X.clone()) {
+            if crate::validation_functions::is_column_vector(&mut Y.clone()) {
+                let Xt = crate::matrix_functions::transpose(X.clone());
+                let A = crate::matrix_functions::mtimes(
+                    crate::matrix_functions::mtimes(
+                        crate::matrix_functions::invert_matrix(
+                            crate::matrix_functions::mtimes(Xt.clone(), X.clone()).unwrap(),
+                        )
+                        .unwrap(),
+                        Xt.clone(),
+                    )
+                    .unwrap(),
+                    Y,
+                )
+                .unwrap();
+                Ok(A)
+            } else {
+                Err(EvalAltResult::ErrorArithmetic(
+                    format!("The second argument must be a column vector."),
+                    Position::NONE,
+                )
+                .into())
+            }
+        } else {
+            Err(EvalAltResult::ErrorArithmetic(
+                format!("The first argument must be a matrix."),
+                Position::NONE,
+            )
+            .into())
+        }
+    }
 }
