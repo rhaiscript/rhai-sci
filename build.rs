@@ -6,26 +6,8 @@ use std::io::Write;
 
 fn main() {
     // Update if needed
-    println!("cargo:rerun-if-changed=scripts");
-    println!("cargo:rerun-if-changed=src"); // TODO: Remove this block once functions are no longer in Rhai
+    println!("cargo:rerun-if-changed=src");
     println!("cargo:rerun-if-changed=build.rs");
-
-    // Read directory of paths - TODO: Remove this block once functions are no longer in Rhai
-    let paths = std::fs::read_dir("scripts").unwrap();
-
-    // Open file to write to - TODO: Remove this block once functions are no longer in Rhai
-    let mut func_file =
-        std::fs::File::create(std::env::var("OUT_DIR").unwrap() + "/rhai-sci-compiled.txt")
-            .unwrap();
-
-    // Build library and test files - TODO: Remove this block once functions are no longer in Rhai
-    for path in paths {
-        let name = path.unwrap().path();
-        if name.clone().to_str().unwrap().ends_with(".rhai") {
-            let contents = std::fs::read_to_string(name.clone()).unwrap();
-            write!(func_file, "{contents}\n\n").expect("Cannot write to {func_file}");
-        }
-    }
 
     // Make a file for documentation
     let mut doc_file =
@@ -33,17 +15,6 @@ fn main() {
 
     // Build an engine for doctests
     let mut engine = Engine::new();
-    let ast = engine
-        .compile(
-            std::fs::read_to_string(std::env::var("OUT_DIR").unwrap() + "/rhai-sci-compiled.txt")
-                .unwrap(),
-        )
-        .unwrap();
-
-    // Add rand and create engine
-    engine.register_global_module(rhai::Shared::new(
-        Module::eval_ast_as_new(rhai::Scope::new(), &ast, &engine).unwrap(),
-    ));
 
     // Add custom functions from Rust
     let mut lib = Module::new();

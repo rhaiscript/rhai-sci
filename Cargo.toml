@@ -14,7 +14,7 @@ documentation = "https://docs.rs/rhai-sci"
 build = "build.rs"
 
 [dependencies]
-rhai = { version = "1.5", features = ["unchecked", "metadata"]}
+rhai = { version = "1.5", features = ["metadata"]}
 rustyline = "10.0.0"
 nalgebra = "0.30.1"
 polars = {version = "0.17.0"}
@@ -26,7 +26,7 @@ rand = { version = "0.8" }
 smartstring = "1.0.1"
 
 [build-dependencies]
-rhai = { version = "1.5", features = ["unchecked", "metadata"]}
+rhai = { version = "1.5", features = ["metadata"]}
 itertools = "0.10.3"
 nalgebra = "0.30.1"
 polars = {version = "0.17.0"}
