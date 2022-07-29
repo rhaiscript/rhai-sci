@@ -9,10 +9,7 @@ fn main() {
     engine.register_global_module(SciPackage::new().as_shared_module());
 
     // Now run your code
-    println!(
-        "{:?}",
-        engine
-            .eval_file::<Dynamic>("examples/download_and_regress.rhai".into())
-            .unwrap()
-    );
+    engine
+        .eval_file::<Dynamic>("examples/download_and_regress.rhai".into())
+        .unwrap();
 }

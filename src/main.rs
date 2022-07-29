@@ -249,43 +249,8 @@ fn setup_editor() -> Editor<()> {
     rl
 }
 
-#[export_module]
-mod sample_functions {
-    /// This is a sample function.
-    ///
-    /// It takes two numbers and prints them to a string.
-    ///
-    /// # Example
-    ///
-    /// ```rhai
-    /// let result = test(42, 123);
-    ///
-    /// print(result);      // prints "42 123"
-    /// ```
-    pub fn test(x: INT, y: INT) -> String {
-        format!("{} {}", x, y)
-    }
-
-    /// This is a sample method for integers.
-    ///
-    /// # Example
-    ///
-    /// ```rhai
-    /// let x = 42;
-    ///
-    /// x.test(123, "hello");
-    ///
-    /// print(x);       // prints 170
-    /// ```
-    #[rhai_fn(name = "test")]
-    pub fn test2(x: &mut INT, y: INT, z: &str) {
-        *x += y + (z.len() as INT);
-        println!("{} {} {}", x, y, z);
-    }
-}
-
 fn main() {
-    let title = format!("Rhai REPL tool (version {})", env!("CARGO_PKG_VERSION"));
+    let title = format!("Rhai-Sci REPL tool (version {})", env!("CARGO_PKG_VERSION"));
     println!("{}", title);
     println!("{0:=<1$}", "", title.len());
 
@@ -312,9 +277,6 @@ fn main() {
         resolver.enable_cache(false);
         engine.set_module_resolver(resolver);
     }
-
-    // Register sample functions
-    engine.register_global_module(exported_module!(sample_functions).into());
 
     // Create scope
     let mut scope = Scope::new();
@@ -351,7 +313,7 @@ fn main() {
             input.clear();
 
             loop {
-                let prompt = if input.is_empty() { "repl> " } else { "    > " };
+                let prompt = if input.is_empty() { ">>> " } else { "    > " };
 
                 match rl.readline(prompt) {
                     // Line continuation

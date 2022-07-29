@@ -9,6 +9,4 @@ let x = ones(1, size(x)[1]) + x;
 
 // Do regression and report
 let b = regress(x.transpose(), y.transpose());
-for bb in b {
-    print(bb);
-}
+pprint(b);

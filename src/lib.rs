@@ -7,27 +7,41 @@
 #![doc = include_str!("../docs/highlight.html")]
 
 use rhai::{def_package, packages::Package, plugin::*, Engine, EvalAltResult};
-use rhai_rand::RandomPackage;
-mod linalg;
-use linalg::linalg_functions;
-mod io;
-use io::io_functions;
+mod matrices_and_arrays;
+use matrices_and_arrays::matrix_functions;
+mod statistics;
+use statistics::stats;
+mod misc;
+use misc::misc_functions;
+mod cumulative;
+use cumulative::cum_functions;
+mod integration_and_differentiation;
+use integration_and_differentiation::int_and_diff;
+mod assertions;
+use assertions::assert_functions;
+mod constants;
+use constants::constant_definitions;
+mod moving;
+use moving::moving_functions;
+mod sets;
+use sets::set_functions;
+mod validate;
+use validate::validation_functions;
 
 def_package! {
     /// Package for scientific computing
     pub SciPackage(lib) {
 
-        // Load random package
-        RandomPackage::init(lib);
-
-        combine_with_exported_module!(lib, "linalg", linalg_functions);
-        combine_with_exported_module!(lib, "io", io_functions);
-
-        // Load scripts
-        let engine = Engine::new();
-        let ast = engine.compile(include_str!(concat!(env!("OUT_DIR"), "/rhai-sci-compiled.txt"))).unwrap();
-        let my_module = Module::eval_ast_as_new(rhai::Scope::new(), &ast, &engine).unwrap();
-        lib.fill_with(&my_module);
+        combine_with_exported_module!(lib, "rhai_sci_matrix_function", matrix_functions);
+        combine_with_exported_module!(lib, "rhai_sci_miscellaneous_functions", misc_functions);
+        combine_with_exported_module!(lib, "rhai_sci_basic_stats", stats);
+        combine_with_exported_module!(lib, "rhai_sci_cumulative", cum_functions);
+        combine_with_exported_module!(lib, "rhai_sci_int_and_diff", int_and_diff);
+        combine_with_exported_module!(lib, "rhai_sci_assertions", assert_functions);
+        combine_with_exported_module!(lib, "rhai_sci_constants", constant_definitions);
+        combine_with_exported_module!(lib, "rhai_sci_sets", set_functions);
+        combine_with_exported_module!(lib, "rhai_sci_moving", moving_functions);
+        combine_with_exported_module!(lib, "rhai_sci_validation", validation_functions);
     }
 }
 
