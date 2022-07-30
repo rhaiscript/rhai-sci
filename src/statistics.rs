@@ -28,18 +28,18 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "max", return_raw)]
     pub fn array_max(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        if arr[0].is::<f64>() {
+        if arr[0].is::<FLOAT>() {
             let mut y = arr
                 .iter()
                 .map(|el| el.as_float().unwrap())
-                .collect::<Vec<f64>>();
+                .collect::<Vec<FLOAT>>();
             y.sort_by(|a, b| a.partial_cmp(b).unwrap());
             Ok(Dynamic::from(y[y.len() - 1]))
-        } else if arr[0].is::<i64>() {
+        } else if arr[0].is::<INT>() {
             let mut y = arr
                 .iter()
                 .map(|el| el.as_int().unwrap())
-                .collect::<Vec<i64>>();
+                .collect::<Vec<INT>>();
             y.sort();
             Ok(Dynamic::from(y[y.len() - 1]))
         } else {
@@ -76,18 +76,18 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "min", return_raw)]
     pub fn array_min(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        if arr[0].is::<f64>() {
+        if arr[0].is::<FLOAT>() {
             let mut y = arr
                 .iter()
                 .map(|el| el.as_float().unwrap())
-                .collect::<Vec<f64>>();
+                .collect::<Vec<FLOAT>>();
             y.sort_by(|a, b| a.partial_cmp(b).unwrap());
             Ok(Dynamic::from(y[0]))
-        } else if arr[0].is::<i64>() {
+        } else if arr[0].is::<INT>() {
             let mut y = arr
                 .iter()
                 .map(|el| el.as_int().unwrap())
-                .collect::<Vec<i64>>();
+                .collect::<Vec<INT>>();
             y.sort();
             Ok(Dynamic::from(y[0]))
         } else {
@@ -124,11 +124,11 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "maxk", return_raw)]
     pub fn maxk(arr: Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
-        if arr[0].is::<f64>() {
+        if arr[0].is::<FLOAT>() {
             let mut y = arr
                 .iter()
                 .map(|el| el.as_float().unwrap())
-                .collect::<Vec<f64>>();
+                .collect::<Vec<FLOAT>>();
             y.sort_by(|a, b| a.partial_cmp(b).unwrap());
             let r = (y.len() - (k as usize))..(y.len());
             let mut v = Array::new();
@@ -136,11 +136,11 @@ pub mod stats {
                 v.push(Dynamic::from(y[idx]));
             }
             Ok(v)
-        } else if arr[0].is::<i64>() {
+        } else if arr[0].is::<INT>() {
             let mut y = arr
                 .iter()
                 .map(|el| el.as_int().unwrap())
-                .collect::<Vec<i64>>();
+                .collect::<Vec<INT>>();
             y.sort();
             let r = (y.len() - (k as usize))..(y.len());
             let mut v = Array::new();
@@ -166,11 +166,11 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "mink", return_raw)]
     pub fn mink(arr: Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
-        if arr[0].is::<f64>() {
+        if arr[0].is::<FLOAT>() {
             let mut y = arr
                 .iter()
                 .map(|el| el.as_float().unwrap())
-                .collect::<Vec<f64>>();
+                .collect::<Vec<FLOAT>>();
             y.sort_by(|a, b| a.partial_cmp(b).unwrap());
             let r = (0 as usize)..(k as usize);
             let mut v = Array::new();
@@ -178,11 +178,11 @@ pub mod stats {
                 v.push(Dynamic::from(y[idx]));
             }
             Ok(v)
-        } else if arr[0].is::<i64>() {
+        } else if arr[0].is::<INT>() {
             let mut y = arr
                 .iter()
                 .map(|el| el.as_int().unwrap())
-                .collect::<Vec<i64>>();
+                .collect::<Vec<INT>>();
             y.sort();
             let r = (0 as usize)..(k as usize);
             let mut v = Array::new();
@@ -208,17 +208,17 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "sum", return_raw)]
     pub fn sum(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        if arr[0].is::<f64>() {
+        if arr[0].is::<FLOAT>() {
             let y = arr
                 .iter()
                 .map(|el| el.as_float().unwrap())
-                .collect::<Vec<f64>>();
+                .collect::<Vec<FLOAT>>();
             Ok(Dynamic::from_float(y.iter().sum()))
-        } else if arr[0].is::<i64>() {
+        } else if arr[0].is::<INT>() {
             let y = arr
                 .iter()
                 .map(|el| el.as_int().unwrap())
-                .collect::<Vec<i64>>();
+                .collect::<Vec<INT>>();
             Ok(Dynamic::from_int(y.iter().sum()))
         } else {
             Err(EvalAltResult::ErrorArithmetic(
@@ -238,12 +238,12 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "mean", return_raw)]
     pub fn mean(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        let L = arr.len() as f64;
+        let L = arr.len() as FLOAT;
         match sum(arr) {
-            Ok(s) => Ok(Dynamic::from_float(if s.is::<f64>() {
+            Ok(s) => Ok(Dynamic::from_float(if s.is::<FLOAT>() {
                 s.as_float().unwrap() / L
             } else {
-                (s.as_int().unwrap() as f64) / L
+                (s.as_int().unwrap() as FLOAT) / L
             })),
             Err(e) => Err(e),
         }
@@ -263,13 +263,13 @@ pub mod stats {
             Ok(m) => Ok(Dynamic::from_int(
                 arr.iter()
                     .position(|r| {
-                        if r.is::<f64>() {
+                        if r.is::<FLOAT>() {
                             r.clone().as_float() == m.clone().as_float()
                         } else {
                             r.clone().as_int() == m.clone().as_int()
                         }
                     })
-                    .unwrap() as i64,
+                    .unwrap() as INT,
             )),
             Err(e) => Err(e),
         }
@@ -289,13 +289,13 @@ pub mod stats {
             Ok(m) => Ok(Dynamic::from_int(
                 arr.iter()
                     .position(|r| {
-                        if r.is::<f64>() {
+                        if r.is::<FLOAT>() {
                             r.clone().as_float() == m.clone().as_float()
                         } else {
                             r.clone().as_int() == m.clone().as_int()
                         }
                     })
-                    .unwrap() as i64,
+                    .unwrap() as INT,
             )),
             Err(e) => Err(e),
         }
@@ -315,13 +315,13 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "prod", return_raw)]
     pub fn prod(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        if arr[0].is::<f64>() {
+        if arr[0].is::<FLOAT>() {
             let mut p = 1.0 as FLOAT;
             for el in arr {
                 p *= el.as_float().unwrap()
             }
             Ok(Dynamic::from_float(p))
-        } else if arr[0].is::<i64>() {
+        } else if arr[0].is::<INT>() {
             let mut p = 1 as INT;
             for el in arr {
                 p *= el.as_int().unwrap()
@@ -464,12 +464,12 @@ pub mod stats {
     #[rhai_fn(name = "prctile", return_raw)]
     pub fn prctile(arr: Array, p: Dynamic) -> Result<FLOAT, Box<EvalAltResult>> {
         let mut float_array = vec![];
-        if arr[0].is::<f64>() {
+        if arr[0].is::<FLOAT>() {
             float_array = arr
                 .iter()
                 .map(|el| el.as_float().unwrap())
                 .collect::<Vec<FLOAT>>();
-        } else if arr[0].is::<i64>() {
+        } else if arr[0].is::<INT>() {
             float_array = arr
                 .iter()
                 .map(|el| el.as_int().unwrap() as FLOAT)
