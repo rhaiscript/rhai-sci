@@ -22,6 +22,23 @@ pub mod validation_functions {
         }
     }
 
+    #[rhai_fn(name = "int_and_float_count", pure)]
+    pub fn int_and_float_count(arr: &mut Array) -> Array {
+        let (ints, floats) =
+            crate::matrix_functions::flatten(arr.to_vec())
+                .iter()
+                .fold((0, 0), |(i, f), x| {
+                    if x.is::<INT>() {
+                        (i + 1, f)
+                    } else if x.is::<FLOAT>() {
+                        (i, f + 1)
+                    } else {
+                        (i, f)
+                    }
+                });
+        vec![Dynamic::from_int(ints), Dynamic::from_int(floats)]
+    }
+
     /// Tests whether the input in a simple list array composed of floating point values.
     /// ```typescript
     /// let x = [1.0, 2.0, 3.0, 4.0];
