@@ -30,7 +30,7 @@ pub mod matrix_functions {
     /// ```
     #[rhai_fn(name = "inv", return_raw)]
     pub fn invert_matrix(matrix: Array) -> Result<Array, Box<EvalAltResult>> {
-        // Turn into Vec<Vec<f64>>
+        // Turn into Vec<Vec<FLOAT>>
         let matrix_as_vec = matrix
             .into_iter()
             .map(|x| x.into_array().unwrap())
@@ -89,7 +89,7 @@ pub mod matrix_functions {
         } else {
             matrix.clone()
         };
-        // Turn into Vec<Vec<f64>>
+        // Turn into Vec<Vec<FLOAT>>
         let matrix_as_vec = new_matrix
             .into_iter()
             .map(|x| x.into_array().unwrap())
@@ -241,14 +241,16 @@ pub mod matrix_functions {
                     .expect("Cannot remove null values");
 
                 // Convert into vec of vec
+
                 let mut final_output = vec![];
                 for series in x.get_columns() {
-                    let col: Vec<f64> = series
+                    let col: Vec<FLOAT> = series
                         .cast(&DataType::Float64)
-                        .expect("Cannot cast to f64")
+                        .expect("Cannot cast to FLOAT")
                         .f64()
                         .unwrap()
                         .into_no_null_iter()
+                        .map(|el| el as FLOAT)
                         .collect();
                     final_output.push(col);
                 }
@@ -315,7 +317,7 @@ pub mod matrix_functions {
     /// ```
     #[rhai_fn(name = "zeros", return_raw)]
     pub fn zeros_single_input(n: Dynamic) -> Result<Array, Box<EvalAltResult>> {
-        if n.is::<i64>() {
+        if n.is::<INT>() {
             Ok(zeros_double_input(n.as_int().unwrap(), n.as_int().unwrap()))
         } else if n.is::<Array>() {
             let mut m = n.into_array().unwrap();
@@ -395,7 +397,7 @@ pub mod matrix_functions {
     /// ```
     #[rhai_fn(name = "ones", return_raw)]
     pub fn ones_single_input(n: Dynamic) -> Result<Array, Box<EvalAltResult>> {
-        if n.is::<i64>() {
+        if n.is::<INT>() {
             Ok(ones_double_input(n.as_int().unwrap(), n.as_int().unwrap()))
         } else if n.is::<Array>() {
             let mut m = n.into_array().unwrap();
@@ -459,7 +461,7 @@ pub mod matrix_functions {
     /// ```
     #[rhai_fn(name = "rand", return_raw)]
     pub fn rand_single_input(n: Dynamic) -> Result<Array, Box<EvalAltResult>> {
-        if n.is::<i64>() {
+        if n.is::<INT>() {
             Ok(rand_double_input(n.as_int().unwrap(), n.as_int().unwrap()))
         } else if n.is::<Array>() {
             let mut m = n.into_array().unwrap();
@@ -530,7 +532,7 @@ pub mod matrix_functions {
     /// ```
     #[rhai_fn(name = "eye", return_raw)]
     pub fn eye_single_input(n: Dynamic) -> Result<Array, Box<EvalAltResult>> {
-        if n.is::<i64>() {
+        if n.is::<INT>() {
             Ok(eye_double_input(n.as_int().unwrap(), n.as_int().unwrap()))
         } else if n.is::<Array>() {
             let mut m = n.into_array().unwrap();
@@ -621,7 +623,7 @@ pub mod matrix_functions {
             )
             .into())
         } else {
-            // Turn into Vec<Vec<f64>>
+            // Turn into Vec<Vec<FLOAT>>
             let matrix_as_vec = matrix
                 .clone()
                 .into_iter()
@@ -660,7 +662,7 @@ pub mod matrix_functions {
             )
             .into())
         } else {
-            // Turn into Vec<Vec<f64>>
+            // Turn into Vec<Vec<FLOAT>>
             let matrix_as_vec = matrix
                 .clone()
                 .into_iter()
@@ -705,7 +707,7 @@ pub mod matrix_functions {
             )
             .into())
         } else {
-            // Turn into Vec<Vec<f64>>
+            // Turn into Vec<Vec<Dynamic>>
             let matrix_as_vec = matrix
                 .clone()
                 .into_iter()
@@ -993,7 +995,7 @@ pub mod matrix_functions {
                     if idx == jdx {
                         new_row.push(matrix[idx].clone());
                     } else {
-                        if matrix[idx].is::<i64>() {
+                        if matrix[idx].is::<INT>() {
                             new_row.push(Dynamic::ZERO);
                         } else {
                             new_row.push(Dynamic::FLOAT_ZERO);

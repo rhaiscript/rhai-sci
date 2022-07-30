@@ -12,7 +12,7 @@ pub mod cum_functions {
     /// ```
     #[rhai_fn(name = "cumprod", return_raw)]
     pub fn cumprod(arr: Array) -> Result<Array, Box<EvalAltResult>> {
-        if arr[0].is::<f64>() {
+        if arr[0].is::<FLOAT>() {
             let mut p = 1.0 as FLOAT;
             let mut y = arr
                 .iter()
@@ -23,7 +23,7 @@ pub mod cum_functions {
                 })
                 .collect::<Vec<Dynamic>>();
             Ok(y)
-        } else if arr[0].is::<i64>() {
+        } else if arr[0].is::<INT>() {
             let mut p = 1 as INT;
             let mut y = arr
                 .iter()
@@ -51,7 +51,7 @@ pub mod cum_functions {
     /// ```
     #[rhai_fn(name = "cummax", return_raw)]
     pub fn cummax(arr: Array) -> Result<Array, Box<EvalAltResult>> {
-        if arr[0].is::<f64>() || arr[0].is::<i64>() {
+        if arr[0].is::<FLOAT>() || arr[0].is::<INT>() {
             let mut p = arr[0].clone();
             let mut y = arr
                 .iter()
@@ -78,7 +78,7 @@ pub mod cum_functions {
     /// ```
     #[rhai_fn(name = "cummin", return_raw)]
     pub fn cummin(arr: Array) -> Result<Array, Box<EvalAltResult>> {
-        if arr[0].is::<f64>() || arr[0].is::<i64>() {
+        if arr[0].is::<FLOAT>() || arr[0].is::<INT>() {
             let mut p = arr[0].clone();
             let mut y = arr
                 .iter()
@@ -105,7 +105,7 @@ pub mod cum_functions {
     /// ```
     #[rhai_fn(name = "cumsum", return_raw)]
     pub fn cumsum(arr: Array) -> Result<Array, Box<EvalAltResult>> {
-        if arr[0].is::<f64>() {
+        if arr[0].is::<FLOAT>() {
             let mut p = 0.0 as FLOAT;
             let mut y = arr
                 .iter()
@@ -116,7 +116,7 @@ pub mod cum_functions {
                 })
                 .collect::<Vec<Dynamic>>();
             Ok(y)
-        } else if arr[0].is::<i64>() {
+        } else if arr[0].is::<INT>() {
             let mut p = 0 as INT;
             let mut y = arr
                 .iter()
