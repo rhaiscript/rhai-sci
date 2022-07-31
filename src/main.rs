@@ -1,6 +1,5 @@
 /// This REPL is borrowed almost verbatim from the main Rhai REPL.
-use rhai::plugin::*;
-use rhai::{Dynamic, Engine, EvalAltResult, Module, Scope, AST, INT};
+use rhai::{Dynamic, Engine, EvalAltResult, Module, Scope, AST};
 use rustyline::config::Builder;
 use rustyline::error::ReadlineError;
 use rustyline::{Cmd, Editor, Event, EventHandler, KeyCode, KeyEvent, Modifiers, Movement};
