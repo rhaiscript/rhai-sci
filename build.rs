@@ -1,10 +1,36 @@
-use itertools::Itertools;
-use rhai::{packages::Package, plugin::*, Engine, ScriptFnMetadata};
-use serde_json::Value;
-use std::collections::HashMap;
-use std::io::Write;
-
+#[cfg(not(feature = "metadata"))]
 fn main() {
+    // Update if needed
+    println!("cargo:rerun-if-changed=src");
+    println!("cargo:rerun-if-changed=build.rs");
+
+    // Make empty file for documentation
+    std::fs::File::create(std::env::var("OUT_DIR").unwrap() + "/rhai-sci-docs.md").unwrap();
+}
+
+#[cfg(feature = "metadata")]
+fn main() {
+    use itertools::Itertools;
+    use rhai::{packages::Package, plugin::*, Engine, ScriptFnMetadata};
+    use serde::{Deserialize, Serialize};
+    use serde_json::Value;
+    use std::collections::HashMap;
+    use std::io::Write;
+
+    #[derive(Serialize, Deserialize, Debug, Clone)]
+    struct Function {
+        pub access: String,
+        pub baseHash: u128,
+        pub fullHash: u128,
+        pub name: String,
+        pub namespace: String,
+        pub numParams: usize,
+        pub params: Option<Vec<HashMap<String, String>>>,
+        pub signature: String,
+        pub returnType: Option<String>,
+        pub docComments: Option<Vec<String>>,
+    }
+
     // Update if needed
     println!("cargo:rerun-if-changed=src");
     println!("cargo:rerun-if-changed=build.rs");
@@ -41,7 +67,7 @@ fn main() {
     let function_list = v["functions"].clone();
 
     // Write functions
-    write!(doc_file, "# Functions\n This package provides a large variety of functions to help with scientific computing. Each one of these is written in Rhai itself! The source code is here.\n").expect("Cannot write to {test_file}");
+    write!(doc_file, "# Functions\n This package provides a large variety of functions to help with scientific computing.\n").expect("Cannot write to {test_file}");
     let mut indented = false;
     for (idx, function) in function_list.iter().enumerate() {
         let mut function = function.clone();
@@ -104,29 +130,20 @@ fn main() {
         }
     }
 }
-use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-struct Function {
-    pub access: String,
-    pub baseHash: u128,
-    pub fullHash: u128,
-    pub name: String,
-    pub namespace: String,
-    pub numParams: usize,
-    pub params: Option<Vec<HashMap<String, String>>>,
-    pub signature: String,
-    pub returnType: Option<String>,
-    pub docComments: Option<Vec<String>>,
+#[cfg(feature = "metadata")]
+mod functions {
+    include!("src/matrices_and_arrays.rs");
+    include!("src/statistics.rs");
+    include!("src/misc.rs");
+    include!("src/cumulative.rs");
+    include!("src/integration_and_differentiation.rs");
+    include!("src/assertions.rs");
+    include!("src/constants.rs");
+    include!("src/sets.rs");
+    include!("src/moving.rs");
+    include!("src/validate.rs");
 }
 
-include!("src/matrices_and_arrays.rs");
-include!("src/statistics.rs");
-include!("src/misc.rs");
-include!("src/cumulative.rs");
-include!("src/integration_and_differentiation.rs");
-include!("src/assertions.rs");
-include!("src/constants.rs");
-include!("src/sets.rs");
-include!("src/moving.rs");
-include!("src/validate.rs");
+#[cfg(feature = "metadata")]
+pub use functions::*;
