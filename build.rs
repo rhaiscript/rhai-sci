@@ -86,12 +86,9 @@ fn main() {
 
             let signature = function
                 .signature
-                .replace("core::result::", "")
-                .replace("rhai::types::dynamic::", "")
-                .replace("types::dynamic::", "")
-                .replace("alloc::boxed::", "")
-                .replace("alloc::vec::", "")
-                .replace("rhai::types::error::", "");
+                .replace("Result<", "")
+                .replace(", Box<EvalAltResult>>", "")
+                .replace("&mut ", "");
 
             // Check if there are multiple arities, and if so add a header and indent
             if idx < function_list.len() - 1 {

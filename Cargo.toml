@@ -2,7 +2,6 @@
 name = "rhai-sci"
 version = "0.1.6"
 edition = "2021"
-resolver = "2"
 authors = ["Chris McComb <ccmcc2012@gmail.com>"]
 description = "Scientific computing in the Rhai scripting language"
 repository = "https://github.com/rhaiscript/rhai-sci"

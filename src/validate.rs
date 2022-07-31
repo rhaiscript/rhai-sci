@@ -22,21 +22,60 @@ pub mod validation_functions {
         }
     }
 
-    #[rhai_fn(name = "int_and_float_count", pure)]
-    pub fn int_and_float_count(arr: &mut Array) -> Array {
-        let (ints, floats) =
-            crate::matrix_functions::flatten(arr.to_vec())
-                .iter()
-                .fold((0, 0), |(i, f), x| {
-                    if x.is::<INT>() {
-                        (i + 1, f)
-                    } else if x.is::<FLOAT>() {
-                        (i, f + 1)
-                    } else {
-                        (i, f)
-                    }
-                });
-        vec![Dynamic::from_int(ints), Dynamic::from_int(floats)]
+    /// Computes the total fraction of elements in the array that are integers or floats.
+    ///
+    /// ```typescript
+    /// let x = [1, 2, 3.0, 5.0];
+    /// assert_eq(int_and_float_fractions(x), [0.5, 0.5]);
+    /// ```
+    #[rhai_fn(name = "int_and_float_fractions", pure)]
+    pub fn int_and_float_fractions(arr: &mut Array) -> Array {
+        let (ints, floats, total) = crate::matrix_functions::flatten(arr.to_vec()).iter().fold(
+            (0, 0, 0),
+            |(i, f, t), x| {
+                if x.is::<INT>() {
+                    (i + 1, f, t + 1)
+                } else if x.is::<FLOAT>() {
+                    (i, f + 1, t + 1)
+                } else {
+                    (i, f, t + 1)
+                }
+            },
+        );
+        vec![
+            Dynamic::from_float(ints as FLOAT / total as FLOAT),
+            Dynamic::from_float(floats as FLOAT / total as FLOAT),
+        ]
+    }
+
+    /// Determines if the entire array is numeric (ints or floats).
+    /// ```typescript
+    /// let x = [1, 2, 3.0, 5.0];
+    /// assert_eq(is_numeric_array(x), true);
+    /// ```
+    /// ```typescript
+    /// let x = [1, 2, 3.0, 5.0, "a"];
+    /// assert_eq(is_numeric_array(x), false);
+    /// ```
+    #[rhai_fn(name = "is_numeric_array", pure)]
+    pub fn is_numeric_array(arr: &mut Array) -> bool {
+        let (ints, floats, total) = crate::matrix_functions::flatten(arr.to_vec()).iter().fold(
+            (0, 0, 0),
+            |(i, f, t), x| {
+                if x.is::<INT>() {
+                    (i + 1, f, t + 1)
+                } else if x.is::<FLOAT>() {
+                    (i, f + 1, t + 1)
+                } else {
+                    (i, f, t + 1)
+                }
+            },
+        );
+        return if ints + floats - total == 0 {
+            true
+        } else {
+            false
+        };
     }
 
     /// Tests whether the input in a simple list array composed of floating point values.

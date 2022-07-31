@@ -12,7 +12,11 @@ pub mod cum_functions {
     /// ```
     #[rhai_fn(name = "cumprod", return_raw)]
     pub fn cumprod(arr: Array) -> Result<Array, Box<EvalAltResult>> {
-        if arr[0].is::<FLOAT>() {
+        let x = crate::validation_functions::int_and_float_fractions(&mut arr.clone())
+            .iter()
+            .map(|x| x.as_float().unwrap())
+            .collect::<Vec<f64>>();
+        if x[1] == 1.0 {
             let mut p = 1.0 as FLOAT;
             let mut y = arr
                 .iter()
@@ -23,7 +27,7 @@ pub mod cum_functions {
                 })
                 .collect::<Vec<Dynamic>>();
             Ok(y)
-        } else if arr[0].is::<INT>() {
+        } else if x[0] == 1.0 {
             let mut p = 1 as INT;
             let mut y = arr
                 .iter()
