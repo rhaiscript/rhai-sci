@@ -4,6 +4,18 @@ use rhai::plugin::*;
 pub mod cum_functions {
     use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT, INT};
 
+    fn accumulate<G>(arr: Array, f: G) -> Result<Array, Box<EvalAltResult>>
+    where
+        G: Fn(Array) -> Dynamic,
+    {
+        let mut new_arr = vec![];
+        let n = arr.len() as INT;
+        for i in 0..n {
+            new_arr.push(f(arr.get(0_usize..=(i as usize)).unwrap().to_vec()))
+        }
+        Ok(new_arr)
+    }
+
     /// Returns an array representing the cumulative product of a 1-D array.
     /// ```typescript
     /// let arr = [1, 2, 3, 4, 5];
@@ -12,39 +24,7 @@ pub mod cum_functions {
     /// ```
     #[rhai_fn(name = "cumprod", return_raw)]
     pub fn cumprod(arr: Array) -> Result<Array, Box<EvalAltResult>> {
-        let x = crate::validation_functions::int_and_float_fractions(&mut arr.clone())
-            .iter()
-            .map(|x| x.as_float().unwrap())
-            .collect::<Vec<f64>>();
-        if x[1] == 1.0 {
-            let mut p = 1.0 as FLOAT;
-            let mut y = arr
-                .iter()
-                .map(|el| {
-                    let e = el.as_float().unwrap();
-                    p = p * e;
-                    Dynamic::from_float(p)
-                })
-                .collect::<Vec<Dynamic>>();
-            Ok(y)
-        } else if x[0] == 1.0 {
-            let mut p = 1 as INT;
-            let mut y = arr
-                .iter()
-                .map(|el| {
-                    let e = el.as_int().unwrap();
-                    p = p * e;
-                    Dynamic::from_int(p)
-                })
-                .collect::<Vec<Dynamic>>();
-            Ok(y)
-        } else {
-            Err(EvalAltResult::ErrorArithmetic(
-                format!("The elements of the input must either be INT or FLOAT."),
-                Position::NONE,
-            )
-            .into())
-        }
+        accumulate(arr, |x| crate::stats::prod(x).unwrap())
     }
 
     /// Returns an array representing the cumulative maximum of a 1-D array.
@@ -55,23 +35,7 @@ pub mod cum_functions {
     /// ```
     #[rhai_fn(name = "cummax", return_raw)]
     pub fn cummax(arr: Array) -> Result<Array, Box<EvalAltResult>> {
-        if arr[0].is::<FLOAT>() || arr[0].is::<INT>() {
-            let mut p = arr[0].clone();
-            let mut y = arr
-                .iter()
-                .map(|el| {
-                    p = crate::stats::gen_max(p.clone(), (*el).clone()).unwrap();
-                    p.clone()
-                })
-                .collect::<Vec<Dynamic>>();
-            Ok(y)
-        } else {
-            Err(EvalAltResult::ErrorArithmetic(
-                format!("The elements of the input must either be INT or FLOAT."),
-                Position::NONE,
-            )
-            .into())
-        }
+        accumulate(arr, |x| crate::stats::array_max(x).unwrap())
     }
 
     /// Returns an array representing the cumulative minimum of a 1-D array.
@@ -82,23 +46,7 @@ pub mod cum_functions {
     /// ```
     #[rhai_fn(name = "cummin", return_raw)]
     pub fn cummin(arr: Array) -> Result<Array, Box<EvalAltResult>> {
-        if arr[0].is::<FLOAT>() || arr[0].is::<INT>() {
-            let mut p = arr[0].clone();
-            let mut y = arr
-                .iter()
-                .map(|el| {
-                    p = crate::stats::gen_min(p.clone(), (*el).clone()).unwrap();
-                    p.clone()
-                })
-                .collect::<Vec<Dynamic>>();
-            Ok(y)
-        } else {
-            Err(EvalAltResult::ErrorArithmetic(
-                format!("The elements of the input must either be INT or FLOAT."),
-                Position::NONE,
-            )
-            .into())
-        }
+        accumulate(arr, |x| crate::stats::array_min(x).unwrap())
     }
 
     /// Returns an array representing the cumulative product of a 1-D array.
@@ -109,35 +57,7 @@ pub mod cum_functions {
     /// ```
     #[rhai_fn(name = "cumsum", return_raw)]
     pub fn cumsum(arr: Array) -> Result<Array, Box<EvalAltResult>> {
-        if arr[0].is::<FLOAT>() {
-            let mut p = 0.0 as FLOAT;
-            let mut y = arr
-                .iter()
-                .map(|el| {
-                    let e = el.as_float().unwrap();
-                    p = p + e;
-                    Dynamic::from_float(p)
-                })
-                .collect::<Vec<Dynamic>>();
-            Ok(y)
-        } else if arr[0].is::<INT>() {
-            let mut p = 0 as INT;
-            let mut y = arr
-                .iter()
-                .map(|el| {
-                    let e = el.as_int().unwrap();
-                    p = p + e;
-                    Dynamic::from_int(p)
-                })
-                .collect::<Vec<Dynamic>>();
-            Ok(y)
-        } else {
-            Err(EvalAltResult::ErrorArithmetic(
-                format!("The elements of the input must either be INT or FLOAT."),
-                Position::NONE,
-            )
-            .into())
-        }
+        accumulate(arr, |x| crate::stats::sum(x).unwrap())
     }
 
     /// Returns the cumulative approximate integral of the curve defined by Y and x using the trapezoidal method.
