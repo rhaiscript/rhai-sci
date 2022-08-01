@@ -28,12 +28,12 @@ pub mod matrix_functions {
     ///                        [1.5, -0.5]]
     /// );
     /// ```
-    #[rhai_fn(name = "inv", return_raw)]
-    pub fn invert_matrix(matrix: Array) -> Result<Array, Box<EvalAltResult>> {
+    #[rhai_fn(name = "inv", return_raw, pure)]
+    pub fn invert_matrix(matrix: &mut Array) -> Result<Array, Box<EvalAltResult>> {
         // Turn into Vec<Vec<FLOAT>>
         let matrix_as_vec = matrix
             .into_iter()
-            .map(|x| x.into_array().unwrap())
+            .map(|x| x.clone().into_array().unwrap())
             .collect::<Vec<Array>>();
 
         let dm = DMatrix::from_fn(matrix_as_vec.len(), matrix_as_vec[0].len(), |i, j| {

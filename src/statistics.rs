@@ -584,14 +584,14 @@ pub mod stats {
     /// let b = regress(x, y);
     /// assert_eq(b, [[0.1], [0.9]]);
     /// ```
-    fn regress(X: Array, Y: Array) -> Result<Array, Box<EvalAltResult>> {
+    fn regress(X: &mut Array, Y: Array) -> Result<Array, Box<EvalAltResult>> {
         if crate::validation_functions::is_matrix(&mut X.clone()) {
             if crate::validation_functions::is_column_vector(&mut Y.clone()) {
                 let Xt = crate::matrix_functions::transpose(X.clone());
                 let A = crate::matrix_functions::mtimes(
                     crate::matrix_functions::mtimes(
                         crate::matrix_functions::invert_matrix(
-                            crate::matrix_functions::mtimes(Xt.clone(), X.clone()).unwrap(),
+                            &mut crate::matrix_functions::mtimes(Xt.clone(), X.clone()).unwrap(),
                         )
                         .unwrap(),
                         Xt.clone(),
