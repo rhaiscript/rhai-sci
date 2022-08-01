@@ -1,19 +1,37 @@
+use crate::validation_functions::is_int_or_float_list;
 use rhai::plugin::*;
 
 #[export_module]
 pub mod cum_functions {
+    use crate::validation_functions::{int_and_float_fractions, is_list};
     use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT, INT};
 
-    fn accumulate<G>(arr: Array, f: G) -> Result<Array, Box<EvalAltResult>>
+    fn accumulate<G>(arr: &mut Array, f: G) -> Result<Array, Box<EvalAltResult>>
     where
         G: Fn(Array) -> Dynamic,
     {
-        let mut new_arr = vec![];
-        let n = arr.len() as INT;
-        for i in 0..n {
-            new_arr.push(f(arr.get(0_usize..=(i as usize)).unwrap().to_vec()))
+        if is_list(arr) {
+            if crate::validation_functions::is_int_or_float_list(arr) {
+                let mut new_arr = vec![];
+                let n = arr.len() as INT;
+                for i in 0..n {
+                    new_arr.push(f(arr.get(0_usize..=(i as usize)).unwrap().to_vec()))
+                }
+                Ok(new_arr)
+            } else {
+                return Err(EvalAltResult::ErrorArithmetic(
+                    format!("The input array must be composed of entirely either INTs or FLOATs."),
+                    Position::NONE,
+                )
+                .into());
+            }
+        } else {
+            return Err(EvalAltResult::ErrorArithmetic(
+                format!("The input must be a list-type array."),
+                Position::NONE,
+            )
+            .into());
         }
-        Ok(new_arr)
     }
 
     /// Returns an array representing the cumulative product of a 1-D array.
@@ -22,8 +40,8 @@ pub mod cum_functions {
     /// let c = cumprod(arr);
     /// assert_eq(c, [1, 2, 6, 24, 120]);
     /// ```
-    #[rhai_fn(name = "cumprod", return_raw)]
-    pub fn cumprod(arr: Array) -> Result<Array, Box<EvalAltResult>> {
+    #[rhai_fn(name = "cumprod", return_raw, pure)]
+    pub fn cumprod(arr: &mut Array) -> Result<Array, Box<EvalAltResult>> {
         accumulate(arr, |x| crate::stats::prod(x).unwrap())
     }
 
@@ -33,8 +51,8 @@ pub mod cum_functions {
     /// let c = cummax(arr);
     /// assert_eq(c, [1, 4, 5, 5, 9, 9]);
     /// ```
-    #[rhai_fn(name = "cummax", return_raw)]
-    pub fn cummax(arr: Array) -> Result<Array, Box<EvalAltResult>> {
+    #[rhai_fn(name = "cummax", return_raw, pure)]
+    pub fn cummax(arr: &mut Array) -> Result<Array, Box<EvalAltResult>> {
         accumulate(arr, |x| crate::stats::array_max(x).unwrap())
     }
 
@@ -44,8 +62,8 @@ pub mod cum_functions {
     /// let c = cummin(arr);
     /// assert_eq(c, [8, 8, 3, 3, 3, 1]);
     /// ```
-    #[rhai_fn(name = "cummin", return_raw)]
-    pub fn cummin(arr: Array) -> Result<Array, Box<EvalAltResult>> {
+    #[rhai_fn(name = "cummin", return_raw, pure)]
+    pub fn cummin(arr: &mut Array) -> Result<Array, Box<EvalAltResult>> {
         accumulate(arr, |x| crate::stats::array_min(x).unwrap())
     }
 
@@ -55,8 +73,8 @@ pub mod cum_functions {
     /// let c = cumsum(arr);
     /// assert_eq(c, [1.1, 3.6, 7.0]);
     /// ```
-    #[rhai_fn(name = "cumsum", return_raw)]
-    pub fn cumsum(arr: Array) -> Result<Array, Box<EvalAltResult>> {
+    #[rhai_fn(name = "cumsum", return_raw, pure)]
+    pub fn cumsum(arr: &mut Array) -> Result<Array, Box<EvalAltResult>> {
         accumulate(arr, |x| crate::stats::sum(x).unwrap())
     }
 
@@ -108,20 +126,36 @@ pub mod cum_functions {
     /// assert_eq(c, [0.0, 1.5, 4.0]);    
     /// ```
     #[rhai_fn(name = "cumtrapz", return_raw)]
-    pub fn cumtrapz_unit(y: Array) -> Result<Array, Box<EvalAltResult>> {
-        // Convert if needed
-        let mut Y: Vec<FLOAT> = if y[0].is::<INT>() {
-            y.iter().map(|el| el.as_int().unwrap() as FLOAT).collect()
-        } else {
-            y.iter().map(|el| el.as_float().unwrap()).collect()
-        };
+    pub fn cumtrapz_unit(y: &mut Array) -> Result<Array, Box<EvalAltResult>> {
+        if is_list(y) {
+            if crate::validation_functions::is_int_or_float_list(y) {
+                // Convert if needed
+                let mut Y: Vec<FLOAT> = if y[0].is::<INT>() {
+                    y.iter().map(|el| el.as_int().unwrap() as FLOAT).collect()
+                } else {
+                    y.iter().map(|el| el.as_float().unwrap()).collect()
+                };
 
-        let mut trapsum = 0.0;
-        let mut cumtrapsum = vec![Dynamic::FLOAT_ZERO];
-        for i in 1..y.len() {
-            trapsum += (Y[i] + Y[i - 1]) / 2.0;
-            cumtrapsum.push(Dynamic::from_float(trapsum));
+                let mut trapsum = 0.0;
+                let mut cumtrapsum = vec![Dynamic::FLOAT_ZERO];
+                for i in 1..y.len() {
+                    trapsum += (Y[i] + Y[i - 1]) / 2.0;
+                    cumtrapsum.push(Dynamic::from_float(trapsum));
+                }
+                Ok(cumtrapsum)
+            } else {
+                return Err(EvalAltResult::ErrorArithmetic(
+                    format!("The input array must be composed of entirely either INTs or FLOATs."),
+                    Position::NONE,
+                )
+                .into());
+            }
+        } else {
+            return Err(EvalAltResult::ErrorArithmetic(
+                format!("The input must be a list-type array."),
+                Position::NONE,
+            )
+            .into());
         }
-        Ok(cumtrapsum)
     }
 }
