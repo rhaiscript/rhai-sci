@@ -82,7 +82,11 @@ pub mod validation_functions {
     #[rhai_fn(name = "is_float_list", pure)]
     pub fn is_float_list(arr: &mut Array) -> bool {
         let (_, floats, total) = int_and_float_totals(arr);
-        return if floats == total { true } else { false };
+        return if (floats == total) && is_list(arr) {
+            true
+        } else {
+            false
+        };
     }
 
     /// Tests whether the input in a simple list array composed of integer values.
@@ -97,26 +101,30 @@ pub mod validation_functions {
     #[rhai_fn(name = "is_int_list", pure)]
     pub fn is_int_list(arr: &mut Array) -> bool {
         let (ints, _, total) = int_and_float_totals(arr);
-        return if ints == total { true } else { false };
+        return if (ints == total) && is_list(arr) {
+            true
+        } else {
+            false
+        };
     }
 
     /// Tests whether the input in a simple list array composed of either floating point or integer values.
     /// ```typescript
     /// let x = [1.0, 2.0, 3.0, 4.0];
-    /// assert_eq(is_int_or_float_list(x), true)
+    /// assert_eq(is_numeric_list(x), true)
     /// ```
     /// ```typescript
     /// let x = [1, 2, 3, 4];
-    /// assert_eq(is_int_or_float_list(x), true)
+    /// assert_eq(is_numeric_list(x), true)
     /// ```
     /// ```typescript
     /// let x = ["a", "b", "c", "d"];
-    /// assert_eq(is_int_or_float_list(x), false)
+    /// assert_eq(is_numeric_list(x), false)
     /// ```
-    #[rhai_fn(name = "is_int_or_float_list", pure)]
-    pub fn is_int_or_float_list(arr: &mut Array) -> bool {
+    #[rhai_fn(name = "is_numeric_list", pure)]
+    pub fn is_numeric_list(arr: &mut Array) -> bool {
         let (int, float, total) = int_and_float_totals(arr);
-        if int == total || float == total {
+        if (int == total || float == total) && is_list(arr) {
             true
         } else {
             false

@@ -5,7 +5,7 @@ pub mod moving_functions {
     use crate::matrix_functions::ndims;
     use rhai::{Array, Dynamic, EvalAltResult, ImmutableString, Position, FLOAT, INT};
 
-    fn mov<G>(arr: Array, k: INT, f: G) -> Array
+    fn mov<G>(arr: &mut Array, k: INT, f: G) -> Array
     where
         G: Fn(Array) -> Dynamic,
     {
@@ -34,7 +34,7 @@ pub mod moving_functions {
     /// assert_eq(m, [1, 1, -1, -2, -3, -3, -3, -1, 1, 1]);
     /// ```
     #[rhai_fn(name = "movmin", return_raw)]
-    pub fn movmin(arr: Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
+    pub fn movmin(arr: &mut Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
         Ok(mov(arr, k, |x| crate::stats::array_min(x).unwrap()))
     }
 
@@ -45,7 +45,7 @@ pub mod moving_functions {
     /// assert_eq(m, [2, 4, 4, 4, -1, -1, 3, 3, 3, 2]);
     /// ```
     #[rhai_fn(name = "movmax", return_raw)]
-    pub fn movmax(arr: Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
+    pub fn movmax(arr: &mut Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
         Ok(mov(arr, k, |x| crate::stats::array_max(x).unwrap()))
     }
 
@@ -56,7 +56,7 @@ pub mod moving_functions {
     /// assert_eq(m, [0.5, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 0.5]);
     /// ```
     #[rhai_fn(name = "movmad", return_raw)]
-    pub fn movmad(arr: Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
+    pub fn movmad(arr: &mut Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
         Ok(mov(arr, k, |x| crate::stats::mad(x).unwrap()))
     }
 
@@ -67,7 +67,7 @@ pub mod moving_functions {
     /// assert_eq(m, [1.5, 2.0, 3.0, 4.0, 5.0, 5.5]);
     /// ```
     #[rhai_fn(name = "movmean", return_raw)]
-    pub fn movmean(arr: Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
+    pub fn movmean(arr: &mut Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
         Ok(mov(arr, k, |x| crate::stats::mean(x).unwrap()))
     }
 
@@ -78,7 +78,7 @@ pub mod moving_functions {
     /// assert_eq(m, [1.5, 2.0, 3.0, 4.0, 5.0, 5.5]);
     /// ```
     #[rhai_fn(name = "movmedian", return_raw)]
-    pub fn movmedian(arr: Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
+    pub fn movmedian(arr: &mut Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
         Ok(mov(arr, k, |x| crate::stats::median(x).unwrap()))
     }
 
@@ -89,7 +89,7 @@ pub mod moving_functions {
     /// assert_eq(m, [2, 6, 24, 60, 120, 30]);
     /// ```
     #[rhai_fn(name = "movprod", return_raw)]
-    pub fn movprod(arr: Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
+    pub fn movprod(arr: &mut Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
         Ok(mov(arr, k, |x| crate::stats::prod(x).unwrap()))
     }
 
@@ -100,7 +100,7 @@ pub mod moving_functions {
     /// assert_eq(m, [0.7071067811865476, 1.0, 1.0, 1.0, 1.0, 0.7071067811865476]);
     /// ```
     #[rhai_fn(name = "movstd", return_raw)]
-    pub fn movstd(arr: Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
+    pub fn movstd(arr: &mut Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
         Ok(mov(arr, k, |x| crate::stats::std(x).unwrap()))
     }
 
@@ -111,7 +111,7 @@ pub mod moving_functions {
     /// assert_eq(m, [0.5, 1.0, 1.0, 1.0, 1.0, 0.5]);
     /// ```
     #[rhai_fn(name = "movvar", return_raw)]
-    pub fn movvar(arr: Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
+    pub fn movvar(arr: &mut Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
         Ok(mov(arr, k, |x| crate::stats::variance(x).unwrap()))
     }
 
@@ -122,7 +122,7 @@ pub mod moving_functions {
     /// assert_eq(m, [3, 6, 9, 12, 15, 11]);
     /// ```
     #[rhai_fn(name = "movsum", return_raw)]
-    pub fn movsum(arr: Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
+    pub fn movsum(arr: &mut Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
         Ok(mov(arr, k, |x| crate::stats::sum(x).unwrap()))
     }
 
@@ -133,7 +133,7 @@ pub mod moving_functions {
     /// assert_eq(u, [1, 2, 4, 5, 8]);
     /// ```
     #[rhai_fn(name = "unique", return_raw)]
-    pub fn unique(arr: Array) -> Result<Array, Box<EvalAltResult>> {
+    pub fn unique(arr: &mut Array) -> Result<Array, Box<EvalAltResult>> {
         // Convert if needed
         if arr[0].is::<INT>() {
             let mut x = arr
