@@ -22,22 +22,7 @@ pub mod validation_functions {
         }
     }
 
-    /// Computes the total fraction of elements in the array that are integers or floats.
-    ///
-    /// ```typescript
-    /// let x = [1, 2, 3.0, 5.0];
-    /// assert_eq(int_and_float_fractions(x), [0.5, 0.5]);
-    /// ```
-    #[rhai_fn(name = "int_and_float_fractions", pure)]
-    pub fn int_and_float_fractions(arr: &mut Array) -> Array {
-        let (ints, floats, total) = int_and_float_totals(arr);
-        vec![
-            Dynamic::from_float(ints as FLOAT / total as FLOAT),
-            Dynamic::from_float(floats as FLOAT / total as FLOAT),
-        ]
-    }
-
-    fn int_and_float_totals(arr: &mut Array) -> (INT, INT, INT) {
+    pub fn int_and_float_totals(arr: &mut Array) -> (INT, INT, INT) {
         crate::matrix_functions::flatten(arr.to_vec())
             .iter()
             .fold((0, 0, 0), |(i, f, t), x| {

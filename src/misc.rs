@@ -5,18 +5,6 @@ pub mod misc_functions {
     use crate::matrix_functions::ndims;
     use rhai::{Array, Dynamic, EvalAltResult, ImmutableString, Position, FLOAT, INT};
 
-    /// Pretty print arrays.
-    #[rhai_fn(name = "pprint")]
-    pub fn pprint(matrix: Array) {
-        if ndims(matrix.clone()) > 1 {
-            for row in matrix {
-                println!("{:?}", row);
-            }
-        } else {
-            println!("{:?}", matrix)
-        }
-    }
-
     /// Returns a random number between zero and one.
     /// ```typescript
     /// let r = rand();
@@ -33,10 +21,11 @@ pub mod misc_functions {
     /// let u = unique(data);
     /// assert_eq(u, [1, 2, 4, 5, 8]);
     /// ```
-    #[rhai_fn(name = "unique", return_raw)]
-    pub fn unique(arr: Array) -> Result<Array, Box<EvalAltResult>> {
+    #[rhai_fn(name = "unique", return_raw, pure)]
+    pub fn unique(arr: &mut Array) -> Result<Array, Box<EvalAltResult>> {
+        let (ints, floats, total) = crate::validation_functions::int_and_float_totals(arr);
         // Convert if needed
-        if arr[0].is::<INT>() {
+        if ints == total {
             let mut x = arr
                 .iter()
                 .map(|el| el.as_int().unwrap())
@@ -44,7 +33,7 @@ pub mod misc_functions {
             x.sort();
             x.dedup();
             Ok(x.iter().map(|el| Dynamic::from_int(*el)).collect())
-        } else if arr[0].is::<FLOAT>() {
+        } else if floats == total {
             let mut x = arr
                 .iter()
                 .map(|el| el.as_float().unwrap())
