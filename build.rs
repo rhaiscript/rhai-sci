@@ -157,6 +157,7 @@ mod functions {
     include!("src/sets.rs");
     include!("src/moving.rs");
     include!("src/validate.rs");
+    include!("src/patterns.rs");
 }
 
 #[cfg(feature = "metadata")]

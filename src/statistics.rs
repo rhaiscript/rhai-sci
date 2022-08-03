@@ -26,29 +26,31 @@ pub mod stats {
     /// let the_highest_number = max([2, 3, 4, 5]);
     /// assert_eq(the_highest_number, 5);
     /// ```
+    /// ```typescript
+    /// let the_highest_number = max([2, 3.0, 4.12, 5]);
+    /// assert_eq(the_highest_number, 5.0);
+    /// ```
     #[rhai_fn(name = "max", return_raw)]
     pub fn array_max(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        if arr[0].is::<FLOAT>() {
-            let mut y = arr
-                .iter()
-                .map(|el| el.as_float().unwrap())
-                .collect::<Vec<FLOAT>>();
-            y.sort_by(|a, b| a.partial_cmp(b).unwrap());
-            Ok(Dynamic::from(y[y.len() - 1]))
-        } else if arr[0].is::<INT>() {
-            let mut y = arr
-                .iter()
-                .map(|el| el.as_int().unwrap())
-                .collect::<Vec<INT>>();
-            y.sort();
-            Ok(Dynamic::from(y[y.len() - 1]))
-        } else {
-            Err(EvalAltResult::ErrorArithmetic(
-                format!("The elements of the input must either be INT or FLOAT."),
-                Position::NONE,
-            )
-            .into())
-        }
+        crate::list_int_float_else(
+            arr,
+            |arr: &mut Array| {
+                let mut y = arr
+                    .iter()
+                    .map(|el| el.as_int().unwrap())
+                    .collect::<Vec<INT>>();
+                y.sort();
+                Ok(Dynamic::from(y[y.len() - 1]))
+            },
+            |arr: &mut Array| {
+                let mut y = arr
+                    .iter()
+                    .map(|el| el.as_float().unwrap())
+                    .collect::<Vec<FLOAT>>();
+                y.sort_by(|a, b| a.partial_cmp(b).unwrap());
+                Ok(Dynamic::from(y[y.len() - 1]))
+            },
+        )
     }
 
     /// Return the lowest value from a pair of numbers. Fails if the numbers are anything other
@@ -74,29 +76,31 @@ pub mod stats {
     /// let the_lowest_number = min([2, 3, 4, 5]);
     /// assert_eq(the_lowest_number, 2);
     /// ```
-    #[rhai_fn(name = "min", return_raw)]
+    /// ```typescript
+    /// let the_lowest_number = min([2, 3.0, 4.12, 5]);
+    /// assert_eq(the_lowest_number, 2.0);
+    /// ```
+    #[rhai_fn(name = "min", return_raw, pure)]
     pub fn array_min(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        if arr[0].is::<FLOAT>() {
-            let mut y = arr
-                .iter()
-                .map(|el| el.as_float().unwrap())
-                .collect::<Vec<FLOAT>>();
-            y.sort_by(|a, b| a.partial_cmp(b).unwrap());
-            Ok(Dynamic::from(y[0]))
-        } else if arr[0].is::<INT>() {
-            let mut y = arr
-                .iter()
-                .map(|el| el.as_int().unwrap())
-                .collect::<Vec<INT>>();
-            y.sort();
-            Ok(Dynamic::from(y[0]))
-        } else {
-            Err(EvalAltResult::ErrorArithmetic(
-                format!("The elements of the input must either be INT or FLOAT."),
-                Position::NONE,
-            )
-            .into())
-        }
+        crate::list_int_float_else(
+            arr,
+            |arr: &mut Array| {
+                let mut y = arr
+                    .iter()
+                    .map(|el| el.as_int().unwrap())
+                    .collect::<Vec<INT>>();
+                y.sort();
+                Ok(Dynamic::from(y[0]))
+            },
+            |arr: &mut Array| {
+                let mut y = arr
+                    .iter()
+                    .map(|el| el.as_float().unwrap())
+                    .collect::<Vec<FLOAT>>();
+                y.sort_by(|a, b| a.partial_cmp(b).unwrap());
+                Ok(Dynamic::from(y[0]))
+            },
+        )
     }
 
     /// Return the highest value from an array. Fails if the input is not an array, or if
@@ -122,39 +126,42 @@ pub mod stats {
     /// let mk = maxk(data, 3);
     /// assert_eq(mk, [41, 42, 1000]);
     /// ```
+    /// ```typescript
+    /// let data = [32, 15, -7.0, 10, 1000, 41.0, 42];
+    /// let mk = maxk(data, 3);
+    /// assert_eq(mk, [41.0, 42.0, 1000.0]);
+    /// ```
     #[rhai_fn(name = "maxk", return_raw, pure)]
     pub fn maxk(arr: &mut Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
-        if arr[0].is::<FLOAT>() {
-            let mut y = arr
-                .iter()
-                .map(|el| el.as_float().unwrap())
-                .collect::<Vec<FLOAT>>();
-            y.sort_by(|a, b| a.partial_cmp(b).unwrap());
-            let r = (y.len() - (k as usize))..(y.len());
-            let mut v = Array::new();
-            for idx in r {
-                v.push(Dynamic::from(y[idx]));
-            }
-            Ok(v)
-        } else if arr[0].is::<INT>() {
-            let mut y = arr
-                .iter()
-                .map(|el| el.as_int().unwrap())
-                .collect::<Vec<INT>>();
-            y.sort();
-            let r = (y.len() - (k as usize))..(y.len());
-            let mut v = Array::new();
-            for idx in r {
-                v.push(Dynamic::from(y[idx]));
-            }
-            Ok(v)
-        } else {
-            Err(EvalAltResult::ErrorArithmetic(
-                format!("The elements of the input must either be INT or FLOAT."),
-                Position::NONE,
-            )
-            .into())
-        }
+        crate::list_int_float_else(
+            arr,
+            |arr: &mut Array| {
+                let mut y = arr
+                    .iter()
+                    .map(|el| el.as_int().unwrap())
+                    .collect::<Vec<INT>>();
+                y.sort();
+                let r = (y.len() - (k as usize))..(y.len());
+                let mut v = Array::new();
+                for idx in r {
+                    v.push(Dynamic::from(y[idx]));
+                }
+                Ok(v)
+            },
+            |arr: &mut Array| {
+                let mut y = arr
+                    .iter()
+                    .map(|el| el.as_float().unwrap())
+                    .collect::<Vec<FLOAT>>();
+                y.sort_by(|a, b| a.partial_cmp(b).unwrap());
+                let r = (y.len() - (k as usize))..(y.len());
+                let mut v = Array::new();
+                for idx in r {
+                    v.push(Dynamic::from(y[idx]));
+                }
+                Ok(v)
+            },
+        )
     }
 
     /// Return the `k` lowest values in an array. Fails if the input is not an array, or if
@@ -164,39 +171,42 @@ pub mod stats {
     /// let mk = mink(data, 3);
     /// assert_eq(mk, [-7, 10, 15]);
     /// ```
+    /// ```typescript
+    /// let data = [32, 15.1223232, -7, 10, 1000.00000, 41, 42];
+    /// let mk = mink(data, 3);
+    /// assert_eq(mk, [-7.0, 10.0, 15.1223232]);
+    /// ```
     #[rhai_fn(name = "mink", return_raw, pure)]
     pub fn mink(arr: &mut Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
-        if arr[0].is::<FLOAT>() {
-            let mut y = arr
-                .iter()
-                .map(|el| el.as_float().unwrap())
-                .collect::<Vec<FLOAT>>();
-            y.sort_by(|a, b| a.partial_cmp(b).unwrap());
-            let r = (0 as usize)..(k as usize);
-            let mut v = Array::new();
-            for idx in r {
-                v.push(Dynamic::from(y[idx]));
-            }
-            Ok(v)
-        } else if arr[0].is::<INT>() {
-            let mut y = arr
-                .iter()
-                .map(|el| el.as_int().unwrap())
-                .collect::<Vec<INT>>();
-            y.sort();
-            let r = (0 as usize)..(k as usize);
-            let mut v = Array::new();
-            for idx in r {
-                v.push(Dynamic::from(y[idx]));
-            }
-            Ok(v)
-        } else {
-            Err(EvalAltResult::ErrorArithmetic(
-                format!("The elements of the input must either be INT or FLOAT."),
-                Position::NONE,
-            )
-            .into())
-        }
+        crate::list_int_float_else(
+            arr,
+            |arr| {
+                let mut y = arr
+                    .iter()
+                    .map(|el| el.as_int().unwrap())
+                    .collect::<Vec<INT>>();
+                y.sort();
+                let r = (0 as usize)..(k as usize);
+                let mut v = Array::new();
+                for idx in r {
+                    v.push(Dynamic::from(y[idx]));
+                }
+                Ok(v)
+            },
+            |arr| {
+                let mut y = arr
+                    .iter()
+                    .map(|el| el.as_float().unwrap())
+                    .collect::<Vec<FLOAT>>();
+                y.sort_by(|a, b| a.partial_cmp(b).unwrap());
+                let r = (0 as usize)..(k as usize);
+                let mut v = Array::new();
+                for idx in r {
+                    v.push(Dynamic::from(y[idx]));
+                }
+                Ok(v)
+            },
+        )
     }
 
     /// Sum an array. Fails if the input is not an array, or if
@@ -206,27 +216,30 @@ pub mod stats {
     /// let m = sum(data);
     /// assert_eq(m, 6);
     /// ```
+    /// ```typescript
+    /// let data = [1, 2.0, 3];
+    /// let m = sum(data);
+    /// assert_eq(m, 6.0);
+    /// ```
     #[rhai_fn(name = "sum", return_raw, pure)]
     pub fn sum(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        if arr[0].is::<FLOAT>() {
-            let y = arr
-                .iter()
-                .map(|el| el.as_float().unwrap())
-                .collect::<Vec<FLOAT>>();
-            Ok(Dynamic::from_float(y.iter().sum()))
-        } else if arr[0].is::<INT>() {
-            let y = arr
-                .iter()
-                .map(|el| el.as_int().unwrap())
-                .collect::<Vec<INT>>();
-            Ok(Dynamic::from_int(y.iter().sum()))
-        } else {
-            Err(EvalAltResult::ErrorArithmetic(
-                format!("The elements of the input must either be INT or FLOAT."),
-                Position::NONE,
-            )
-            .into())
-        }
+        crate::list_int_float_else(
+            arr,
+            |arr| {
+                let y = arr
+                    .iter()
+                    .map(|el| el.as_int().unwrap())
+                    .collect::<Vec<INT>>();
+                Ok(Dynamic::from_int(y.iter().sum()))
+            },
+            |arr| {
+                let y = arr
+                    .iter()
+                    .map(|el| el.as_float().unwrap())
+                    .collect::<Vec<FLOAT>>();
+                Ok(Dynamic::from_float(y.iter().sum()))
+            },
+        )
     }
 
     /// Return the average of an array.Fails if the input is not an array, or if
@@ -238,15 +251,23 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "mean", return_raw, pure)]
     pub fn mean(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        let L = arr.len() as FLOAT;
-        match sum(arr) {
-            Ok(s) => Ok(Dynamic::from_float(if s.is::<FLOAT>() {
-                s.as_float().unwrap() / L
-            } else {
-                (s.as_int().unwrap() as FLOAT) / L
-            })),
-            Err(e) => Err(e),
-        }
+        crate::list_int_float_else(
+            arr,
+            |arr: &mut Array| {
+                let L = arr.len() as FLOAT;
+                match sum(arr) {
+                    Ok(s) => Ok(Dynamic::from_float(s.as_int().unwrap() as FLOAT / L)),
+                    Err(e) => Err(e),
+                }
+            },
+            |arr: &mut Array| {
+                let L = arr.len() as FLOAT;
+                match sum(arr) {
+                    Ok(s) => Ok(Dynamic::from_float(s.as_float().unwrap() / L)),
+                    Err(e) => Err(e),
+                }
+            },
+        )
     }
 
     /// Return the index of the largest array element. Fails if the input is not an array, or if
