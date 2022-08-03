@@ -7,13 +7,13 @@ pub mod cum_functions {
 
     fn accumulate<G>(arr: &mut Array, f: G) -> Result<Array, Box<EvalAltResult>>
     where
-        G: Fn(Array) -> Dynamic,
+        G: Fn(&mut Array) -> Dynamic,
     {
         if is_numeric_list(arr) {
-            let mut new_arr = vec![];
+            let mut new_arr: Vec<Dynamic> = vec![];
             let n = arr.len() as INT;
             for i in 0..n {
-                new_arr.push(f(arr.get(0_usize..=(i as usize)).unwrap().to_vec()))
+                new_arr.push(f(&mut arr.get(0_usize..=(i as usize)).unwrap().to_vec()))
             }
             Ok(new_arr)
         } else {

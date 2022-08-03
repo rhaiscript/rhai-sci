@@ -163,12 +163,12 @@ pub mod validation_functions {
     /// let x = ones([5, 5, 5]);
     /// assert_eq(is_matrix(x), false)
     /// ```
-    #[rhai_fn(name = "is_matrix")]
+    #[rhai_fn(name = "is_matrix", pure)]
     pub fn is_matrix(arr: &mut Array) -> bool {
         if crate::matrix_functions::matrix_size_by_reference(arr).len() != 2 {
             false
         } else {
-            if crate::stats::prod(crate::matrix_functions::matrix_size_by_reference(arr))
+            if crate::stats::prod(&mut crate::matrix_functions::matrix_size_by_reference(arr))
                 .unwrap()
                 .as_int()
                 .unwrap()

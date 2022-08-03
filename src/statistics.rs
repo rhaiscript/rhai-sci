@@ -17,7 +17,7 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "max", return_raw)]
     pub fn gen_max(a: Dynamic, b: Dynamic) -> Result<Dynamic, Box<EvalAltResult>> {
-        array_max(vec![a, b])
+        array_max(&mut vec![a, b])
     }
 
     /// Return the highest value from an array. Fails if the input is not an array, or if
@@ -27,7 +27,7 @@ pub mod stats {
     /// assert_eq(the_highest_number, 5);
     /// ```
     #[rhai_fn(name = "max", return_raw)]
-    pub fn array_max(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
+    pub fn array_max(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
         if arr[0].is::<FLOAT>() {
             let mut y = arr
                 .iter()
@@ -64,7 +64,7 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "min", return_raw)]
     pub fn gen_min(a: Dynamic, b: Dynamic) -> Result<Dynamic, Box<EvalAltResult>> {
-        array_min(vec![a, b])
+        array_min(&mut vec![a, b])
     }
 
     /// Return the lowest value from an array. Fails if the input is not an array, or if
@@ -75,7 +75,7 @@ pub mod stats {
     /// assert_eq(the_lowest_number, 2);
     /// ```
     #[rhai_fn(name = "min", return_raw)]
-    pub fn array_min(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
+    pub fn array_min(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
         if arr[0].is::<FLOAT>() {
             let mut y = arr
                 .iter()
@@ -106,8 +106,8 @@ pub mod stats {
     /// assert_eq(high_and_low, [2, 5]);
     /// ```
     #[rhai_fn(name = "bounds", return_raw)]
-    pub fn bounds(arr: Array) -> Result<Array, Box<EvalAltResult>> {
-        match (array_min(arr.clone()), array_max(arr.clone())) {
+    pub fn bounds(arr: &mut Array) -> Result<Array, Box<EvalAltResult>> {
+        match (array_min(arr), array_max(arr)) {
             (Ok(low), Ok(high)) => Ok(vec![low, high]),
             (Ok(_), Err(high)) => Err(high),
             (Err(low), Ok(_)) => Err(low),
@@ -206,8 +206,8 @@ pub mod stats {
     /// let m = sum(data);
     /// assert_eq(m, 6);
     /// ```
-    #[rhai_fn(name = "sum", return_raw)]
-    pub fn sum(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
+    #[rhai_fn(name = "sum", return_raw, pure)]
+    pub fn sum(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
         if arr[0].is::<FLOAT>() {
             let y = arr
                 .iter()
@@ -237,7 +237,7 @@ pub mod stats {
     /// assert_eq(m, 2.0);
     /// ```
     #[rhai_fn(name = "mean", return_raw)]
-    pub fn mean(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
+    pub fn mean(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
         let L = arr.len() as FLOAT;
         match sum(arr) {
             Ok(s) => Ok(Dynamic::from_float(if s.is::<FLOAT>() {
@@ -256,9 +256,9 @@ pub mod stats {
     /// let m = argmax(data);
     /// assert_eq(m, 2);
     /// ```
-    #[rhai_fn(name = "argmax", return_raw)]
-    pub fn argmax(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        let mm = array_max(arr.clone());
+    #[rhai_fn(name = "argmax", return_raw, pure)]
+    pub fn argmax(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
+        let mm = array_max(arr);
         match mm {
             Ok(m) => Ok(Dynamic::from_int(
                 arr.iter()
@@ -282,9 +282,9 @@ pub mod stats {
     /// let m = argmin(data);
     /// assert_eq(m, 0);
     /// ```
-    #[rhai_fn(name = "argmin", return_raw)]
-    pub fn argmin(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        let mm = array_min(arr.clone());
+    #[rhai_fn(name = "argmin", return_raw, pure)]
+    pub fn argmin(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
+        let mm = array_min(arr);
         match mm {
             Ok(m) => Ok(Dynamic::from_int(
                 arr.iter()
@@ -314,7 +314,7 @@ pub mod stats {
     /// assert_eq(m, 180);
     /// ```
     #[rhai_fn(name = "prod", return_raw)]
-    pub fn prod(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
+    pub fn prod(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
         if arr[0].is::<FLOAT>() {
             let mut p = 1.0 as FLOAT;
             for el in arr {
@@ -342,10 +342,10 @@ pub mod stats {
     /// let v = variance(data);
     /// assert_eq(v, 1.0);
     /// ```
-    #[rhai_fn(name = "variance", return_raw)]
-    pub fn variance(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
+    #[rhai_fn(name = "variance", return_raw, pure)]
+    pub fn variance(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
         let mut m = 0.0 as FLOAT;
-        match mean(arr.clone()) {
+        match mean(arr) {
             Ok(raw_mean) => m = raw_mean.as_float().unwrap(),
             Err(e) => return Err(e),
         }
@@ -370,8 +370,8 @@ pub mod stats {
     /// let v = std(data);
     /// assert_eq(v, 1.0);
     /// ```
-    #[rhai_fn(name = "std", return_raw)]
-    pub fn std(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
+    #[rhai_fn(name = "std", return_raw, pure)]
+    pub fn std(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
         let mut s = Dynamic::FLOAT_ZERO;
         match variance(arr) {
             Ok(v) => s = v,
@@ -409,8 +409,8 @@ pub mod stats {
     /// let m = median(data);
     /// assert_eq(m, 2.0);
     /// ```
-    #[rhai_fn(name = "median", return_raw)]
-    pub fn median(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
+    #[rhai_fn(name = "median", return_raw, pure)]
+    pub fn median(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
         // Convert if needed
         let mut x: Vec<FLOAT> = if arr[0].is::<INT>() {
             arr.iter().map(|el| el.as_int().unwrap() as FLOAT).collect()
@@ -436,9 +436,9 @@ pub mod stats {
     /// assert_eq(m, 2.0);
     /// ```
     #[rhai_fn(name = "mad", return_raw)]
-    pub fn mad(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
+    pub fn mad(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
         let mut m = 0.0 as FLOAT;
-        match median(arr.clone()) {
+        match median(arr) {
             Ok(raw_median) => m = raw_median.as_float().unwrap(),
             Err(e) => return Err(e),
         }
@@ -452,7 +452,7 @@ pub mod stats {
         for v in x {
             dev.push(Dynamic::from_float((v - m).abs()));
         }
-        Ok(median(dev).unwrap())
+        Ok(median(&mut dev).unwrap())
     }
 
     /// Returns a given percentile value for a 1-D array of data.

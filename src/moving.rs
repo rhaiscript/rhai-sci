@@ -6,13 +6,13 @@ pub mod moving_functions {
 
     fn mov<G>(arr: &mut Array, k: INT, f: G) -> Array
     where
-        G: Fn(Array) -> Dynamic,
+        G: Fn(&mut Array) -> Dynamic,
     {
         // First, validate the inputs
         let mut new_arr = vec![];
         let n = arr.len() as INT;
         for i in 0..n {
-            new_arr.push(f(arr
+            new_arr.push(f(&mut arr
                 .get(if k % 2 != 0 {
                     (std::cmp::max(i - (k - 1) / 2, 0) as usize)
                         ..=(std::cmp::min(i + (k - 1) / 2, n - 1) as usize)
