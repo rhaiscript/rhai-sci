@@ -122,8 +122,8 @@ pub mod stats {
     /// let mk = maxk(data, 3);
     /// assert_eq(mk, [41, 42, 1000]);
     /// ```
-    #[rhai_fn(name = "maxk", return_raw)]
-    pub fn maxk(arr: Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
+    #[rhai_fn(name = "maxk", return_raw, pure)]
+    pub fn maxk(arr: &mut Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
         if arr[0].is::<FLOAT>() {
             let mut y = arr
                 .iter()
@@ -164,8 +164,8 @@ pub mod stats {
     /// let mk = mink(data, 3);
     /// assert_eq(mk, [-7, 10, 15]);
     /// ```
-    #[rhai_fn(name = "mink", return_raw)]
-    pub fn mink(arr: Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
+    #[rhai_fn(name = "mink", return_raw, pure)]
+    pub fn mink(arr: &mut Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
         if arr[0].is::<FLOAT>() {
             let mut y = arr
                 .iter()
@@ -236,7 +236,7 @@ pub mod stats {
     /// let m = mean(data);
     /// assert_eq(m, 2.0);
     /// ```
-    #[rhai_fn(name = "mean", return_raw)]
+    #[rhai_fn(name = "mean", return_raw, pure)]
     pub fn mean(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
         let L = arr.len() as FLOAT;
         match sum(arr) {
@@ -313,7 +313,7 @@ pub mod stats {
     /// let m = prod(data);
     /// assert_eq(m, 180);
     /// ```
-    #[rhai_fn(name = "prod", return_raw)]
+    #[rhai_fn(name = "prod", return_raw, pure)]
     pub fn prod(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
         if arr[0].is::<FLOAT>() {
             let mut p = 1.0 as FLOAT;
@@ -386,8 +386,8 @@ pub mod stats {
     /// let r = rms(data);
     /// assert_eq(r, 3.3166247903554);
     /// ```
-    #[rhai_fn(name = "rms", return_raw)]
-    pub fn rms(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
+    #[rhai_fn(name = "rms", return_raw, pure)]
+    pub fn rms(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
         let mut sum = 0.0 as FLOAT;
 
         // Convert if needed
@@ -435,7 +435,7 @@ pub mod stats {
     /// let m = mad(data);
     /// assert_eq(m, 2.0);
     /// ```
-    #[rhai_fn(name = "mad", return_raw)]
+    #[rhai_fn(name = "mad", return_raw, pure)]
     pub fn mad(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
         let mut m = 0.0 as FLOAT;
         match median(arr) {
@@ -461,8 +461,8 @@ pub mod stats {
     /// let p = prctile(data, 50);
     /// assert_eq(p, 2.0);
     /// ```
-    #[rhai_fn(name = "prctile", return_raw)]
-    pub fn prctile(arr: Array, p: Dynamic) -> Result<FLOAT, Box<EvalAltResult>> {
+    #[rhai_fn(name = "prctile", return_raw, pure)]
+    pub fn prctile(arr: &mut Array, p: Dynamic) -> Result<FLOAT, Box<EvalAltResult>> {
         let mut float_array = vec![];
         if arr[0].is::<FLOAT>() {
             float_array = arr
@@ -505,11 +505,11 @@ pub mod stats {
     /// let inter_quartile_range = iqr(data);
     /// assert_eq(inter_quartile_range, 8.0);
     /// ```
-    #[rhai_fn(name = "iqr", return_raw)]
-    pub fn iqr(arr: Array) -> Result<FLOAT, Box<EvalAltResult>> {
+    #[rhai_fn(name = "iqr", return_raw, pure)]
+    pub fn iqr(arr: &mut Array) -> Result<FLOAT, Box<EvalAltResult>> {
         match (
-            prctile(arr.clone(), Dynamic::from_int(25)),
-            prctile(arr.clone(), Dynamic::from_int(75)),
+            prctile(arr, Dynamic::from_int(25)),
+            prctile(arr, Dynamic::from_int(75)),
         ) {
             (Ok(low), Ok(high)) => Ok(high - low),
             (Ok(_), Err(high)) => Err(high),
@@ -529,8 +529,8 @@ pub mod stats {
     /// let m = mode(data);
     /// assert_eq(m, 2.0);
     /// ```
-    #[rhai_fn(name = "mode", return_raw)]
-    pub fn mode(arr: Array) -> Result<Dynamic, Box<EvalAltResult>> {
+    #[rhai_fn(name = "mode", return_raw, pure)]
+    pub fn mode(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
         if arr[0].is::<FLOAT>() {
             let mut v = arr
                 .iter()
@@ -586,9 +586,9 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "regress", return_raw, pure)]
     pub fn regress(X: &mut Array, Y: Array) -> Result<Array, Box<EvalAltResult>> {
-        if crate::validation_functions::is_matrix(&mut X.clone()) {
+        if crate::validation_functions::is_matrix(X) {
             if crate::validation_functions::is_column_vector(&mut Y.clone()) {
-                let Xt = crate::matrix_functions::transpose(X.clone());
+                let Xt = crate::matrix_functions::transpose(X);
                 let A = crate::matrix_functions::mtimes(
                     crate::matrix_functions::mtimes(
                         crate::matrix_functions::invert_matrix(

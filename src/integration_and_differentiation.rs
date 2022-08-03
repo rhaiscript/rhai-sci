@@ -60,8 +60,8 @@ pub mod int_and_diff {
     /// let A = trapz(y);
     /// assert_eq(A, 4.0);
     /// ```
-    #[rhai_fn(name = "trapz", return_raw)]
-    pub fn trapz_unit(y: Array) -> Result<Dynamic, Box<EvalAltResult>> {
+    #[rhai_fn(name = "trapz", return_raw, pure)]
+    pub fn trapz_unit(y: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
         // Convert if needed
         let mut Y: Vec<FLOAT> = if y[0].is::<INT>() {
             y.iter().map(|el| el.as_int().unwrap() as FLOAT).collect()
@@ -69,7 +69,7 @@ pub mod int_and_diff {
             y.iter().map(|el| el.as_float().unwrap()).collect()
         };
 
-        let mut trapsum = 0.0;
+        let mut trapsum = 0.0 as FLOAT;
         for i in 1..y.len() {
             trapsum += (Y[i] + Y[i - 1]) / 2.0;
         }
@@ -82,8 +82,8 @@ pub mod int_and_diff {
     /// let d = diff(arr);
     /// assert_eq(d, [3, -4, 6, 1]);
     /// ```
-    #[rhai_fn(name = "diff", return_raw)]
-    pub fn diff(arr: Array) -> Result<Array, Box<EvalAltResult>> {
+    #[rhai_fn(name = "diff", return_raw, pure)]
+    pub fn diff(arr: &mut Array) -> Result<Array, Box<EvalAltResult>> {
         if arr[0].is::<INT>() {
             let mut new_arr = vec![];
             for idx in 1..arr.len() {

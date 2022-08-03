@@ -116,7 +116,7 @@ pub mod cum_functions {
     /// let c = cumtrapz(y);
     /// assert_eq(c, [0.0, 1.5, 4.0]);    
     /// ```
-    #[rhai_fn(name = "cumtrapz", return_raw)]
+    #[rhai_fn(name = "cumtrapz", return_raw, pure)]
     pub fn cumtrapz_unit(y: &mut Array) -> Result<Array, Box<EvalAltResult>> {
         if is_numeric_list(y) {
             // Convert if needed

@@ -81,8 +81,8 @@ pub mod matrix_functions {
     /// let matrix = transpose(eye(3));
     /// assert_eq(matrix, eye(3));
     /// ```
-    #[rhai_fn(name = "transpose")]
-    pub fn transpose(matrix: Array) -> Array {
+    #[rhai_fn(name = "transpose", pure)]
+    pub fn transpose(matrix: &mut Array) -> Array {
         let new_matrix = if !matrix[0].is::<Array>() {
             vec![Dynamic::from_array(matrix.clone())]
         } else {
@@ -1029,7 +1029,7 @@ pub mod matrix_functions {
         let mut yid = smartstring::SmartString::new();
         yid.push_str("y");
         result.insert(xid, Dynamic::from_array(x_dyn));
-        result.insert(yid, Dynamic::from_array(transpose(y_dyn)));
+        result.insert(yid, Dynamic::from_array(transpose(&mut y_dyn)));
         Ok(result)
     }
 
