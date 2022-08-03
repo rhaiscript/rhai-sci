@@ -106,16 +106,16 @@ pub mod matrix_functions {
         out
     }
 
-    /// Returns an array indicating the size of the matrix along each dimension, called as a method and passed by reference.
+    /// Returns an array indicating the size of the matrix along each dimension, passed by reference.
     /// ```typescript
     /// let matrix = ones(3, 5);
-    /// assert_eq(matrix.size(), [3, 5]);
+    /// assert_eq(size(matrix), [3, 5]);
     /// ```
     /// ```typescript
     /// let matrix = [[[1, 2]]];
-    /// assert_eq(matrix.size(), [1, 1, 2]);
+    /// assert_eq(size(matrix), [1, 1, 2]);
     /// ```
-    #[rhai_fn(name = "size")]
+    #[rhai_fn(name = "size", pure)]
     pub fn matrix_size_by_reference(matrix: &mut Array) -> Array {
         let mut new_matrix = matrix.clone();
 
@@ -132,47 +132,10 @@ pub mod matrix_functions {
         shape
     }
 
-    /// Returns an array indicating the size of the matrix along each dimension.
-    /// ```typescript
-    /// let matrix = ones(3, 5);
-    /// assert_eq(size(matrix), [3, 5]);
-    /// ```
-    /// ```typescript
-    /// let matrix = [[[1, 2]]];
-    /// assert_eq(size(matrix), [1, 1, 2]);
-    /// ```
-    #[rhai_fn(name = "size")]
-    pub fn matrix_size(matrix: Array) -> Array {
-        let mut new_matrix = matrix.clone();
-
-        let mut shape = vec![Dynamic::from_int(new_matrix.len() as INT)];
-        loop {
-            if new_matrix[0].is::<Array>() {
-                new_matrix = new_matrix[0].clone().into_array().unwrap();
-                shape.push(Dynamic::from_int(new_matrix.len() as INT));
-            } else {
-                break;
-            }
-        }
-
-        shape
-    }
-
-    /// Return the number of dimensions in matrix
+    /// Return the number of dimensions in matrix, passed by reference.
     /// ```typescript
     /// let matrix = ones(4, 6);
     /// let n = ndims(matrix);
-    /// assert_eq(n, 2);
-    /// ```
-    #[rhai_fn(name = "ndims")]
-    pub fn ndims(matrix: Array) -> INT {
-        matrix_size(matrix).len() as INT
-    }
-
-    /// Return the number of dimensions in matrix, called as a method and passed by reference.
-    /// ```typescript
-    /// let matrix = ones(4, 6);
-    /// let n = matrix.ndims();
     /// assert_eq(n, 2);
     /// ```
     #[rhai_fn(name = "ndims")]
@@ -180,7 +143,7 @@ pub mod matrix_functions {
         matrix_size_by_reference(matrix).len() as INT
     }
 
-    /// Returns the number of elements in a matrix
+    /// Returns the number of elements in a matrix, passed by reference.
     /// ```typescript
     /// let matrix = ones(4, 6);
     /// let n = numel(matrix);
@@ -189,27 +152,11 @@ pub mod matrix_functions {
     /// ```typescript
     /// let matrix = [1, [1, 2, 3]];
     /// let n = numel(matrix);
-    /// assert_eq(n, 4);
-    /// ```
-    #[rhai_fn(name = "numel")]
-    pub fn numel(matrix: Array) -> INT {
-        flatten(matrix).len() as INT
-    }
-
-    /// Returns the number of elements in a matrix, called as a method and passed by reference.
-    /// ```typescript
-    /// let matrix = ones(4, 6);
-    /// let n = matrix.numel();
-    /// assert_eq(n, 24);
-    /// ```
-    /// ```typescript
-    /// let matrix = [1, [1, 2, 3]];
-    /// let n = matrix.numel();
     /// assert_eq(n, 4);
     /// ```
     #[rhai_fn(name = "numel", pure)]
     pub fn numel_by_reference(matrix: &mut Array) -> INT {
-        flatten(matrix.to_vec()).len() as INT
+        flatten(matrix).len() as INT
     }
 
     #[cfg(feature = "io")]
@@ -601,14 +548,14 @@ pub mod matrix_functions {
     /// let flat = flatten(matrix);
     /// assert_eq(len(flat), 4);
     /// ```
-    #[rhai_fn(name = "flatten")]
-    pub fn flatten(matrix: Array) -> Array {
+    #[rhai_fn(name = "flatten", pure)]
+    pub fn flatten(matrix: &mut Array) -> Array {
         let mut flat: Vec<Dynamic> = vec![];
         for el in matrix {
             if el.is::<Array>() {
-                flat.extend(flatten(el.into_array().unwrap()))
+                flat.extend(flatten(&mut el.clone().into_array().unwrap()))
             } else {
-                flat.push(el);
+                flat.push(el.clone());
             }
         }
         flat
@@ -623,7 +570,7 @@ pub mod matrix_functions {
     /// ```
     #[rhai_fn(name = "fliplr", return_raw)]
     pub fn fliplr(matrix: Array) -> Result<Array, Box<EvalAltResult>> {
-        if ndims(matrix.clone()) > 2 {
+        if ndims_by_reference(&mut matrix.clone()) > 2 {
             Err(EvalAltResult::ErrorArithmetic(
                 format!("Matrix cannot be flipped - too many dims"),
                 Position::NONE,
@@ -662,7 +609,7 @@ pub mod matrix_functions {
     /// ```
     #[rhai_fn(name = "flipud", return_raw)]
     pub fn flipud(matrix: Array) -> Result<Array, Box<EvalAltResult>> {
-        if ndims(matrix.clone()) > 2 {
+        if ndims_by_reference(&mut matrix.clone()) > 2 {
             Err(EvalAltResult::ErrorArithmetic(
                 format!("Matrix cannot be flipped - too many dims"),
                 Position::NONE,
@@ -701,13 +648,13 @@ pub mod matrix_functions {
     /// ```
     #[rhai_fn(name = "rot90", return_raw)]
     pub fn rot90_once(matrix: Array) -> Result<Array, Box<EvalAltResult>> {
-        if ndims(matrix.clone()) == 1 {
+        if ndims_by_reference(&mut matrix.clone()) == 1 {
             Err(EvalAltResult::ErrorArithmetic(
                 format!("Matrix cannot be rotated - not enough dimensions"),
                 Position::NONE,
             )
             .into())
-        } else if ndims(matrix.clone()) > 2 {
+        } else if ndims_by_reference(&mut matrix.clone()) > 2 {
             Err(EvalAltResult::ErrorArithmetic(
                 format!("Matrix cannot be rotated - too many dimensions"),
                 Position::NONE,
@@ -767,8 +714,12 @@ pub mod matrix_functions {
     /// ```
     #[rhai_fn(name = "mtimes", return_raw)]
     pub fn mtimes(matrix1: Array, matrix2: Array) -> Result<Array, Box<EvalAltResult>> {
-        if matrix_size(matrix1.clone())[1].as_int().unwrap()
-            != matrix_size(matrix2.clone())[0].as_int().unwrap()
+        if matrix_size_by_reference(&mut matrix1.clone())[1]
+            .as_int()
+            .unwrap()
+            != matrix_size_by_reference(&mut matrix2.clone())[0]
+                .as_int()
+                .unwrap()
         {
             return Err(EvalAltResult::ErrorArithmetic(
                 format!("The width of the first matrix must be equal to the height of the second matrix"),
@@ -828,8 +779,12 @@ pub mod matrix_functions {
     /// ```
     #[rhai_fn(name = "horzcat", return_raw)]
     pub fn horzcat(matrix1: Array, matrix2: Array) -> Result<Array, Box<EvalAltResult>> {
-        if matrix_size(matrix1.clone())[0].as_int().unwrap()
-            != matrix_size(matrix2.clone())[0].as_int().unwrap()
+        if matrix_size_by_reference(&mut matrix1.clone())[0]
+            .as_int()
+            .unwrap()
+            != matrix_size_by_reference(&mut matrix2.clone())[0]
+                .as_int()
+                .unwrap()
         {
             return Err(EvalAltResult::ErrorArithmetic(
                 format!("Matrices must have the same height"),
@@ -899,8 +854,12 @@ pub mod matrix_functions {
     /// ```
     #[rhai_fn(name = "vertcat", return_raw)]
     pub fn vertcat(matrix1: Array, matrix2: Array) -> Result<Array, Box<EvalAltResult>> {
-        if matrix_size(matrix1.clone())[1].as_int().unwrap()
-            != matrix_size(matrix2.clone())[1].as_int().unwrap()
+        if matrix_size_by_reference(&mut matrix1.clone())[1]
+            .as_int()
+            .unwrap()
+            != matrix_size_by_reference(&mut matrix2.clone())[1]
+                .as_int()
+                .unwrap()
         {
             return Err(EvalAltResult::ErrorArithmetic(
                 format!("Matrices must have the same width"),
@@ -981,7 +940,7 @@ pub mod matrix_functions {
     /// ```
     #[rhai_fn(name = "diag", return_raw)]
     pub fn diag(matrix: Array) -> Result<Array, Box<EvalAltResult>> {
-        if ndims(matrix.clone()) == 2 {
+        if ndims_by_reference(&mut matrix.clone()) == 2 {
             // Turn into Vec<Vec<Dynamic>>
             let matrix_as_vec = matrix
                 .into_iter()
@@ -994,7 +953,7 @@ pub mod matrix_functions {
             }
 
             Ok(out)
-        } else if ndims(matrix.clone()) == 1 {
+        } else if ndims_by_reference(&mut matrix.clone()) == 1 {
             let mut out = vec![];
             for idx in 0..matrix.len() {
                 let mut new_row = vec![];

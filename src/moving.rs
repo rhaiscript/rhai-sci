@@ -2,7 +2,6 @@ use rhai::plugin::*;
 
 #[export_module]
 pub mod moving_functions {
-    use crate::matrix_functions::ndims;
     use rhai::{Array, Dynamic, EvalAltResult, ImmutableString, Position, FLOAT, INT};
 
     fn mov<G>(arr: &mut Array, k: INT, f: G) -> Array

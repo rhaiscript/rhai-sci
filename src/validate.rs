@@ -23,7 +23,7 @@ pub mod validation_functions {
     }
 
     pub fn int_and_float_totals(arr: &mut Array) -> (INT, INT, INT) {
-        crate::matrix_functions::flatten(arr.to_vec())
+        crate::matrix_functions::flatten(arr)
             .iter()
             .fold((0, 0, 0), |(i, f, t), x| {
                 if x.is::<INT>() {
