@@ -1,6 +1,6 @@
 use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT, INT};
 
-pub fn list_int_float_else<FA, FB, T>(
+pub fn if_list_int_float<FA, FB, T>(
     arr: &mut Array,
     f_int: FA,
     f_float: FB,
@@ -28,6 +28,21 @@ where
             })
             .collect::<Vec<Dynamic>>();
         f_float(&mut arr_of_float)
+    } else {
+        Err(EvalAltResult::ErrorArithmetic(
+            format!("The elements of the input array must either be INT or FLOAT."),
+            Position::NONE,
+        )
+        .into())
+    }
+}
+
+pub fn if_list_do<F, T>(arr: &mut Array, f: F) -> Result<T, Box<EvalAltResult>>
+where
+    F: Fn(&mut Array) -> Result<T, Box<EvalAltResult>>,
+{
+    if crate::validation_functions::is_numeric_list(arr) {
+        f(arr)
     } else {
         Err(EvalAltResult::ErrorArithmetic(
             format!("The elements of the input array must either be INT or FLOAT."),

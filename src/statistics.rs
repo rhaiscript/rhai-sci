@@ -32,7 +32,7 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "max", return_raw)]
     pub fn array_max(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        crate::list_int_float_else(
+        crate::if_list_int_float(
             arr,
             |arr: &mut Array| {
                 let mut y = arr
@@ -82,7 +82,7 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "min", return_raw, pure)]
     pub fn array_min(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        crate::list_int_float_else(
+        crate::if_list_int_float(
             arr,
             |arr: &mut Array| {
                 let mut y = arr
@@ -133,7 +133,7 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "maxk", return_raw, pure)]
     pub fn maxk(arr: &mut Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
-        crate::list_int_float_else(
+        crate::if_list_int_float(
             arr,
             |arr: &mut Array| {
                 let mut y = arr
@@ -178,7 +178,7 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "mink", return_raw, pure)]
     pub fn mink(arr: &mut Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
-        crate::list_int_float_else(
+        crate::if_list_int_float(
             arr,
             |arr| {
                 let mut y = arr
@@ -223,7 +223,7 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "sum", return_raw, pure)]
     pub fn sum(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        crate::list_int_float_else(
+        crate::if_list_int_float(
             arr,
             |arr| {
                 let y = arr
@@ -251,7 +251,7 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "mean", return_raw, pure)]
     pub fn mean(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        crate::list_int_float_else(
+        crate::if_list_int_float(
             arr,
             |arr: &mut Array| {
                 let L = arr.len() as FLOAT;
@@ -279,21 +279,14 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "argmax", return_raw, pure)]
     pub fn argmax(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        let mm = array_max(arr);
-        match mm {
+        crate::if_list_do(arr, |arr| match array_max(arr) {
             Ok(m) => Ok(Dynamic::from_int(
                 arr.iter()
-                    .position(|r| {
-                        if r.is::<FLOAT>() {
-                            r.clone().as_float() == m.clone().as_float()
-                        } else {
-                            r.clone().as_int() == m.clone().as_int()
-                        }
-                    })
+                    .position(|r| format!("{r}") == format!("{m}"))
                     .unwrap() as INT,
             )),
             Err(e) => Err(e),
-        }
+        })
     }
 
     /// Return the index of the smallest array element. Fails if the input is not an array, or if
@@ -305,21 +298,14 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "argmin", return_raw, pure)]
     pub fn argmin(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        let mm = array_min(arr);
-        match mm {
+        crate::if_list_do(arr, |arr| match array_min(arr) {
             Ok(m) => Ok(Dynamic::from_int(
                 arr.iter()
-                    .position(|r| {
-                        if r.is::<FLOAT>() {
-                            r.clone().as_float() == m.clone().as_float()
-                        } else {
-                            r.clone().as_int() == m.clone().as_int()
-                        }
-                    })
+                    .position(|r| format!("{r}") == format!("{m}"))
                     .unwrap() as INT,
             )),
             Err(e) => Err(e),
-        }
+        })
     }
 
     /// Compute the product of an array. Fails if the input is not an array, or if
@@ -336,25 +322,23 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "prod", return_raw, pure)]
     pub fn prod(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        if arr[0].is::<FLOAT>() {
-            let mut p = 1.0 as FLOAT;
-            for el in arr {
-                p *= el.as_float().unwrap()
-            }
-            Ok(Dynamic::from_float(p))
-        } else if arr[0].is::<INT>() {
-            let mut p = 1 as INT;
-            for el in arr {
-                p *= el.as_int().unwrap()
-            }
-            Ok(Dynamic::from_int(p))
-        } else {
-            Err(EvalAltResult::ErrorArithmetic(
-                format!("The elements of the input must either be INT or FLOAT."),
-                Position::NONE,
-            )
-            .into())
-        }
+        crate::if_list_int_float(
+            arr,
+            |arr| {
+                let mut p = 1 as INT;
+                for el in arr {
+                    p *= el.as_int().unwrap()
+                }
+                Ok(Dynamic::from_int(p))
+            },
+            |arr| {
+                let mut p = 1.0 as FLOAT;
+                for el in arr {
+                    p *= el.as_float().unwrap()
+                }
+                Ok(Dynamic::from_float(p))
+            },
+        )
     }
 
     /// Returns the variance of a 1-D array.
@@ -393,12 +377,10 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "std", return_raw, pure)]
     pub fn std(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        let mut s = Dynamic::FLOAT_ZERO;
         match variance(arr) {
-            Ok(v) => s = v,
-            Err(e) => return Err(e),
+            Ok(v) => Ok(Dynamic::from_float(v.as_float().unwrap().sqrt())),
+            Err(e) => Err(e),
         }
-        Ok(Dynamic::from_float(s.as_float().unwrap().sqrt()))
     }
 
     /// Returns the variance of a 1-D array.
