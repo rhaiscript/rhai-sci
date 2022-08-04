@@ -323,24 +323,16 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "variance", return_raw, pure)]
     pub fn variance(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        let mut m = 0.0 as FLOAT;
-        match mean(arr) {
-            Ok(raw_mean) => m = raw_mean.as_float().unwrap(),
-            Err(e) => return Err(e),
-        }
-        let mut sum = 0.0 as FLOAT;
+        if_list_convert_to_vec_float_and_do(arr, |x| {
+            let m = x.iter().sum::<FLOAT>() / (x.len() as FLOAT);
+            let mut sum = 0.0 as FLOAT;
 
-        // Convert if needed
-        let mut x: Vec<FLOAT> = if arr[0].is::<INT>() {
-            arr.iter().map(|el| el.as_int().unwrap() as FLOAT).collect()
-        } else {
-            arr.iter().map(|el| el.as_float().unwrap()).collect()
-        };
-        for v in x {
-            sum += (v - m).powi(2)
-        }
-        let d = sum / (arr.len() as FLOAT - 1.0);
-        Ok(Dynamic::from_float(d))
+            for v in &x {
+                sum += (v - m).powi(2)
+            }
+            let d = sum / (x.len() as FLOAT - 1.0);
+            Ok(Dynamic::from_float(d))
+        })
     }
 
     /// Returns the standard deviation of a 1-D array.
@@ -430,40 +422,28 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "prctile", return_raw, pure)]
     pub fn prctile(arr: &mut Array, p: Dynamic) -> Result<FLOAT, Box<EvalAltResult>> {
-        let mut float_array = vec![];
-        if arr[0].is::<FLOAT>() {
-            float_array = arr
-                .iter()
-                .map(|el| el.as_float().unwrap())
-                .collect::<Vec<FLOAT>>();
-        } else if arr[0].is::<INT>() {
-            float_array = arr
-                .iter()
-                .map(|el| el.as_int().unwrap() as FLOAT)
-                .collect::<Vec<FLOAT>>();
+        let pp = if p.is::<FLOAT>() {
+            p.as_float().unwrap()
         } else {
-            return Err(EvalAltResult::ErrorArithmetic(
-                format!("The elements of the input must either be INT or FLOAT."),
-                Position::NONE,
+            p.as_int().unwrap() as FLOAT
+        };
+        if_list_convert_to_vec_float_and_do(arr, |mut float_array| {
+            // Sort
+            float_array.sort_by(|a, b| a.partial_cmp(b).unwrap());
+
+            let sorted_array = float_array
+                .iter()
+                .map(|el| Dynamic::from_float(*el))
+                .collect::<Vec<Dynamic>>();
+
+            let x = crate::matrix_functions::linspace(
+                Dynamic::from_int(0),
+                Dynamic::from_int(100),
+                float_array.len() as INT,
             )
-            .into());
-        }
-
-        // Sort
-        float_array.sort_by(|a, b| a.partial_cmp(b).unwrap());
-
-        let sorted_array = float_array
-            .iter()
-            .map(|el| Dynamic::from_float(*el))
-            .collect::<Vec<Dynamic>>();
-
-        let x = crate::matrix_functions::linspace(
-            Dynamic::from_int(0),
-            Dynamic::from_int(100),
-            arr.len() as INT,
-        )
-        .unwrap();
-        crate::misc_functions::interp1(x, sorted_array, p)
+            .unwrap();
+            crate::misc_functions::interp1(x, sorted_array, Dynamic::from_float(pp))
+        })
     }
 
     /// Returns the inter-quartile range for a 1-D array.
@@ -537,7 +517,8 @@ pub mod stats {
 
     /// Performs ordinary least squares regression.
     /// ```javascript
-    /// let x = [[1.0, 0.0], [1.0, 1.0]];
+    /// let x = [[1.0, 0.0],
+    ///          [1.0, 1.0]];
     /// let y = [[0.1],
     ///          [1.0]];
     /// let b = regress(x, y);
