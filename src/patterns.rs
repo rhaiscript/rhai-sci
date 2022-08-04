@@ -1,6 +1,6 @@
 use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT, INT};
 
-pub fn if_list_int_float<FA, FB, T>(
+pub fn if_list_do_int_or_do_float<FA, FB, T>(
     arr: &mut Array,
     f_int: FA,
     f_float: FB,
@@ -49,5 +49,34 @@ where
             Position::NONE,
         )
         .into())
+    }
+}
+
+pub fn array_to_vec_int(arr: &mut Array) -> Vec<INT> {
+    arr.iter()
+        .map(|el| el.as_int().unwrap())
+        .collect::<Vec<INT>>()
+}
+
+pub fn array_to_vec_float(arr: &mut Array) -> Vec<FLOAT> {
+    arr.iter()
+        .map(|el| el.as_float().unwrap())
+        .collect::<Vec<FLOAT>>()
+}
+
+pub fn if_list_convert_to_vec_float_and_do<F, T>(
+    arr: &mut Array,
+    f: F,
+) -> Result<T, Box<EvalAltResult>>
+where
+    F: Fn(Vec<FLOAT>) -> Result<T, Box<EvalAltResult>>,
+{
+    match if_list_do_int_or_do_float(
+        arr,
+        |arr: &mut Array| Ok(arr.iter().map(|el| el.as_int().unwrap() as FLOAT).collect()),
+        |arr: &mut Array| Ok(arr.iter().map(|el| el.as_float().unwrap()).collect()),
+    ) {
+        Ok(r) => f(r),
+        Err(e) => Err(e),
     }
 }

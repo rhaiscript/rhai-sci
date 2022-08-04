@@ -2,6 +2,10 @@ use rhai::plugin::*;
 
 #[export_module]
 pub mod stats {
+    use crate::{
+        array_to_vec_float, array_to_vec_int, if_list_convert_to_vec_float_and_do, if_list_do,
+        if_list_do_int_or_do_float,
+    };
     use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT, INT};
     use std::collections::HashMap;
 
@@ -32,21 +36,15 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "max", return_raw)]
     pub fn array_max(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        crate::if_list_int_float(
+        if_list_do_int_or_do_float(
             arr,
             |arr: &mut Array| {
-                let mut y = arr
-                    .iter()
-                    .map(|el| el.as_int().unwrap())
-                    .collect::<Vec<INT>>();
+                let mut y = array_to_vec_int(arr);
                 y.sort();
                 Ok(Dynamic::from(y[y.len() - 1]))
             },
             |arr: &mut Array| {
-                let mut y = arr
-                    .iter()
-                    .map(|el| el.as_float().unwrap())
-                    .collect::<Vec<FLOAT>>();
+                let mut y = array_to_vec_float(arr);
                 y.sort_by(|a, b| a.partial_cmp(b).unwrap());
                 Ok(Dynamic::from(y[y.len() - 1]))
             },
@@ -82,21 +80,15 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "min", return_raw, pure)]
     pub fn array_min(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        crate::if_list_int_float(
+        if_list_do_int_or_do_float(
             arr,
             |arr: &mut Array| {
-                let mut y = arr
-                    .iter()
-                    .map(|el| el.as_int().unwrap())
-                    .collect::<Vec<INT>>();
+                let mut y = array_to_vec_int(arr);
                 y.sort();
                 Ok(Dynamic::from(y[0]))
             },
             |arr: &mut Array| {
-                let mut y = arr
-                    .iter()
-                    .map(|el| el.as_float().unwrap())
-                    .collect::<Vec<FLOAT>>();
+                let mut y = array_to_vec_float(arr);
                 y.sort_by(|a, b| a.partial_cmp(b).unwrap());
                 Ok(Dynamic::from(y[0]))
             },
@@ -133,13 +125,10 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "maxk", return_raw, pure)]
     pub fn maxk(arr: &mut Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
-        crate::if_list_int_float(
+        if_list_do_int_or_do_float(
             arr,
             |arr: &mut Array| {
-                let mut y = arr
-                    .iter()
-                    .map(|el| el.as_int().unwrap())
-                    .collect::<Vec<INT>>();
+                let mut y = array_to_vec_int(arr);
                 y.sort();
                 let r = (y.len() - (k as usize))..(y.len());
                 let mut v = Array::new();
@@ -149,10 +138,7 @@ pub mod stats {
                 Ok(v)
             },
             |arr: &mut Array| {
-                let mut y = arr
-                    .iter()
-                    .map(|el| el.as_float().unwrap())
-                    .collect::<Vec<FLOAT>>();
+                let mut y = array_to_vec_float(arr);
                 y.sort_by(|a, b| a.partial_cmp(b).unwrap());
                 let r = (y.len() - (k as usize))..(y.len());
                 let mut v = Array::new();
@@ -178,13 +164,10 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "mink", return_raw, pure)]
     pub fn mink(arr: &mut Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
-        crate::if_list_int_float(
+        if_list_do_int_or_do_float(
             arr,
             |arr| {
-                let mut y = arr
-                    .iter()
-                    .map(|el| el.as_int().unwrap())
-                    .collect::<Vec<INT>>();
+                let mut y = array_to_vec_int(arr);
                 y.sort();
                 let r = (0 as usize)..(k as usize);
                 let mut v = Array::new();
@@ -194,10 +177,7 @@ pub mod stats {
                 Ok(v)
             },
             |arr| {
-                let mut y = arr
-                    .iter()
-                    .map(|el| el.as_float().unwrap())
-                    .collect::<Vec<FLOAT>>();
+                let mut y = array_to_vec_float(arr);
                 y.sort_by(|a, b| a.partial_cmp(b).unwrap());
                 let r = (0 as usize)..(k as usize);
                 let mut v = Array::new();
@@ -223,20 +203,14 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "sum", return_raw, pure)]
     pub fn sum(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        crate::if_list_int_float(
+        if_list_do_int_or_do_float(
             arr,
             |arr| {
-                let y = arr
-                    .iter()
-                    .map(|el| el.as_int().unwrap())
-                    .collect::<Vec<INT>>();
+                let y = array_to_vec_int(arr);
                 Ok(Dynamic::from_int(y.iter().sum()))
             },
             |arr| {
-                let y = arr
-                    .iter()
-                    .map(|el| el.as_float().unwrap())
-                    .collect::<Vec<FLOAT>>();
+                let y = array_to_vec_float(arr);
                 Ok(Dynamic::from_float(y.iter().sum()))
             },
         )
@@ -251,7 +225,7 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "mean", return_raw, pure)]
     pub fn mean(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        crate::if_list_int_float(
+        if_list_do_int_or_do_float(
             arr,
             |arr: &mut Array| {
                 let L = arr.len() as FLOAT;
@@ -279,7 +253,7 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "argmax", return_raw, pure)]
     pub fn argmax(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        crate::if_list_do(arr, |arr| match array_max(arr) {
+        if_list_do(arr, |arr| match array_max(arr) {
             Ok(m) => Ok(Dynamic::from_int(
                 arr.iter()
                     .position(|r| format!("{r}") == format!("{m}"))
@@ -298,7 +272,7 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "argmin", return_raw, pure)]
     pub fn argmin(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        crate::if_list_do(arr, |arr| match array_min(arr) {
+        if_list_do(arr, |arr| match array_min(arr) {
             Ok(m) => Ok(Dynamic::from_int(
                 arr.iter()
                     .position(|r| format!("{r}") == format!("{m}"))
@@ -322,7 +296,7 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "prod", return_raw, pure)]
     pub fn prod(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        crate::if_list_int_float(
+        if_list_do_int_or_do_float(
             arr,
             |arr| {
                 let mut p = 1 as INT;
@@ -391,19 +365,14 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "rms", return_raw, pure)]
     pub fn rms(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        let mut sum = 0.0 as FLOAT;
-
-        // Convert if needed
-        let mut x: Vec<FLOAT> = if arr[0].is::<INT>() {
-            arr.iter().map(|el| el.as_int().unwrap() as FLOAT).collect()
-        } else {
-            arr.iter().map(|el| el.as_float().unwrap()).collect()
-        };
-        for v in x {
-            sum += v.powi(2)
-        }
-        let d = sum / (arr.len() as FLOAT);
-        Ok(Dynamic::from_float(d.sqrt()))
+        if_list_convert_to_vec_float_and_do(arr, |arr| {
+            let mut sum = 0.0 as FLOAT;
+            for v in &arr {
+                sum += v.powi(2)
+            }
+            let d = sum / (arr.len() as FLOAT);
+            Ok(Dynamic::from_float(d.sqrt()))
+        })
     }
 
     /// Returns the variance of a 1-D array.
@@ -414,22 +383,17 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "median", return_raw, pure)]
     pub fn median(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        // Convert if needed
-        let mut x: Vec<FLOAT> = if arr[0].is::<INT>() {
-            arr.iter().map(|el| el.as_int().unwrap() as FLOAT).collect()
-        } else {
-            arr.iter().map(|el| el.as_float().unwrap()).collect()
-        };
+        if_list_convert_to_vec_float_and_do(arr, |mut x| {
+            x.sort_by(|a, b| a.partial_cmp(b).unwrap());
 
-        x.sort_by(|a, b| a.partial_cmp(b).unwrap());
+            let med = if x.len() % 2 == 1 {
+                x[(x.len() - 1) / 2]
+            } else {
+                (x[x.len() / 2] + x[x.len() / 2 - 1]) / 2.0
+            };
 
-        let med = if x.len() % 2 == 1 {
-            x[(x.len() - 1) / 2]
-        } else {
-            (x[x.len() / 2] + x[x.len() / 2 - 1]) / 2.0
-        };
-
-        Ok(Dynamic::from_float(med))
+            Ok(Dynamic::from_float(med))
+        })
     }
 
     /// Returns the median absolute deviation of a 1-D array.
@@ -534,49 +498,41 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "mode", return_raw, pure)]
     pub fn mode(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        if arr[0].is::<FLOAT>() {
-            let mut v = arr
-                .iter()
-                .map(|el| el.as_float().unwrap())
-                .collect::<Vec<FLOAT>>();
+        if_list_do_int_or_do_float(
+            arr,
+            |arr| {
+                let mut v = array_to_vec_int(arr);
 
-            let mut counts: HashMap<String, usize> = HashMap::new();
+                let mut counts: HashMap<INT, usize> = HashMap::new();
 
-            Ok(Dynamic::from_float(
-                v.iter()
-                    .copied()
-                    .max_by_key(|&n| {
-                        let count = counts.entry(format!("{:?}", n)).or_insert(0);
-                        *count += 1;
-                        *count
-                    })
-                    .unwrap(),
-            ))
-        } else if arr[0].is::<INT>() {
-            let mut v = arr
-                .iter()
-                .map(|el| el.as_int().unwrap())
-                .collect::<Vec<INT>>();
+                Ok(Dynamic::from_int(
+                    v.iter()
+                        .copied()
+                        .max_by_key(|&n| {
+                            let count = counts.entry(n).or_insert(0);
+                            *count += 1;
+                            *count
+                        })
+                        .unwrap(),
+                ))
+            },
+            |arr| {
+                let mut v = array_to_vec_float(arr);
 
-            let mut counts: HashMap<INT, usize> = HashMap::new();
+                let mut counts: HashMap<String, usize> = HashMap::new();
 
-            Ok(Dynamic::from_int(
-                v.iter()
-                    .copied()
-                    .max_by_key(|&n| {
-                        let count = counts.entry(n).or_insert(0);
-                        *count += 1;
-                        *count
-                    })
-                    .unwrap(),
-            ))
-        } else {
-            Err(EvalAltResult::ErrorArithmetic(
-                format!("The elements of the input must either be INT or FLOAT."),
-                Position::NONE,
-            )
-            .into())
-        }
+                Ok(Dynamic::from_float(
+                    v.iter()
+                        .copied()
+                        .max_by_key(|&n| {
+                            let count = counts.entry(format!("{:?}", n)).or_insert(0);
+                            *count += 1;
+                            *count
+                        })
+                        .unwrap(),
+                ))
+            },
+        )
     }
 
     /// Performs ordinary least squares regression.

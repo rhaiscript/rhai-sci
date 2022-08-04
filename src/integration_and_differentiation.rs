@@ -86,7 +86,7 @@ pub mod int_and_diff {
     /// ```
     #[rhai_fn(name = "diff", return_raw, pure)]
     pub fn diff(arr: &mut Array) -> Result<Array, Box<EvalAltResult>> {
-        crate::if_list_int_float(
+        crate::if_list_do_int_or_do_float(
             arr,
             |arr| {
                 let mut new_arr = vec![];
