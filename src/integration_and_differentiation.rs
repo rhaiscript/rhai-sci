@@ -2,6 +2,7 @@ use rhai::plugin::*;
 
 #[export_module]
 pub mod int_and_diff {
+    use crate::if_list_convert_to_vec_float_and_do;
     use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT, INT};
 
     /// Returns the approximate integral of the curve defined by `y` and `x` using the trapezoidal method.
@@ -20,32 +21,22 @@ pub mod int_and_diff {
     #[rhai_fn(name = "trapz", return_raw)]
     pub fn trapz(x: Array, y: Array) -> Result<Dynamic, Box<EvalAltResult>> {
         if x.len() != y.len() {
-            return Err(EvalAltResult::ErrorArithmetic(
+            Err(EvalAltResult::ErrorArithmetic(
                 format!("The arrays must have the same length"),
                 Position::NONE,
             )
-            .into());
-        }
-
-        // Convert if needed
-        let mut X: Vec<FLOAT> = if x[0].is::<INT>() {
-            x.iter().map(|el| el.as_int().unwrap() as FLOAT).collect()
+            .into())
         } else {
-            x.iter().map(|el| el.as_float().unwrap()).collect()
-        };
-
-        // Convert if needed
-        let mut Y: Vec<FLOAT> = if y[0].is::<INT>() {
-            y.iter().map(|el| el.as_int().unwrap() as FLOAT).collect()
-        } else {
-            y.iter().map(|el| el.as_float().unwrap()).collect()
-        };
-
-        let mut trapsum = 0.0;
-        for i in 1..x.len() {
-            trapsum += (Y[i] + Y[i - 1]) * (X[i] - X[i - 1]) / 2.0;
+            if_list_convert_to_vec_float_and_do(&mut y.clone(), |Y| {
+                if_list_convert_to_vec_float_and_do(&mut x.clone(), |X| {
+                    let mut trapsum = 0.0;
+                    for i in 1..x.len() {
+                        trapsum += (Y[i] + Y[i - 1]) * (X[i] - X[i - 1]) / 2.0;
+                    }
+                    Ok(Dynamic::from_float(trapsum))
+                })
+            })
         }
-        Ok(Dynamic::from_float(trapsum))
     }
 
     /// Returns the approximate integral of the curve defined by `y` using the trapezoidal method.
@@ -62,16 +53,9 @@ pub mod int_and_diff {
     /// ```
     #[rhai_fn(name = "trapz", return_raw, pure)]
     pub fn trapz_unit(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        crate::if_list_do(arr, |y| {
-            // Convert if needed
-            let mut Y: Vec<FLOAT> = if y[0].is::<INT>() {
-                y.iter().map(|el| el.as_int().unwrap() as FLOAT).collect()
-            } else {
-                y.iter().map(|el| el.as_float().unwrap()).collect()
-            };
-
+        if_list_convert_to_vec_float_and_do(arr, |Y| {
             let mut trapsum = 0.0 as FLOAT;
-            for i in 1..y.len() {
+            for i in 1..Y.len() {
                 trapsum += (Y[i] + Y[i - 1]) / 2.0;
             }
             Ok(Dynamic::from_float(trapsum))
