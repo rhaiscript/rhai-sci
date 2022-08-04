@@ -2,6 +2,8 @@ use rhai::plugin::*;
 
 #[export_module]
 pub mod misc_functions {
+    use crate::if_list_convert_to_vec_float_and_do;
+    use crate::if_list_do_int_or_do_float;
     use rhai::{Array, Dynamic, EvalAltResult, ImmutableString, Position, FLOAT, INT};
 
     /// Returns a random number between zero and one.
@@ -22,31 +24,27 @@ pub mod misc_functions {
     /// ```
     #[rhai_fn(name = "unique", return_raw, pure)]
     pub fn unique(arr: &mut Array) -> Result<Array, Box<EvalAltResult>> {
-        let (ints, floats, total) = crate::validation_functions::int_and_float_totals(arr);
-        // Convert if needed
-        if ints == total {
-            let mut x = arr
-                .iter()
-                .map(|el| el.as_int().unwrap())
-                .collect::<Vec<INT>>();
-            x.sort();
-            x.dedup();
-            Ok(x.iter().map(|el| Dynamic::from_int(*el)).collect())
-        } else if floats == total {
-            let mut x = arr
-                .iter()
-                .map(|el| el.as_float().unwrap())
-                .collect::<Vec<FLOAT>>();
-            x.sort_by(|a, b| a.partial_cmp(b).unwrap());
-            x.dedup();
-            Ok(x.iter().map(|el| Dynamic::from_float(*el)).collect())
-        } else {
-            Err(EvalAltResult::ErrorArithmetic(
-                format!("Elements of array must be either INT or FLOAT"),
-                Position::NONE,
-            )
-            .into())
-        }
+        if_list_do_int_or_do_float(
+            arr,
+            |arr| {
+                let mut x = arr
+                    .iter()
+                    .map(|el| el.as_int().unwrap())
+                    .collect::<Vec<INT>>();
+                x.sort();
+                x.dedup();
+                Ok(x.iter().map(|el| Dynamic::from_int(*el)).collect())
+            },
+            |arr| {
+                let mut x = arr
+                    .iter()
+                    .map(|el| el.as_float().unwrap())
+                    .collect::<Vec<FLOAT>>();
+                x.sort_by(|a, b| a.partial_cmp(b).unwrap());
+                x.dedup();
+                Ok(x.iter().map(|el| Dynamic::from_float(*el)).collect())
+            },
+        )
     }
 
     /// Given reference data, perform linear interpolation.
@@ -59,70 +57,32 @@ pub mod misc_functions {
     /// ```
     #[rhai_fn(name = "interp1", return_raw)]
     pub fn interp1(x: Array, y: Array, xq: Dynamic) -> Result<FLOAT, Box<EvalAltResult>> {
-        // New variables
-        let mut new_x = vec![];
-        let mut new_y = vec![];
-        let mut new_xq = 0.0 as FLOAT;
+        if_list_convert_to_vec_float_and_do(&mut y.clone(), |new_y| {
+            if_list_convert_to_vec_float_and_do(&mut x.clone(), |new_x| {
+                let mut new_xq = 0.0 as FLOAT;
+                if xq.is::<INT>() {
+                    new_xq = xq.as_int().unwrap() as FLOAT;
+                } else if xq.is::<FLOAT>() {
+                    new_xq = xq.as_float().unwrap();
+                } else {
+                    return Err(EvalAltResult::ErrorArithmetic(
+                        format!("xq must be either INT or FLOAT"),
+                        Position::NONE,
+                    )
+                    .into());
+                }
 
-        // Convert if needed
-        if x[0].is::<INT>() {
-            new_x = x
-                .iter()
-                .map(|el| el.as_int().unwrap() as FLOAT)
-                .collect::<Vec<FLOAT>>();
-        } else if x[0].is::<FLOAT>() {
-            new_x = x
-                .iter()
-                .map(|el| el.as_float().unwrap())
-                .collect::<Vec<FLOAT>>();
-        } else {
-            return Err(EvalAltResult::ErrorArithmetic(
-                format!("Elements of array x must be either INT or FLOAT"),
-                Position::NONE,
-            )
-            .into());
-        }
-
-        // Convert if needed
-        if y[0].is::<INT>() {
-            new_y = y
-                .iter()
-                .map(|el| el.as_int().unwrap() as FLOAT)
-                .collect::<Vec<FLOAT>>();
-        } else if y[0].is::<FLOAT>() {
-            new_y = y
-                .iter()
-                .map(|el| el.as_float().unwrap())
-                .collect::<Vec<FLOAT>>();
-        } else {
-            return Err(EvalAltResult::ErrorArithmetic(
-                format!("Elements of array y must be either INT or FLOAT"),
-                Position::NONE,
-            )
-            .into());
-        }
-
-        if xq.is::<INT>() {
-            new_xq = xq.as_int().unwrap() as FLOAT;
-        } else if xq.is::<FLOAT>() {
-            new_xq = xq.as_float().unwrap();
-        } else {
-            return Err(EvalAltResult::ErrorArithmetic(
-                format!("xq must be either INT or FLOAT"),
-                Position::NONE,
-            )
-            .into());
-        }
-
-        // Identify teh right index
-        let mut b: usize = 0;
-        for idx in 0..x.len() {
-            if new_x[idx] > new_xq {
-                b = idx;
-                break;
-            }
-        }
-        let a = b - 1;
-        Ok(new_y[a] + (new_xq - new_x[a]) * (new_y[b] - new_y[a]) / (new_x[b] - new_x[a]))
+                // Identify the right index
+                let mut b: usize = 0;
+                for idx in 0..x.len() {
+                    if new_x[idx] > new_xq {
+                        b = idx;
+                        break;
+                    }
+                }
+                let a = b - 1;
+                Ok(new_y[a] + (new_xq - new_x[a]) * (new_y[b] - new_y[a]) / (new_x[b] - new_x[a]))
+            })
+        })
     }
 }
