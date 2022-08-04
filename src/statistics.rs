@@ -323,8 +323,11 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "variance", return_raw, pure)]
     pub fn variance(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
+        let m = match mean(arr) {
+            Ok(med) => med.as_float().unwrap(),
+            Err(e) => return Err(e),
+        };
         if_list_convert_to_vec_float_and_do(arr, |x| {
-            let m = x.iter().sum::<FLOAT>() / (x.len() as FLOAT);
             let mut sum = 0.0 as FLOAT;
 
             for v in &x {
@@ -396,22 +399,17 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "mad", return_raw, pure)]
     pub fn mad(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        let mut m = 0.0 as FLOAT;
-        match median(arr) {
-            Ok(raw_median) => m = raw_median.as_float().unwrap(),
+        let m = match median(arr) {
+            Ok(med) => med.as_float().unwrap(),
             Err(e) => return Err(e),
-        }
-        // Convert if needed
-        let mut x: Vec<FLOAT> = if arr[0].is::<INT>() {
-            arr.iter().map(|el| el.as_int().unwrap() as FLOAT).collect()
-        } else {
-            arr.iter().map(|el| el.as_float().unwrap()).collect()
         };
-        let mut dev = vec![];
-        for v in x {
-            dev.push(Dynamic::from_float((v - m).abs()));
-        }
-        Ok(median(&mut dev).unwrap())
+        if_list_convert_to_vec_float_and_do(arr, |mut x| {
+            let mut dev = vec![];
+            for v in x {
+                dev.push(Dynamic::from_float((v - m).abs()));
+            }
+            Ok(median(&mut dev).unwrap())
+        })
     }
 
     /// Returns a given percentile value for a 1-D array of data.
@@ -436,12 +434,14 @@ pub mod stats {
                 .map(|el| Dynamic::from_float(*el))
                 .collect::<Vec<Dynamic>>();
 
-            let x = crate::matrix_functions::linspace(
+            let x = match crate::matrix_functions::linspace(
                 Dynamic::from_int(0),
                 Dynamic::from_int(100),
                 float_array.len() as INT,
-            )
-            .unwrap();
+            ) {
+                Ok(lins) => lins,
+                Err(e) => return Err(e),
+            };
             crate::misc_functions::interp1(x, sorted_array, Dynamic::from_float(pp))
         })
     }
