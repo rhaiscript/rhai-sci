@@ -27,19 +27,13 @@ pub mod misc_functions {
         if_list_do_int_or_do_float(
             arr,
             |arr| {
-                let mut x = arr
-                    .iter()
-                    .map(|el| el.as_int().unwrap())
-                    .collect::<Vec<INT>>();
+                let mut x = crate::array_to_vec_int(arr);
                 x.sort();
                 x.dedup();
                 Ok(x.iter().map(|el| Dynamic::from_int(*el)).collect())
             },
             |arr| {
-                let mut x = arr
-                    .iter()
-                    .map(|el| el.as_float().unwrap())
-                    .collect::<Vec<FLOAT>>();
+                let mut x = crate::array_to_vec_float(arr);
                 x.sort_by(|a, b| a.partial_cmp(b).unwrap());
                 x.dedup();
                 Ok(x.iter().map(|el| Dynamic::from_float(*el)).collect())
