@@ -3,6 +3,7 @@ use rhai::plugin::*;
 #[export_module]
 pub mod matrix_functions {
     use crate::misc_functions::rand_float;
+    use crate::{if_matrix_convert_to_vec_array_and_do, vec_vec_float_to_vec_dynamic};
     use nalgebra::DMatrix;
     use rhai::{Array, Dynamic, EvalAltResult, ImmutableString, Map, Position, FLOAT, INT};
     use std::collections::BTreeMap;
@@ -29,48 +30,33 @@ pub mod matrix_functions {
     /// ```
     #[rhai_fn(name = "inv", return_raw, pure)]
     pub fn invert_matrix(matrix: &mut Array) -> Result<Array, Box<EvalAltResult>> {
-        // Turn into Vec<Vec<FLOAT>>
-        let matrix_as_vec = matrix
-            .into_iter()
-            .map(|x| x.clone().into_array().unwrap())
-            .collect::<Vec<Array>>();
-
-        let dm = DMatrix::from_fn(matrix_as_vec.len(), matrix_as_vec[0].len(), |i, j| {
-            if matrix_as_vec[0][0].is::<FLOAT>() {
-                matrix_as_vec[i][j].as_float().unwrap()
-            } else {
-                matrix_as_vec[i][j].as_int().unwrap() as FLOAT
-            }
-        });
-
-        // Try ot invert
-        let dm = dm.try_inverse();
-
-        match dm {
-            None => Err(EvalAltResult::ErrorArithmetic(
-                format!("Matrix cannot be inverted"),
-                Position::NONE,
-            )
-            .into()),
-
-            Some(mat) => {
-                // Turn into Vec<Dynamic>
-                let mut out = vec![];
-                for idx in 0..mat.shape().0 {
-                    let mut new_row = vec![];
-                    for jdx in 0..mat.shape().1 {
-                        new_row.push(Dynamic::from_float(mat[(idx, jdx)]));
-                    }
-                    out.push(Dynamic::from_array(new_row));
+        if_matrix_convert_to_vec_array_and_do(matrix, |matrix_as_vec| {
+            let dm = DMatrix::from_fn(matrix_as_vec.len(), matrix_as_vec[0].len(), |i, j| {
+                if matrix_as_vec[0][0].is::<FLOAT>() {
+                    matrix_as_vec[i][j].as_float().unwrap()
+                } else {
+                    matrix_as_vec[i][j].as_int().unwrap() as FLOAT
                 }
-                Ok(out)
+            });
+
+            // Try ot invert
+            let dm = dm.try_inverse();
+
+            match dm {
+                None => Err(EvalAltResult::ErrorArithmetic(
+                    format!("Matrix cannot be inverted"),
+                    Position::NONE,
+                )
+                .into()),
+
+                Some(mat) => Ok(vec_vec_float_to_vec_dynamic(mat)),
             }
-        }
+        })
     }
 
     /// Transposes a matrix.
     /// ```typescript
-    /// let row = [1, 2, 3, 4];
+    /// let row = [[1, 2, 3, 4]];
     /// let column = transpose(row);
     /// assert_eq(column, [[1],
     ///                    [2],
@@ -83,27 +69,19 @@ pub mod matrix_functions {
     /// ```
     #[rhai_fn(name = "transpose", pure)]
     pub fn transpose(matrix: &mut Array) -> Array {
-        let new_matrix = if !matrix[0].is::<Array>() {
-            vec![Dynamic::from_array(matrix.clone())]
-        } else {
-            matrix.clone()
-        };
-        // Turn into Vec<Vec<FLOAT>>
-        let matrix_as_vec = new_matrix
-            .into_iter()
-            .map(|x| x.into_array().unwrap())
-            .collect::<Vec<Array>>();
-
-        // Turn into Vec<Dynamic>
-        let mut out = vec![];
-        for idx in 0..matrix_as_vec[0].len() {
-            let mut new_row = vec![];
-            for jdx in 0..matrix_as_vec.len() {
-                new_row.push(matrix_as_vec[jdx][idx].clone());
+        crate::if_matrix_convert_to_vec_array_and_do(matrix, |matrix_as_vec| {
+            // Turn into Vec<Dynamic>
+            let mut out = vec![];
+            for idx in 0..matrix_as_vec[0].len() {
+                let mut new_row = vec![];
+                for jdx in 0..matrix_as_vec.len() {
+                    new_row.push(matrix_as_vec[jdx][idx].clone());
+                }
+                out.push(Dynamic::from_array(new_row));
             }
-            out.push(Dynamic::from_array(new_row));
-        }
-        out
+            Ok(out)
+        })
+        .expect("This really should never happen")
     }
 
     /// Returns an array indicating the size of the matrix along each dimension, passed by reference.

@@ -64,6 +64,20 @@ pub fn array_to_vec_float(arr: &mut Array) -> Vec<FLOAT> {
         .collect::<Vec<FLOAT>>()
 }
 
+pub fn vec_vec_float_to_vec_dynamic(
+    mat: nalgebra::OMatrix<FLOAT, nalgebra::Dynamic, nalgebra::Dynamic>,
+) -> Vec<Dynamic> {
+    let mut out = vec![];
+    for idx in 0..mat.shape().0 {
+        let mut new_row = vec![];
+        for jdx in 0..mat.shape().1 {
+            new_row.push(Dynamic::from_float(mat[(idx, jdx)]));
+        }
+        out.push(Dynamic::from_array(new_row));
+    }
+    out
+}
+
 pub fn if_list_convert_to_vec_float_and_do<F, T>(
     arr: &mut Array,
     f: F,
@@ -78,5 +92,43 @@ where
     ) {
         Ok(r) => f(r),
         Err(e) => Err(e),
+    }
+}
+
+pub fn if_matrix_do<T, F>(matrix: &mut Array, f: F) -> Result<T, Box<EvalAltResult>>
+where
+    F: Fn(&mut Array) -> Result<T, Box<EvalAltResult>>,
+{
+    if crate::validation_functions::is_matrix(matrix) {
+        f(matrix)
+    } else {
+        Err(
+            EvalAltResult::ErrorArithmetic(format!("The input must be a matrix."), Position::NONE)
+                .into(),
+        )
+    }
+}
+
+pub fn if_matrix_convert_to_vec_array_and_do<F, T>(
+    matrix: &mut Array,
+    f: F,
+) -> Result<T, Box<EvalAltResult>>
+where
+    F: Fn(Vec<Array>) -> Result<T, Box<EvalAltResult>>,
+{
+    {
+        let matrix_as_vec = matrix
+            .into_iter()
+            .map(|x| x.clone().into_array().unwrap())
+            .collect::<Vec<Array>>();
+        if crate::validation_functions::is_matrix(matrix) {
+            f(matrix_as_vec)
+        } else {
+            Err(EvalAltResult::ErrorArithmetic(
+                format!("The input must be a matrix."),
+                Position::NONE,
+            )
+            .into())
+        }
     }
 }
