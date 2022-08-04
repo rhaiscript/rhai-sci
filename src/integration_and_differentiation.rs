@@ -61,19 +61,21 @@ pub mod int_and_diff {
     /// assert_eq(A, 4.0);
     /// ```
     #[rhai_fn(name = "trapz", return_raw, pure)]
-    pub fn trapz_unit(y: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        // Convert if needed
-        let mut Y: Vec<FLOAT> = if y[0].is::<INT>() {
-            y.iter().map(|el| el.as_int().unwrap() as FLOAT).collect()
-        } else {
-            y.iter().map(|el| el.as_float().unwrap()).collect()
-        };
+    pub fn trapz_unit(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
+        crate::if_list_do(arr, |y| {
+            // Convert if needed
+            let mut Y: Vec<FLOAT> = if y[0].is::<INT>() {
+                y.iter().map(|el| el.as_int().unwrap() as FLOAT).collect()
+            } else {
+                y.iter().map(|el| el.as_float().unwrap()).collect()
+            };
 
-        let mut trapsum = 0.0 as FLOAT;
-        for i in 1..y.len() {
-            trapsum += (Y[i] + Y[i - 1]) / 2.0;
-        }
-        Ok(Dynamic::from_float(trapsum))
+            let mut trapsum = 0.0 as FLOAT;
+            for i in 1..y.len() {
+                trapsum += (Y[i] + Y[i - 1]) / 2.0;
+            }
+            Ok(Dynamic::from_float(trapsum))
+        })
     }
 
     /// Returns the difference between successive elements of a 1-D array.
@@ -84,28 +86,26 @@ pub mod int_and_diff {
     /// ```
     #[rhai_fn(name = "diff", return_raw, pure)]
     pub fn diff(arr: &mut Array) -> Result<Array, Box<EvalAltResult>> {
-        if arr[0].is::<INT>() {
-            let mut new_arr = vec![];
-            for idx in 1..arr.len() {
-                new_arr.push(Dynamic::from_int(
-                    arr[idx].as_int().unwrap() - arr[idx - 1].as_int().unwrap(),
-                ));
-            }
-            Ok(new_arr)
-        } else if arr[0].is::<FLOAT>() {
-            let mut new_arr = vec![];
-            for idx in 1..arr.len() {
-                new_arr.push(Dynamic::from_float(
-                    arr[idx].as_float().unwrap() - arr[idx - 1].as_float().unwrap(),
-                ));
-            }
-            Ok(new_arr)
-        } else {
-            Err(EvalAltResult::ErrorArithmetic(
-                format!("The elements of the input must either be INT or FLOAT."),
-                Position::NONE,
-            )
-            .into())
-        }
+        crate::if_list_int_float(
+            arr,
+            |arr| {
+                let mut new_arr = vec![];
+                for idx in 1..arr.len() {
+                    new_arr.push(Dynamic::from_int(
+                        arr[idx].as_int().unwrap() - arr[idx - 1].as_int().unwrap(),
+                    ));
+                }
+                Ok(new_arr)
+            },
+            |arr| {
+                let mut new_arr = vec![];
+                for idx in 1..arr.len() {
+                    new_arr.push(Dynamic::from_float(
+                        arr[idx].as_float().unwrap() - arr[idx - 1].as_float().unwrap(),
+                    ));
+                }
+                Ok(new_arr)
+            },
+        )
     }
 }
