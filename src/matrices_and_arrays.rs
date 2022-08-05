@@ -236,6 +236,10 @@ pub mod matrix_functions {
     ///                    [0.0, 0.0, 0.0]]);
     /// ```
     /// ```typescript
+    /// let matrix = zeros([3]);
+    /// assert_eq(matrix, [0.0, 0.0, 0.0]);
+    /// ```
+    /// ```typescript
     /// let matrix = zeros([3, 3, 3]);
     /// assert_eq(matrix, [[[0.0, 0.0, 0.0],
     ///                     [0.0, 0.0, 0.0],
@@ -247,43 +251,31 @@ pub mod matrix_functions {
     ///                     [0.0, 0.0, 0.0],
     ///                    [0.0, 0.0, 0.0]]]);
     /// ```
-    /// TODO - add checks
     #[rhai_fn(name = "zeros", return_raw)]
     pub fn zeros_single_input(n: Dynamic) -> Result<Array, Box<EvalAltResult>> {
-        if n.is::<INT>() {
-            Ok(zeros_double_input(n.as_int().unwrap(), n.as_int().unwrap()))
-        } else if n.is::<Array>() {
-            let mut m = n.into_array().unwrap();
-            if m.len() == 2 {
-                Ok(zeros_double_input(
-                    m[0].as_int().unwrap(),
-                    m[1].as_int().unwrap(),
-                ))
-            } else if m.len() > 2 {
-                let l = m[0].clone();
-                m.remove(0);
-                Ok(vec![
-                    Dynamic::from_array(
-                        zeros_single_input(Dynamic::from_array(m)).unwrap()
-                    );
-                    l.as_int().unwrap() as usize
-                ])
-            } else {
-                Err(EvalAltResult::ErrorMismatchDataType(
-                    format!("Input must be INT or Array"),
-                    format!(""),
-                    Position::NONE,
-                )
-                .into())
-            }
-        } else {
-            Err(EvalAltResult::ErrorMismatchDataType(
-                format!("Input must be INT or Array"),
-                format!(""),
-                Position::NONE,
-            )
-            .into())
-        }
+        crate::if_int_do_else_if_array_do(
+            n,
+            |n| Ok(zeros_double_input(n, n)),
+            |m| {
+                if m.len() == 2 {
+                    Ok(zeros_double_input(
+                        m[0].as_int().unwrap(),
+                        m[1].as_int().unwrap(),
+                    ))
+                } else if m.len() > 2 {
+                    let l = m[0].clone();
+                    m.remove(0);
+                    Ok(vec![
+                        Dynamic::from_array(
+                            zeros_single_input(Dynamic::from_array(m.to_vec())).unwrap()
+                        );
+                        l.as_int().unwrap() as usize
+                    ])
+                } else {
+                    Ok(vec![Dynamic::FLOAT_ZERO; m[0].as_int().unwrap() as usize])
+                }
+            },
+        )
     }
 
     /// Return a matrix of zeros. Arguments indicate the number of rows and columns in the matrix.
@@ -293,7 +285,6 @@ pub mod matrix_functions {
     ///                    [0.0, 0.0, 0.0],
     ///                    [0.0, 0.0, 0.0]]);
     /// ```
-    /// TODO - add checks
     #[rhai_fn(name = "zeros")]
     pub fn zeros_double_input(nx: INT, ny: INT) -> Array {
         let mut output = vec![];
@@ -318,6 +309,10 @@ pub mod matrix_functions {
     ///                    [1.0, 1.0, 1.0]]);
     /// ```
     /// ```typescript
+    /// let matrix = ones([3]);
+    /// assert_eq(matrix, [1.0, 1.0, 1.0]);
+    /// ```
+    /// ```typescript
     /// let matrix = ones([3, 3, 3]);
     /// assert_eq(matrix, [[[1.0, 1.0, 1.0],
     ///                     [1.0, 1.0, 1.0],
@@ -329,43 +324,31 @@ pub mod matrix_functions {
     ///                     [1.0, 1.0, 1.0],
     ///                     [1.0, 1.0, 1.0]]]);
     /// ```
-    /// TODO - add checks
     #[rhai_fn(name = "ones", return_raw)]
     pub fn ones_single_input(n: Dynamic) -> Result<Array, Box<EvalAltResult>> {
-        if n.is::<INT>() {
-            Ok(ones_double_input(n.as_int().unwrap(), n.as_int().unwrap()))
-        } else if n.is::<Array>() {
-            let mut m = n.into_array().unwrap();
-            if m.len() == 2 {
-                Ok(ones_double_input(
-                    m[0].as_int().unwrap(),
-                    m[1].as_int().unwrap(),
-                ))
-            } else if m.len() > 2 {
-                let l = m[0].clone();
-                m.remove(0);
-                Ok(vec![
-                    Dynamic::from_array(
-                        ones_single_input(Dynamic::from_array(m)).unwrap()
-                    );
-                    l.as_int().unwrap() as usize
-                ])
-            } else {
-                Err(EvalAltResult::ErrorMismatchDataType(
-                    format!("Input must be INT or Array"),
-                    format!(""),
-                    Position::NONE,
-                )
-                .into())
-            }
-        } else {
-            Err(EvalAltResult::ErrorMismatchDataType(
-                format!("Input must be INT or Array"),
-                format!(""),
-                Position::NONE,
-            )
-            .into())
-        }
+        crate::if_int_do_else_if_array_do(
+            n,
+            |n| Ok(ones_double_input(n, n)),
+            |m| {
+                if m.len() == 2 {
+                    Ok(ones_double_input(
+                        m[0].as_int().unwrap(),
+                        m[1].as_int().unwrap(),
+                    ))
+                } else if m.len() > 2 {
+                    let l = m[0].clone();
+                    m.remove(0);
+                    Ok(vec![
+                        Dynamic::from_array(
+                            ones_single_input(Dynamic::from_array(m.to_vec())).unwrap()
+                        );
+                        l.as_int().unwrap() as usize
+                    ])
+                } else {
+                    Ok(vec![Dynamic::FLOAT_ONE; m[0].as_int().unwrap() as usize])
+                }
+            },
+        )
     }
 
     /// Return a matrix of ones. Arguments indicate the number of rows and columns in the matrix.
@@ -375,7 +358,6 @@ pub mod matrix_functions {
     ///                    [1.0, 1.0, 1.0],
     ///                    [1.0, 1.0, 1.0]]);
     /// ```
-    /// TODO - add checks
     #[rhai_fn(name = "ones")]
     pub fn ones_double_input(nx: INT, ny: INT) -> Array {
         let mut output = vec![];
@@ -395,43 +377,34 @@ pub mod matrix_functions {
     /// let matrix = rand([3, 3]);
     /// assert_eq(size(matrix), [3, 3]);
     /// ```
-    /// TODO - add checks
     #[rhai_fn(name = "rand", return_raw)]
     pub fn rand_single_input(n: Dynamic) -> Result<Array, Box<EvalAltResult>> {
-        if n.is::<INT>() {
-            Ok(rand_double_input(n.as_int().unwrap(), n.as_int().unwrap()))
-        } else if n.is::<Array>() {
-            let mut m = n.into_array().unwrap();
-            if m.len() == 2 {
-                Ok(rand_double_input(
-                    m[0].as_int().unwrap(),
-                    m[1].as_int().unwrap(),
-                ))
-            } else if m.len() > 2 {
-                let l = m[0].clone();
-                m.remove(0);
-                Ok(vec![
-                    Dynamic::from_array(
-                        rand_single_input(Dynamic::from_array(m)).unwrap()
-                    );
-                    l.as_int().unwrap() as usize
-                ])
-            } else {
-                Err(EvalAltResult::ErrorMismatchDataType(
-                    format!("Input must be INT or Array"),
-                    format!(""),
-                    Position::NONE,
-                )
-                .into())
-            }
-        } else {
-            Err(EvalAltResult::ErrorMismatchDataType(
-                format!("Input must be INT or Array"),
-                format!(""),
-                Position::NONE,
-            )
-            .into())
-        }
+        crate::if_int_do_else_if_array_do(
+            n,
+            |n| Ok(rand_double_input(n, n)),
+            |m| {
+                if m.len() == 2 {
+                    Ok(rand_double_input(
+                        m[0].as_int().unwrap(),
+                        m[1].as_int().unwrap(),
+                    ))
+                } else if m.len() > 2 {
+                    let l = m[0].clone();
+                    m.remove(0);
+                    Ok(vec![
+                        Dynamic::from_array(
+                            rand_single_input(Dynamic::from_array(m.to_vec())).unwrap()
+                        );
+                        l.as_int().unwrap() as usize
+                    ])
+                } else {
+                    Ok(rand_double_input(1, m[0].as_int().unwrap())[0]
+                        .clone()
+                        .into_array()
+                        .unwrap())
+                }
+            },
+        )
     }
 
     /// Return a matrix of random values, each between zero and one. Arguments indicate the number
@@ -440,7 +413,6 @@ pub mod matrix_functions {
     /// let matrix = rand(3, 3);
     /// assert_eq(size(matrix), [3, 3]);
     /// ```
-    /// TODO - add checks
     #[rhai_fn(name = "rand")]
     pub fn rand_double_input(nx: INT, ny: INT) -> Array {
         let mut output = vec![];

@@ -116,19 +116,38 @@ pub fn if_matrix_convert_to_vec_array_and_do<F, T>(
 where
     F: Fn(Vec<Array>) -> Result<T, Box<EvalAltResult>>,
 {
-    {
-        let matrix_as_vec = matrix
-            .into_iter()
-            .map(|x| x.clone().into_array().unwrap())
-            .collect::<Vec<Array>>();
-        if crate::validation_functions::is_matrix(matrix) {
-            f(matrix_as_vec)
-        } else {
-            Err(EvalAltResult::ErrorArithmetic(
-                format!("The input must be a matrix."),
-                Position::NONE,
-            )
-            .into())
-        }
+    let matrix_as_vec = matrix
+        .into_iter()
+        .map(|x| x.clone().into_array().unwrap())
+        .collect::<Vec<Array>>();
+    if crate::validation_functions::is_matrix(matrix) {
+        f(matrix_as_vec)
+    } else {
+        Err(
+            EvalAltResult::ErrorArithmetic(format!("The input must be a matrix."), Position::NONE)
+                .into(),
+        )
+    }
+}
+
+pub fn if_int_do_else_if_array_do<FA, FB, T>(
+    d: Dynamic,
+    f_int: FA,
+    f_array: FB,
+) -> Result<T, Box<EvalAltResult>>
+where
+    FA: Fn(INT) -> Result<T, Box<EvalAltResult>>,
+    FB: Fn(&mut Array) -> Result<T, Box<EvalAltResult>>,
+{
+    if d.is::<INT>() {
+        f_int(d.as_int().unwrap())
+    } else if d.is::<Array>() {
+        if_list_do(&mut d.into_array().unwrap(), |arr| f_array(arr))
+    } else {
+        Err(EvalAltResult::ErrorArithmetic(
+            format!("The input must be either an INT or an numeric array."),
+            Position::NONE,
+        )
+        .into())
     }
 }
