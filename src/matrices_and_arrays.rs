@@ -67,8 +67,8 @@ pub mod matrix_functions {
     /// let matrix = transpose(eye(3));
     /// assert_eq(matrix, eye(3));
     /// ```
-    #[rhai_fn(name = "transpose", pure)]
-    pub fn transpose(matrix: &mut Array) -> Array {
+    #[rhai_fn(name = "transpose", pure, return_raw)]
+    pub fn transpose(matrix: &mut Array) -> Result<Array, Box<EvalAltResult>> {
         if_matrix_convert_to_vec_array_and_do(matrix, |matrix_as_vec| {
             // Turn into Vec<Dynamic>
             let mut out = vec![];
@@ -81,7 +81,6 @@ pub mod matrix_functions {
             }
             Ok(out)
         })
-        .expect("This really should never happen")
     }
 
     /// Returns an array indicating the size of the matrix along each dimension, passed by reference.
@@ -946,7 +945,7 @@ pub mod matrix_functions {
         let mut yid = smartstring::SmartString::new();
         yid.push_str("y");
         result.insert(xid, Dynamic::from_array(x_dyn));
-        result.insert(yid, Dynamic::from_array(transpose(&mut y_dyn)));
+        result.insert(yid, Dynamic::from_array(transpose(&mut y_dyn).unwrap()));
         Ok(result)
     }
 

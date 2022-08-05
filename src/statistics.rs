@@ -6,7 +6,9 @@ pub mod stats {
         array_to_vec_float, array_to_vec_int, if_list_convert_to_vec_float_and_do, if_list_do,
         if_list_do_int_or_do_float,
     };
-    use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT, INT};
+    use linregress::{FormulaRegressionBuilder, RegressionDataBuilder};
+    use rhai::{Array, Dynamic, EvalAltResult, Map, Position, FLOAT, INT};
+    use std::collections::BTreeMap;
     use std::collections::HashMap;
 
     /// Return the highest value from a pair of numbers. Fails if the numbers are anything other
@@ -518,44 +520,74 @@ pub mod stats {
     /// Performs ordinary least squares regression.
     /// ```javascript
     /// let x = [[1.0, 0.0],
-    ///          [1.0, 1.0]];
+    ///          [1.0, 1.0],
+    ///          [1.0, 2.0]];
     /// let y = [[0.1],
-    ///          [1.0]];
+    ///          [0.8],
+    ///          [2.1]];
     /// let b = regress(x, y);
-    /// assert_eq(b, [[0.1], [0.9]]);
+    /// assert_eq(b,  #{"parameters": [5.551115123125783e-16, 1.0000000000000002],
+    ///                 "pvalues": [1.0, 0.1091825535092476],
+    ///                 "standard_errors": [0.1118033988749896, 0.17320508075688787]});
     /// ```
-    /// TODO - add checks
     #[rhai_fn(name = "regress", return_raw, pure)]
-    pub fn regress(X: &mut Array, Y: Array) -> Result<Array, Box<EvalAltResult>> {
-        if crate::validation_functions::is_matrix(X) {
-            if crate::validation_functions::is_column_vector(&mut Y.clone()) {
-                let Xt = crate::matrix_functions::transpose(X);
-                let A = crate::matrix_functions::mtimes(
-                    crate::matrix_functions::mtimes(
-                        crate::matrix_functions::invert_matrix(
-                            &mut crate::matrix_functions::mtimes(Xt.clone(), X.clone()).unwrap(),
-                        )
-                        .unwrap(),
-                        Xt.clone(),
-                    )
-                    .unwrap(),
-                    Y,
-                )
-                .unwrap();
-                Ok(A)
-            } else {
-                Err(EvalAltResult::ErrorArithmetic(
-                    format!("The second argument must be a column vector."),
-                    Position::NONE,
-                )
-                .into())
-            }
-        } else {
-            Err(EvalAltResult::ErrorArithmetic(
-                format!("The first argument must be a matrix."),
-                Position::NONE,
-            )
-            .into())
+    pub fn regress(X: &mut Array, Y: Array) -> Result<Map, Box<EvalAltResult>> {
+        let x_transposed = match crate::matrix_functions::transpose(X) {
+            Ok(mat) => mat,
+            Err(e) => return Err(e),
+        };
+        let mut data: Vec<(String, Vec<f64>)> = vec![];
+        let mut vars = vec![];
+        for (iter, column) in x_transposed.iter().enumerate() {
+            let var_name = format!("X_{iter}");
+            vars.push(var_name.clone());
+            data.push((
+                var_name,
+                crate::array_to_vec_float(&mut column.clone().into_array().unwrap()),
+            ));
         }
+        data.push((
+            "Y".to_string(),
+            crate::array_to_vec_float(&mut crate::matrix_functions::flatten(&mut Y.clone())),
+        ));
+
+        let regress_data = RegressionDataBuilder::new().build_from(data).unwrap();
+
+        let model = FormulaRegressionBuilder::new()
+            .data(&regress_data)
+            .data_columns("Y", vars)
+            .fit()
+            .unwrap();
+
+        let parameters = Dynamic::from_array(
+            model
+                .iter_parameter_pairs()
+                .map(|x| Dynamic::from_float(x.1))
+                .collect::<Vec<Dynamic>>(),
+        );
+        let pvalues = Dynamic::from_array(
+            model
+                .iter_p_value_pairs()
+                .map(|x| Dynamic::from_float(x.1))
+                .collect::<Vec<Dynamic>>(),
+        );
+        let standard_errors = Dynamic::from_array(
+            model
+                .iter_se_pairs()
+                .map(|x| Dynamic::from_float(x.1))
+                .collect::<Vec<Dynamic>>(),
+        );
+
+        let mut result = BTreeMap::new();
+        let mut params = smartstring::SmartString::new();
+        params.push_str("parameters");
+        result.insert(params, parameters);
+        let mut pv = smartstring::SmartString::new();
+        pv.push_str("pvalues");
+        result.insert(pv, pvalues);
+        let mut se = smartstring::SmartString::new();
+        se.push_str("standard_errors");
+        result.insert(se, standard_errors);
+        Ok(result)
     }
 }
