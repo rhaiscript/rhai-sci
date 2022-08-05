@@ -22,20 +22,6 @@ pub mod validation_functions {
         }
     }
 
-    pub fn int_and_float_totals(arr: &mut Array) -> (INT, INT, INT) {
-        crate::matrix_functions::flatten(arr)
-            .iter()
-            .fold((0, 0, 0), |(i, f, t), x| {
-                if x.is::<INT>() {
-                    (i + 1, f, t + 1)
-                } else if x.is::<FLOAT>() {
-                    (i, f + 1, t + 1)
-                } else {
-                    (i, f, t + 1)
-                }
-            })
-    }
-
     /// Determines if the entire array is numeric (ints or floats).
     /// ```typescript
     /// let x = [1, 2, 3.0, 5.0];
@@ -47,7 +33,7 @@ pub mod validation_functions {
     /// ```
     #[rhai_fn(name = "is_numeric_array", pure)]
     pub fn is_numeric_array(arr: &mut Array) -> bool {
-        let (ints, floats, total) = int_and_float_totals(arr);
+        let (ints, floats, total) = crate::int_and_float_totals(arr);
         return if ints + floats - total == 0 {
             true
         } else {
@@ -66,7 +52,7 @@ pub mod validation_functions {
     /// ```
     #[rhai_fn(name = "is_float_list", pure)]
     pub fn is_float_list(arr: &mut Array) -> bool {
-        let (_, floats, total) = int_and_float_totals(arr);
+        let (_, floats, total) = crate::int_and_float_totals(arr);
         return if (floats == total) && is_list(arr) {
             true
         } else {
@@ -85,7 +71,7 @@ pub mod validation_functions {
     /// ```
     #[rhai_fn(name = "is_int_list", pure)]
     pub fn is_int_list(arr: &mut Array) -> bool {
-        let (ints, _, total) = int_and_float_totals(arr);
+        let (ints, _, total) = crate::int_and_float_totals(arr);
         return if (ints == total) && is_list(arr) {
             true
         } else {
@@ -108,7 +94,7 @@ pub mod validation_functions {
     /// ```
     #[rhai_fn(name = "is_numeric_list", pure)]
     pub fn is_numeric_list(arr: &mut Array) -> bool {
-        let (int, float, total) = int_and_float_totals(arr);
+        let (int, float, total) = crate::int_and_float_totals(arr);
         if (int == total || float == total) && is_list(arr) {
             true
         } else {

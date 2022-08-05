@@ -7,6 +7,20 @@ pub enum FOIL {
     Last,
 }
 
+pub fn int_and_float_totals(arr: &mut Array) -> (INT, INT, INT) {
+    crate::matrix_functions::flatten(arr)
+        .iter()
+        .fold((0, 0, 0), |(i, f, t), x| {
+            if x.is::<INT>() {
+                (i + 1, f, t + 1)
+            } else if x.is::<FLOAT>() {
+                (i, f + 1, t + 1)
+            } else {
+                (i, f, t + 1)
+            }
+        })
+}
+
 pub fn if_list_do_int_or_do_float<FA, FB, T>(
     arr: &mut Array,
     f_int: FA,
@@ -16,7 +30,7 @@ where
     FA: Fn(&mut Array) -> Result<T, Box<EvalAltResult>>,
     FB: Fn(&mut Array) -> Result<T, Box<EvalAltResult>>,
 {
-    let (int, float, total) = crate::validation_functions::int_and_float_totals(arr);
+    let (int, float, total) = int_and_float_totals(arr);
     if int == total {
         f_int(arr)
     } else if float == total {

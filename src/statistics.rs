@@ -519,7 +519,7 @@ pub mod stats {
     }
 
     /// Performs ordinary least squares regression.
-    /// ```javascript
+    /// ```typescript
     /// let x = [[1.0, 0.0],
     ///          [1.0, 1.0],
     ///          [1.0, 2.0]];
