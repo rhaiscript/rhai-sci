@@ -4,7 +4,7 @@ use rhai::plugin::*;
 pub mod matrix_functions {
     use crate::misc_functions::rand_float;
     use crate::{
-        if_int_do_else_if_array_do, if_matrix_convert_to_vec_array_and_do,
+        if_int_do_else_if_array_do, if_list_do, if_matrix_convert_to_vec_array_and_do,
         vec_vec_float_to_vec_dynamic,
     };
     use nalgebra::DMatrix;
@@ -932,22 +932,25 @@ pub mod matrix_functions {
     ///                "y": [[3, 3],
     ///                      [4, 4]]});
     /// ```
-    /// TODO - add checks
     #[rhai_fn(name = "meshgrid", return_raw)]
     pub fn meshgrid(x: Array, y: Array) -> Result<Map, Box<EvalAltResult>> {
-        let nx = x.len();
-        let ny = y.len();
-        let mut x_dyn: Vec<Dynamic> = vec![Dynamic::from_array(x); nx];
-        let mut y_dyn: Vec<Dynamic> = vec![Dynamic::from_array(y); ny];
+        if_list_do(&mut x.clone(), |x| {
+            if_list_do(&mut y.clone(), |y| {
+                let nx = x.len();
+                let ny = y.len();
+                let mut x_dyn: Vec<Dynamic> = vec![Dynamic::from_array(x.to_vec()); nx];
+                let mut y_dyn: Vec<Dynamic> = vec![Dynamic::from_array(y.to_vec()); ny];
 
-        let mut result = BTreeMap::new();
-        let mut xid = smartstring::SmartString::new();
-        xid.push_str("x");
-        let mut yid = smartstring::SmartString::new();
-        yid.push_str("y");
-        result.insert(xid, Dynamic::from_array(x_dyn));
-        result.insert(yid, Dynamic::from_array(transpose(&mut y_dyn).unwrap()));
-        Ok(result)
+                let mut result = BTreeMap::new();
+                let mut xid = smartstring::SmartString::new();
+                xid.push_str("x");
+                let mut yid = smartstring::SmartString::new();
+                yid.push_str("y");
+                result.insert(xid, Dynamic::from_array(x_dyn));
+                result.insert(yid, Dynamic::from_array(transpose(&mut y_dyn).unwrap()));
+                Ok(result)
+            })
+        })
     }
 
     /// Returns an array containing a number of elements linearly spaced between two bounds.
