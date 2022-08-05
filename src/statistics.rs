@@ -1,3 +1,4 @@
+use linregress::Error;
 use rhai::plugin::*;
 
 #[export_module]
@@ -553,11 +554,16 @@ pub mod stats {
 
         let regress_data = RegressionDataBuilder::new().build_from(data).unwrap();
 
-        let model = FormulaRegressionBuilder::new()
+        let model = match FormulaRegressionBuilder::new()
             .data(&regress_data)
             .data_columns("Y", vars)
             .fit()
-            .unwrap();
+        {
+            Ok(m) => m,
+            Err(e) => {
+                return Err(EvalAltResult::ErrorArithmetic(format!("{e}"), Position::NONE).into())
+            }
+        };
 
         let parameters = Dynamic::from_array(
             model
