@@ -524,6 +524,7 @@ pub mod stats {
     /// let b = regress(x, y);
     /// assert_eq(b, [[0.1], [0.9]]);
     /// ```
+    /// TODO - add checks
     #[rhai_fn(name = "regress", return_raw, pure)]
     pub fn regress(X: &mut Array, Y: Array) -> Result<Array, Box<EvalAltResult>> {
         if crate::validation_functions::is_matrix(X) {

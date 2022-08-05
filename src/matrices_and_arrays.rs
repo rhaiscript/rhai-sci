@@ -247,6 +247,7 @@ pub mod matrix_functions {
     ///                     [0.0, 0.0, 0.0],
     ///                    [0.0, 0.0, 0.0]]]);
     /// ```
+    /// TODO - add checks
     #[rhai_fn(name = "zeros", return_raw)]
     pub fn zeros_single_input(n: Dynamic) -> Result<Array, Box<EvalAltResult>> {
         if n.is::<INT>() {
@@ -292,6 +293,7 @@ pub mod matrix_functions {
     ///                    [0.0, 0.0, 0.0],
     ///                    [0.0, 0.0, 0.0]]);
     /// ```
+    /// TODO - add checks
     #[rhai_fn(name = "zeros")]
     pub fn zeros_double_input(nx: INT, ny: INT) -> Array {
         let mut output = vec![];
@@ -327,6 +329,7 @@ pub mod matrix_functions {
     ///                     [1.0, 1.0, 1.0],
     ///                     [1.0, 1.0, 1.0]]]);
     /// ```
+    /// TODO - add checks
     #[rhai_fn(name = "ones", return_raw)]
     pub fn ones_single_input(n: Dynamic) -> Result<Array, Box<EvalAltResult>> {
         if n.is::<INT>() {
@@ -372,6 +375,7 @@ pub mod matrix_functions {
     ///                    [1.0, 1.0, 1.0],
     ///                    [1.0, 1.0, 1.0]]);
     /// ```
+    /// TODO - add checks
     #[rhai_fn(name = "ones")]
     pub fn ones_double_input(nx: INT, ny: INT) -> Array {
         let mut output = vec![];
@@ -391,6 +395,7 @@ pub mod matrix_functions {
     /// let matrix = rand([3, 3]);
     /// assert_eq(size(matrix), [3, 3]);
     /// ```
+    /// TODO - add checks
     #[rhai_fn(name = "rand", return_raw)]
     pub fn rand_single_input(n: Dynamic) -> Result<Array, Box<EvalAltResult>> {
         if n.is::<INT>() {
@@ -435,6 +440,7 @@ pub mod matrix_functions {
     /// let matrix = rand(3, 3);
     /// assert_eq(size(matrix), [3, 3]);
     /// ```
+    /// TODO - add checks
     #[rhai_fn(name = "rand")]
     pub fn rand_double_input(nx: INT, ny: INT) -> Array {
         let mut output = vec![];
@@ -462,6 +468,7 @@ pub mod matrix_functions {
     ///                    [0.0, 1.0, 0.0, 0.0],
     ///                    [0.0, 0.0, 1.0, 0.0]]);
     /// ```
+    /// TODO - add checks
     #[rhai_fn(name = "eye", return_raw)]
     pub fn eye_single_input(n: Dynamic) -> Result<Array, Box<EvalAltResult>> {
         if n.is::<INT>() {
@@ -644,6 +651,7 @@ pub mod matrix_functions {
     /// let c = mtimes(a, b);
     /// assert_eq(b, c);
     /// ```
+    /// TODO - add checks
     #[rhai_fn(name = "mtimes", return_raw)]
     pub fn mtimes(matrix1: Array, matrix2: Array) -> Result<Array, Box<EvalAltResult>> {
         if matrix_size_by_reference(&mut matrix1.clone())[1]
@@ -709,6 +717,7 @@ pub mod matrix_functions {
     /// let combined = horzcat(arr1, arr2);
     /// assert_eq(size(combined), [3, 6]);
     /// ```
+    /// TODO - add checks
     #[rhai_fn(name = "horzcat", return_raw)]
     pub fn horzcat(matrix1: Array, matrix2: Array) -> Result<Array, Box<EvalAltResult>> {
         if matrix_size_by_reference(&mut matrix1.clone())[0]
@@ -784,6 +793,7 @@ pub mod matrix_functions {
     /// let combined = vertcat(arr1, arr2);
     /// assert_eq(size(combined), [6, 3]);
     /// ```
+    /// TODO - add checks
     #[rhai_fn(name = "vertcat", return_raw)]
     pub fn vertcat(matrix1: Array, matrix2: Array) -> Result<Array, Box<EvalAltResult>> {
         if matrix_size_by_reference(&mut matrix1.clone())[1]
@@ -870,6 +880,7 @@ pub mod matrix_functions {
     ///                     [0.0, 2.0, 0.0],
     ///                     [0.0, 0.0, 3.0]]);
     /// ```
+    /// TODO - add checks
     #[rhai_fn(name = "diag", return_raw)]
     pub fn diag(matrix: Array) -> Result<Array, Box<EvalAltResult>> {
         if ndims_by_reference(&mut matrix.clone()) == 2 {
@@ -918,6 +929,7 @@ pub mod matrix_functions {
     /// let combined = repmat(matrix, 2, 2);
     /// assert_eq(size(combined), [6, 6]);
     /// ```
+    /// TODO - add checks
     #[rhai_fn(name = "repmat", return_raw)]
     pub fn repmat(matrix: Array, nx: INT, ny: INT) -> Result<Array, Box<EvalAltResult>> {
         let mut row_matrix = matrix.clone();
@@ -948,6 +960,7 @@ pub mod matrix_functions {
     ///                "y": [[3, 3],
     ///                      [4, 4]]});
     /// ```
+    /// TODO - add checks
     #[rhai_fn(name = "meshgrid", return_raw)]
     pub fn meshgrid(x: Array, y: Array) -> Result<Map, Box<EvalAltResult>> {
         let nx = x.len();
@@ -970,6 +983,7 @@ pub mod matrix_functions {
     /// let x = linspace(1, 2, 5);
     /// assert_eq(x, [1.0, 1.25, 1.5, 1.75, 2.0]);
     /// ```
+    /// TODO - add checks
     #[rhai_fn(name = "linspace", return_raw)]
     pub fn linspace(x1: Dynamic, x2: Dynamic, n: INT) -> Result<Array, Box<EvalAltResult>> {
         let x1_type = x1.type_name();
@@ -1019,6 +1033,7 @@ pub mod matrix_functions {
     /// let x = logspace(1, 3, 3);
     /// assert_eq(x, [10.0, 100.0, 1000.0]);
     /// ```
+    /// TODO - add checks
     #[rhai_fn(name = "logspace", return_raw)]
     pub fn logspace(a: Dynamic, b: Dynamic, n: INT) -> Result<Array, Box<EvalAltResult>> {
         match linspace(a, b, n) {
