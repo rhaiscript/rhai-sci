@@ -3,7 +3,10 @@ use rhai::plugin::*;
 #[export_module]
 pub mod matrix_functions {
     use crate::misc_functions::rand_float;
-    use crate::{if_matrix_convert_to_vec_array_and_do, vec_vec_float_to_vec_dynamic};
+    use crate::{
+        if_int_do_else_if_array_do, if_matrix_convert_to_vec_array_and_do,
+        vec_vec_float_to_vec_dynamic,
+    };
     use nalgebra::DMatrix;
     use rhai::{Array, Dynamic, EvalAltResult, ImmutableString, Map, Position, FLOAT, INT};
     use std::collections::BTreeMap;
@@ -252,7 +255,7 @@ pub mod matrix_functions {
     /// ```
     #[rhai_fn(name = "zeros", return_raw)]
     pub fn zeros_single_input(n: Dynamic) -> Result<Array, Box<EvalAltResult>> {
-        crate::if_int_do_else_if_array_do(
+        if_int_do_else_if_array_do(
             n,
             |n| Ok(zeros_double_input(n, n)),
             |m| {
@@ -439,34 +442,32 @@ pub mod matrix_functions {
     ///                    [0.0, 1.0, 0.0, 0.0],
     ///                    [0.0, 0.0, 1.0, 0.0]]);
     /// ```
-    /// TODO - add checks
     #[rhai_fn(name = "eye", return_raw)]
     pub fn eye_single_input(n: Dynamic) -> Result<Array, Box<EvalAltResult>> {
-        if n.is::<INT>() {
-            Ok(eye_double_input(n.as_int().unwrap(), n.as_int().unwrap()))
-        } else if n.is::<Array>() {
-            let mut m = n.into_array().unwrap();
-            if m.len() == 2 {
-                Ok(eye_double_input(
-                    m[0].as_int().unwrap(),
-                    m[1].as_int().unwrap(),
-                ))
-            } else {
-                Err(EvalAltResult::ErrorMismatchDataType(
-                    format!("Input must be INT or Array"),
-                    format!(""),
-                    Position::NONE,
-                )
-                .into())
-            }
-        } else {
-            Err(EvalAltResult::ErrorMismatchDataType(
-                format!("Input must be INT or Array"),
-                format!(""),
-                Position::NONE,
-            )
-            .into())
-        }
+        if_int_do_else_if_array_do(
+            n,
+            |n| Ok(eye_double_input(n, n)),
+            |m| {
+                if m.len() == 1 {
+                    Ok(eye_double_input(1, m[0].as_int().unwrap())[0]
+                        .clone()
+                        .into_array()
+                        .unwrap())
+                } else if m.len() == 2 {
+                    Ok(eye_double_input(
+                        m[0].as_int().unwrap(),
+                        m[1].as_int().unwrap(),
+                    ))
+                } else {
+                    Err(EvalAltResult::ErrorMismatchDataType(
+                        format!("Cannot create an identity matrix with more than 2 dimensions."),
+                        format!(""),
+                        Position::NONE,
+                    )
+                    .into())
+                }
+            },
+        )
     }
 
     /// Returns the identity matrix, specifying the number of rows and columns separately.
