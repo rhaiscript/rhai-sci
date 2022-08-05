@@ -5,7 +5,7 @@ pub mod matrix_functions {
     use crate::misc_functions::rand_float;
     use crate::{
         if_int_do_else_if_array_do, if_list_do, if_matrix_convert_to_vec_array_and_do,
-        vec_vec_float_to_vec_dynamic,
+        if_matrix_do, vec_vec_float_to_vec_dynamic,
     };
     use nalgebra::DMatrix;
     use rhai::{Array, Dynamic, EvalAltResult, ImmutableString, Map, Position, FLOAT, INT};
@@ -901,24 +901,25 @@ pub mod matrix_functions {
     /// let combined = repmat(matrix, 2, 2);
     /// assert_eq(size(combined), [6, 6]);
     /// ```
-    /// TODO - add checks
     #[rhai_fn(name = "repmat", return_raw)]
-    pub fn repmat(matrix: Array, nx: INT, ny: INT) -> Result<Array, Box<EvalAltResult>> {
-        let mut row_matrix = matrix.clone();
-        for i in 1..ny {
-            match horzcat(row_matrix, matrix.clone()) {
-                Ok(mat) => row_matrix = mat,
-                Err(e) => return Err(e),
-            };
-        }
-        let mut new_matrix = row_matrix.clone();
-        for i in 1..nx {
-            match vertcat(new_matrix, row_matrix.clone()) {
-                Ok(mat) => new_matrix = mat,
-                Err(e) => return Err(e),
+    pub fn repmat(matrix: &mut Array, nx: INT, ny: INT) -> Result<Array, Box<EvalAltResult>> {
+        if_matrix_do(matrix, |matrix| {
+            let mut row_matrix = matrix.clone();
+            for i in 1..ny {
+                match horzcat(row_matrix, matrix.clone()) {
+                    Ok(mat) => row_matrix = mat,
+                    Err(e) => return Err(e),
+                };
             }
-        }
-        Ok(new_matrix)
+            let mut new_matrix = row_matrix.clone();
+            for i in 1..nx {
+                match vertcat(new_matrix, row_matrix.clone()) {
+                    Ok(mat) => new_matrix = mat,
+                    Err(e) => return Err(e),
+                }
+            }
+            Ok(new_matrix)
+        })
     }
 
     /// Returns an object map containing 2-D grid coordinates based on the uni-axial coordinates
