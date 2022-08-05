@@ -95,6 +95,24 @@ where
     }
 }
 
+pub fn if_int_convert_to_float_and_do<F, T>(x: Dynamic, f: F) -> Result<T, Box<EvalAltResult>>
+where
+    F: Fn(FLOAT) -> Result<T, Box<EvalAltResult>>,
+{
+    let new_x: FLOAT = if x.is::<FLOAT>() {
+        x.as_float().unwrap()
+    } else if x.is::<INT>() {
+        x.as_int().unwrap() as FLOAT
+    } else {
+        return Err(EvalAltResult::ErrorArithmetic(
+            format!("The input must either be INT or FLOAT."),
+            Position::NONE,
+        )
+        .into());
+    };
+    f(new_x)
+}
+
 pub fn if_matrix_do<T, F>(matrix: &mut Array, f: F) -> Result<T, Box<EvalAltResult>>
 where
     F: Fn(&mut Array) -> Result<T, Box<EvalAltResult>>,

@@ -4,8 +4,8 @@ use rhai::plugin::*;
 pub mod matrix_functions {
     use crate::misc_functions::rand_float;
     use crate::{
-        if_int_do_else_if_array_do, if_list_do, if_matrix_convert_to_vec_array_and_do,
-        if_matrix_do, vec_vec_float_to_vec_dynamic,
+        if_int_convert_to_float_and_do, if_int_do_else_if_array_do, if_list_do,
+        if_matrix_convert_to_vec_array_and_do, if_matrix_do, vec_vec_float_to_vec_dynamic,
     };
     use nalgebra::DMatrix;
     use rhai::{Array, Dynamic, EvalAltResult, ImmutableString, Map, Position, FLOAT, INT};
@@ -959,49 +959,23 @@ pub mod matrix_functions {
     /// let x = linspace(1, 2, 5);
     /// assert_eq(x, [1.0, 1.25, 1.5, 1.75, 2.0]);
     /// ```
-    /// TODO - add checks
     #[rhai_fn(name = "linspace", return_raw)]
     pub fn linspace(x1: Dynamic, x2: Dynamic, n: INT) -> Result<Array, Box<EvalAltResult>> {
-        let x1_type = x1.type_name();
-        let x2_type = x2.type_name();
-        if x1_type != x2_type {
-            return Err(EvalAltResult::ErrorArithmetic(
-                format!(
-                    "The left endpoint ({}) and right endpoint ({}) do not have the same type.",
-                    x1_type, x2_type
-                ),
-                Position::NONE,
-            )
-            .into());
-        }
+        if_int_convert_to_float_and_do(x1, |new_x1| {
+            if_int_convert_to_float_and_do(x2, |new_x2| {
+                let new_n = n as FLOAT;
 
-        let new_n = n as FLOAT;
-        let mut new_x1 = 0 as FLOAT;
-        let mut new_x2 = 0 as FLOAT;
-
-        if x1.is::<FLOAT>() {
-            new_x1 = x1.as_float().unwrap();
-            new_x2 = x2.as_float().unwrap();
-        } else if x1.is::<INT>() {
-            new_x1 = x1.as_int().unwrap() as FLOAT;
-            new_x2 = x2.as_int().unwrap() as FLOAT;
-        } else {
-            return Err(EvalAltResult::ErrorArithmetic(
-                format!("The elements of the input must either be INT or FLOAT."),
-                Position::NONE,
-            )
-            .into());
-        }
-
-        let mut arr = vec![Dynamic::from_float(new_x1)];
-        let mut counter = new_x1;
-        let interval = (new_x2 - new_x1) / (new_n - 1.0);
-        for i in 0..(n - 2) {
-            counter += interval;
-            arr.push(Dynamic::from_float(counter));
-        }
-        arr.push(Dynamic::from_float(new_x2));
-        Ok(arr)
+                let mut arr = vec![Dynamic::from_float(new_x1)];
+                let mut counter = new_x1;
+                let interval = (new_x2 - new_x1) / (new_n - 1.0);
+                for i in 0..(n - 2) {
+                    counter += interval;
+                    arr.push(Dynamic::from_float(counter));
+                }
+                arr.push(Dynamic::from_float(new_x2));
+                Ok(arr)
+            })
+        })
     }
 
     /// Returns an array containing a number of elements logarithmically spaced between two bounds.
@@ -1009,7 +983,6 @@ pub mod matrix_functions {
     /// let x = logspace(1, 3, 3);
     /// assert_eq(x, [10.0, 100.0, 1000.0]);
     /// ```
-    /// TODO - add checks
     #[rhai_fn(name = "logspace", return_raw)]
     pub fn logspace(a: Dynamic, b: Dynamic, n: INT) -> Result<Array, Box<EvalAltResult>> {
         match linspace(a, b, n) {
