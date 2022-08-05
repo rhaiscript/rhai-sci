@@ -1,5 +1,12 @@
 use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT, INT};
 
+pub enum FOIL {
+    First,
+    Outside,
+    Inside,
+    Last,
+}
+
 pub fn if_list_do_int_or_do_float<FA, FB, T>(
     arr: &mut Array,
     f_int: FA,
@@ -124,6 +131,59 @@ where
             EvalAltResult::ErrorArithmetic(format!("The input must be a matrix."), Position::NONE)
                 .into(),
         )
+    }
+}
+
+pub fn if_matrices_and_compatible_convert_to_vec_array_and_do<T, F>(
+    compatibility_condition: FOIL,
+    matrix1: &mut Array,
+    matrix2: &mut Array,
+    f: F,
+) -> Result<T, Box<EvalAltResult>>
+where
+    F: Fn(Vec<Array>, Vec<Array>) -> Result<T, Box<EvalAltResult>>,
+{
+    if crate::validation_functions::is_matrix(matrix1) {
+        if crate::validation_functions::is_matrix(matrix2) {
+            let s1 = crate::matrix_functions::matrix_size_by_reference(matrix1);
+            let s2 = crate::matrix_functions::matrix_size_by_reference(matrix2);
+            if match compatibility_condition {
+                FOIL::First => s1[0].as_int().unwrap() == s2[0].as_int().unwrap(),
+                FOIL::Outside => s1[0].as_int().unwrap() == s2[1].as_int().unwrap(),
+                FOIL::Inside => s1[1].as_int().unwrap() == s2[0].as_int().unwrap(),
+                FOIL::Last => s1[1].as_int().unwrap() == s2[1].as_int().unwrap(),
+            } {
+                // Turn into Vec<Vec<Dynamic>>
+                let matrix_as_vec1 = matrix1
+                    .into_iter()
+                    .map(|x| x.clone().into_array().unwrap())
+                    .collect::<Vec<Array>>();
+                // Turn into Vec<Vec<Dynamic>>
+                let matrix_as_vec2 = matrix2
+                    .into_iter()
+                    .map(|x| x.clone().into_array().unwrap())
+                    .collect::<Vec<Array>>();
+                f(matrix_as_vec1, matrix_as_vec2)
+            } else {
+                Err(EvalAltResult::ErrorArithmetic(
+                    format!("The input matrices are not compatible for this operation."),
+                    Position::NONE,
+                )
+                .into())
+            }
+        } else {
+            Err(EvalAltResult::ErrorArithmetic(
+                format!("The second input must be a matrix."),
+                Position::NONE,
+            )
+            .into())
+        }
+    } else {
+        Err(EvalAltResult::ErrorArithmetic(
+            format!("The first input must be a matrix."),
+            Position::NONE,
+        )
+        .into())
     }
 }
 
