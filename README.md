@@ -9,7 +9,7 @@ like MATLAB, Octave, and R. For a complete API reference, check [the docs](https
 # Install
 To use the latest released version of `rhai-sci`, add this to your `Cargo.toml`:
 ```toml
-rhai-sci = "0.1.6"
+rhai-sci = "0.1.7"
 ```
 To use the bleeding edge instead, add this:
 ```toml
@@ -37,3 +37,9 @@ engine.register_global_module(SciPackage::new().as_shared_module());
 // Now run your code
 let value = engine.eval::<INT>("argmin([43, 42, -500])").unwrap();
 ```
+
+# Features
+| Feature Flag | Description                                                                                  |
+|--------------|----------------------------------------------------------------------------------------------|
+| `metadata`   | Enables exporting function metadata and is necessary for running doc-tests on Rhai examples. |
+| `io`         | Enables the `read_matrix` function but pulls in several additional dependencies.             | 

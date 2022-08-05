@@ -6,6 +6,8 @@
 #![doc = include_str!(concat!(env!("OUT_DIR"), "/rhai-sci-docs.md"))]
 #![doc = include_str!("../docs/highlight.html")]
 
+mod patterns;
+use patterns::*;
 use rhai::{def_package, packages::Package, plugin::*, Engine, EvalAltResult};
 mod matrices_and_arrays;
 use matrices_and_arrays::matrix_functions;

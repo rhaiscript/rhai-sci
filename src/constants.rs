@@ -22,6 +22,6 @@ pub mod constant_definitions {
     // The golden ratio
     pub const phi: FLOAT = 1.61803398874989484820;
 
-    // Newtonian gravitational constnat
+    // Newtonian gravitational constant
     pub const G: FLOAT = 6.6743015e-11;
 }

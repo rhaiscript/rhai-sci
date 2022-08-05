@@ -39,6 +39,10 @@ fn main() {
     let mut doc_file =
         std::fs::File::create(std::env::var("OUT_DIR").unwrap() + "/rhai-sci-docs.md").unwrap();
 
+    // Make a file for tests
+    let mut test_file =
+        std::fs::File::create(std::env::var("OUT_DIR").unwrap() + "/rhai-sci-tests.rs").unwrap();
+
     // Build an engine for doctests
     let mut engine = Engine::new();
 
@@ -67,7 +71,8 @@ fn main() {
     let function_list = v["functions"].clone();
 
     // Write functions
-    write!(doc_file, "# Functions\n This package provides a large variety of functions to help with scientific computing.\n").expect("Cannot write to {test_file}");
+    write!(doc_file, "# Functions\n This package provides a large variety of functions to help with scientific computing.\n").expect("Cannot write to {doc_file}");
+    write!(test_file, "#[cfg(test)]\nmod rhai_tests {{\n").expect("Cannot write to {test_file}");
     let mut indented = false;
     for (idx, function) in function_list.iter().enumerate() {
         let mut function = function.clone();
@@ -86,12 +91,9 @@ fn main() {
 
             let signature = function
                 .signature
-                .replace("core::result::", "")
-                .replace("rhai::types::dynamic::", "")
-                .replace("types::dynamic::", "")
-                .replace("alloc::boxed::", "")
-                .replace("alloc::vec::", "")
-                .replace("rhai::types::error::", "");
+                .replace("Result<", "")
+                .replace(", Box<EvalAltResult>>", "")
+                .replace("&mut ", "");
 
             // Check if there are multiple arities, and if so add a header and indent
             if idx < function_list.len() - 1 {
@@ -124,11 +126,23 @@ fn main() {
                     .replace("javascript", "")
                     .replace("typescript", "")
                     .replace("rhai", "");
-                println!("{clean_code}");
-                assert!(engine.eval::<bool>(&clean_code).unwrap());
+                write!(
+                    test_file,
+                    "#[test]\nfn {}_{i}() {{ \n assert!(rhai_sci::eval::<bool>(\"{}\").unwrap()); }}\n",
+                    signature
+                        .replace("(", "_")
+                        .replace(")", "_")
+                        .replace(" ", "_")
+                        .replace(":", "_")
+                        .replace("->", "_")
+                        .replace(",", "_").replace("____", "_").replace("___", "_").replace("__", "_").to_lowercase(),
+                    clean_code.replace("\"", "\\\"")
+                )
+                .expect("Cannot write to {test_file}");
             }
         }
     }
+    write!(test_file, "\n}}").expect("Cannot write to {test_file}");
 }
 
 #[cfg(feature = "metadata")]
@@ -143,6 +157,7 @@ mod functions {
     include!("src/sets.rs");
     include!("src/moving.rs");
     include!("src/validate.rs");
+    include!("src/patterns.rs");
 }
 
 #[cfg(feature = "metadata")]
