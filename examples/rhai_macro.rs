@@ -3,13 +3,15 @@ use rhai::INT;
 macro_rules! rhai {
     () => {};
     ($($t:tt)+) => {
-        rhai_sci::eval(
-            concat!(
-                $(
-                    stringify!($t), " "
-                ),+
-            )
-        ).unwrap()
+        {
+            rhai_sci::eval(
+                concat!(
+                    $(
+                        stringify!($t), " "
+                    ),+
+                )
+            ).unwrap()
+        }
     };
 }
 
