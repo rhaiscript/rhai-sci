@@ -69,7 +69,7 @@ fn main() {
     let function_list = v["functions"].clone();
 
     // Write functions
-    write!(doc_file, "# Functions\n This package provides a large variety of functions to help with scientific computing.\n").expect("Cannot write to {doc_file}");
+    write!(doc_file, "\n# API\n This package provides a large variety of functions to help with scientific computing.\n").expect("Cannot write to {doc_file}");
     write!(test_file, "#[cfg(test)]\nmod rhai_tests {{\n").expect("Cannot write to {test_file}");
     let mut indented = false;
     for (idx, function) in function_list.iter().enumerate() {
@@ -89,7 +89,8 @@ fn main() {
                 .signature
                 .replace("Result<", "")
                 .replace(", Box<EvalAltResult>>", "")
-                .replace("&mut ", "");
+                .replace("&mut ", "")
+                .replace("_____CONSTANTS_____()", "physical constants");
 
             // Check if there are multiple arities, and if so add a header and indent
             if idx < function_list.len() - 1 {
