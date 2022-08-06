@@ -2,13 +2,13 @@ use rhai::plugin::*;
 
 #[export_module]
 pub mod matrix_functions {
-    #[cfg(feature = "nalgebra")]
-    use crate::omatrix_to_vec_dynamic;
     use crate::{
         if_int_convert_to_float_and_do, if_int_do_else_if_array_do, if_list_do,
         if_matrices_and_compatible_convert_to_vec_array_and_do,
         if_matrix_convert_to_vec_array_and_do, if_matrix_do, FOIL,
     };
+    #[cfg(feature = "nalgebra")]
+    use crate::{omatrix_to_vec_dynamic, ovector_to_vec_dynamic};
     #[cfg(feature = "nalgebra")]
     use nalgebralib::DMatrix;
     use rhai::{Array, Dynamic, EvalAltResult, Map, Position, FLOAT, INT};
@@ -58,6 +58,102 @@ pub mod matrix_functions {
 
                 Some(mat) => Ok(omatrix_to_vec_dynamic(mat)),
             }
+        })
+    }
+    /// Calculate the eigenvalues for a matrix.
+    /// ```typescript
+    /// let matrix = eye(5);
+    /// let eigen_values = eigs(matrix);
+    /// assert_eq(eigen_values, ones([5]));
+    /// ```
+    /// ```typescript
+    /// let matrix = diag([1, 2, 3, 4, 5]);
+    /// let eigen_values = eigs(matrix);
+    /// assert_eq(eigen_values, linspace(1, 5, 5));
+    /// ```
+    #[cfg(feature = "nalgebra")]
+    #[rhai_fn(name = "eigs", return_raw, pure)]
+    pub fn matrix_eigs(matrix: &mut Array) -> Result<Array, Box<EvalAltResult>> {
+        if_matrix_convert_to_vec_array_and_do(matrix, |matrix_as_vec| {
+            let dm = DMatrix::from_fn(matrix_as_vec.len(), matrix_as_vec[0].len(), |i, j| {
+                if matrix_as_vec[0][0].is::<FLOAT>() {
+                    matrix_as_vec[i][j].as_float().unwrap()
+                } else {
+                    matrix_as_vec[i][j].as_int().unwrap() as FLOAT
+                }
+            });
+
+            // Try to invert
+            let dm = dm.eigenvalues();
+
+            match dm {
+                None => Err(EvalAltResult::ErrorArithmetic(
+                    format!("Matrix cannot be inverted"),
+                    Position::NONE,
+                )
+                .into()),
+
+                Some(mat) => Ok(ovector_to_vec_dynamic(mat)),
+            }
+        })
+    }
+
+    /// Calculates the singular value decomposition of a matrix
+    /// ```typescript
+    /// let matrix = eye(5);
+    /// let svd_results = svd(matrix);
+    /// assert_eq(svd_results, #{"s": ones([5]), "u": eye(5), "v": eye(5)});
+    /// ```
+    #[cfg(feature = "nalgebra")]
+    #[rhai_fn(name = "svd", return_raw, pure)]
+    pub fn svd_matrix(matrix: &mut Array) -> Result<Map, Box<EvalAltResult>> {
+        if_matrix_convert_to_vec_array_and_do(matrix, |matrix_as_vec| {
+            let dm = DMatrix::from_fn(matrix_as_vec.len(), matrix_as_vec[0].len(), |i, j| {
+                if matrix_as_vec[0][0].is::<FLOAT>() {
+                    matrix_as_vec[i][j].as_float().unwrap()
+                } else {
+                    matrix_as_vec[i][j].as_int().unwrap() as FLOAT
+                }
+            });
+
+            // Try ot invert
+            let svd = nalgebralib::linalg::SVD::new(dm, true, true);
+
+            let mut result = BTreeMap::new();
+            let mut uid = smartstring::SmartString::new();
+            uid.push_str("u");
+            match svd.u {
+                Some(u) => result.insert(uid, Dynamic::from_array(omatrix_to_vec_dynamic(u))),
+                None => {
+                    return Err(EvalAltResult::ErrorArithmetic(
+                        format!("SVD decomposition cannot be computed for this matrix."),
+                        Position::NONE,
+                    )
+                    .into());
+                }
+            };
+
+            let mut vid = smartstring::SmartString::new();
+            vid.push_str("v");
+            match svd.v_t {
+                Some(v) => result.insert(vid, Dynamic::from_array(omatrix_to_vec_dynamic(v))),
+                None => {
+                    return Err(EvalAltResult::ErrorArithmetic(
+                        format!("SVD decomposition cannot be computed for this matrix."),
+                        Position::NONE,
+                    )
+                    .into());
+                }
+            };
+
+            let mut sid = smartstring::SmartString::new();
+            sid.push_str("s");
+            result.insert(
+                sid,
+                Dynamic::from_array(ovector_to_vec_dynamic(svd.singular_values)),
+            );
+
+            Ok(result)
         })
     }
 

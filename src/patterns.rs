@@ -105,6 +105,17 @@ pub fn omatrix_to_vec_dynamic(
     out
 }
 
+#[cfg(feature = "nalgebra")]
+pub fn ovector_to_vec_dynamic(
+    mat: nalgebralib::OVector<FLOAT, nalgebralib::Dynamic>,
+) -> Vec<Dynamic> {
+    let mut out = vec![];
+    for idx in 0..mat.shape().0 {
+        out.push(Dynamic::from_float(mat[idx]));
+    }
+    out
+}
+
 pub fn if_list_convert_to_vec_float_and_do<F, T>(
     arr: &mut Array,
     f: F,
