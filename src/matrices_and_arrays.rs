@@ -106,7 +106,7 @@ pub mod matrix_functions {
     /// ```
     #[cfg(feature = "nalgebra")]
     #[rhai_fn(name = "svd", return_raw, pure)]
-    pub fn svd_matrix(matrix: &mut Array) -> Result<Map, Box<EvalAltResult>> {
+    pub fn svd_decomp(matrix: &mut Array) -> Result<Map, Box<EvalAltResult>> {
         if_matrix_convert_to_vec_array_and_do(matrix, |matrix_as_vec| {
             let dm = DMatrix::from_fn(matrix_as_vec.len(), matrix_as_vec[0].len(), |i, j| {
                 if matrix_as_vec[0][0].is::<FLOAT>() {
@@ -152,6 +152,74 @@ pub mod matrix_functions {
                 sid,
                 Dynamic::from_array(ovector_to_vec_dynamic(svd.singular_values)),
             );
+
+            Ok(result)
+        })
+    }
+
+    /// Calculates the QR decomposition of a matrix
+    /// ```typescript
+    /// let matrix = eye(5);
+    /// let qr_results = qr(matrix);
+    /// assert_eq(qr_results, #{"q": eye(5), "r": eye(5)});
+    /// ```
+    #[cfg(feature = "nalgebra")]
+    #[rhai_fn(name = "qr", return_raw, pure)]
+    pub fn qr_decomp(matrix: &mut Array) -> Result<Map, Box<EvalAltResult>> {
+        if_matrix_convert_to_vec_array_and_do(matrix, |matrix_as_vec| {
+            let dm = DMatrix::from_fn(matrix_as_vec.len(), matrix_as_vec[0].len(), |i, j| {
+                if matrix_as_vec[0][0].is::<FLOAT>() {
+                    matrix_as_vec[i][j].as_float().unwrap()
+                } else {
+                    matrix_as_vec[i][j].as_int().unwrap() as FLOAT
+                }
+            });
+
+            // Try ot invert
+            let qr = nalgebralib::linalg::QR::new(dm);
+
+            let mut result = BTreeMap::new();
+            let mut qid = smartstring::SmartString::new();
+            qid.push_str("q");
+            result.insert(qid, Dynamic::from_array(omatrix_to_vec_dynamic(qr.q())));
+
+            let mut rid = smartstring::SmartString::new();
+            rid.push_str("r");
+            result.insert(rid, Dynamic::from_array(omatrix_to_vec_dynamic(qr.r())));
+
+            Ok(result)
+        })
+    }
+
+    /// Calculates the QR decomposition of a matrix
+    /// ```typescript
+    /// let matrix = eye(5);
+    /// let h_results = hessenberg(matrix);
+    /// assert_eq(h_results, #{"h": eye(5), "q": eye(5)});
+    /// ```
+    #[cfg(feature = "nalgebra")]
+    #[rhai_fn(name = "hessenberg", return_raw, pure)]
+    pub fn hessenberg(matrix: &mut Array) -> Result<Map, Box<EvalAltResult>> {
+        if_matrix_convert_to_vec_array_and_do(matrix, |matrix_as_vec| {
+            let dm = DMatrix::from_fn(matrix_as_vec.len(), matrix_as_vec[0].len(), |i, j| {
+                if matrix_as_vec[0][0].is::<FLOAT>() {
+                    matrix_as_vec[i][j].as_float().unwrap()
+                } else {
+                    matrix_as_vec[i][j].as_int().unwrap() as FLOAT
+                }
+            });
+
+            // Try ot invert
+            let h = nalgebralib::linalg::Hessenberg::new(dm);
+
+            let mut result = BTreeMap::new();
+            let mut hid = smartstring::SmartString::new();
+            hid.push_str("h");
+            result.insert(hid, Dynamic::from_array(omatrix_to_vec_dynamic(h.h())));
+
+            let mut qid = smartstring::SmartString::new();
+            qid.push_str("q");
+            result.insert(qid, Dynamic::from_array(omatrix_to_vec_dynamic(h.q())));
 
             Ok(result)
         })
