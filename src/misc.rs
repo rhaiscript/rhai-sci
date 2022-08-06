@@ -2,9 +2,8 @@ use rhai::plugin::*;
 
 #[export_module]
 pub mod misc_functions {
-    use crate::if_list_convert_to_vec_float_and_do;
-    use crate::if_list_do_int_or_do_float;
-    use rhai::{Array, Dynamic, EvalAltResult, ImmutableString, Position, FLOAT, INT};
+    use crate::{if_list_convert_to_vec_float_and_do, if_list_do_int_or_do_float};
+    use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT, INT};
 
     /// Returns a random number between zero and one.
     /// ```typescript
@@ -54,18 +53,17 @@ pub mod misc_functions {
     pub fn interp1(x: Array, y: Array, xq: Dynamic) -> Result<FLOAT, Box<EvalAltResult>> {
         if_list_convert_to_vec_float_and_do(&mut y.clone(), |new_y| {
             if_list_convert_to_vec_float_and_do(&mut x.clone(), |new_x| {
-                let mut new_xq = 0.0 as FLOAT;
-                if xq.is::<INT>() {
-                    new_xq = xq.as_int().unwrap() as FLOAT;
+                let new_xq = if xq.is::<INT>() {
+                    xq.as_int().unwrap() as FLOAT
                 } else if xq.is::<FLOAT>() {
-                    new_xq = xq.as_float().unwrap();
+                    xq.as_float().unwrap()
                 } else {
                     return Err(EvalAltResult::ErrorArithmetic(
                         format!("xq must be either INT or FLOAT"),
                         Position::NONE,
                     )
                     .into());
-                }
+                };
 
                 // Identify the right index
                 let mut b: usize = 0;

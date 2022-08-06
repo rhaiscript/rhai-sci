@@ -3,7 +3,7 @@ use rhai::plugin::*;
 #[export_module]
 pub mod moving_functions {
     use crate::if_list_do;
-    use rhai::{Array, Dynamic, EvalAltResult, ImmutableString, Position, FLOAT, INT};
+    use rhai::{Array, Dynamic, EvalAltResult, INT};
 
     fn mov<G>(arr: &mut Array, k: INT, f: G) -> Result<Array, Box<EvalAltResult>>
     where

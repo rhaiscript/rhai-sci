@@ -1,9 +1,14 @@
 use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT, INT};
 
+/// Matrix compatibility conditions
 pub enum FOIL {
+    /// Height of first matrix must match height of second matrix
     First,
+    /// Height of first matrix must match width of second matrix
     Outside,
+    /// Width of first matrix must match height of second matrix
     Inside,
+    /// Width of first matrix must match width of second matrix
     Last,
 }
 

@@ -2,7 +2,7 @@ use rhai::plugin::*;
 
 #[export_module]
 pub mod constant_definitions {
-    use rhai::{Dynamic, FLOAT};
+    use rhai::FLOAT;
 
     // The ratio of a circle's circumference to its diameter.
     pub const pi: FLOAT = 3.14159265358979323846264338327950288;

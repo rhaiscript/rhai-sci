@@ -10,10 +10,8 @@ fn main() {
 
 #[cfg(feature = "metadata")]
 fn main() {
-    use itertools::Itertools;
-    use rhai::{packages::Package, plugin::*, Engine, ScriptFnMetadata};
+    use rhai::{plugin::*, Engine};
     use serde::{Deserialize, Serialize};
-    use serde_json::Value;
     use std::collections::HashMap;
     use std::io::Write;
 
@@ -61,7 +59,7 @@ fn main() {
     engine.register_global_module(rhai::Shared::new(lib));
 
     // Extract metadata
-    let mut json_fns = engine.gen_fn_metadata_to_json(false).unwrap();
+    let json_fns = engine.gen_fn_metadata_to_json(false).unwrap();
     println!("{json_fns}");
     let v: HashMap<String, Vec<Function>> = serde_json::from_str(&json_fns).unwrap();
     for function in v["functions"].clone() {
@@ -75,12 +73,10 @@ fn main() {
     write!(test_file, "#[cfg(test)]\nmod rhai_tests {{\n").expect("Cannot write to {test_file}");
     let mut indented = false;
     for (idx, function) in function_list.iter().enumerate() {
-        let mut function = function.clone();
+        let function = function.clone();
         // Pull out basic info
         let name = function.name;
         if !name.starts_with("anon") {
-            // let params = function.params.join(", ");
-
             let comments = match function.docComments {
                 None => "".to_owned(),
                 Some(strings) => strings.join("\n"),

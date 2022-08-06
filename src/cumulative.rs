@@ -2,9 +2,7 @@ use rhai::plugin::*;
 
 #[export_module]
 pub mod cum_functions {
-    use crate::{
-        if_list_convert_to_vec_float_and_do, if_list_do, validation_functions::is_numeric_list,
-    };
+    use crate::{if_list_convert_to_vec_float_and_do, if_list_do};
     use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT, INT};
 
     fn accumulate<G>(arr: &mut Array, f: G) -> Result<Array, Box<EvalAltResult>>
@@ -81,12 +79,12 @@ pub mod cum_functions {
             )
             .into())
         } else {
-            if_list_convert_to_vec_float_and_do(&mut y.clone(), |Y| {
-                if_list_convert_to_vec_float_and_do(&mut x.clone(), |X| {
+            if_list_convert_to_vec_float_and_do(&mut y.clone(), |yf| {
+                if_list_convert_to_vec_float_and_do(&mut x.clone(), |xf| {
                     let mut trapsum = 0.0;
                     let mut cumtrapsum = vec![Dynamic::FLOAT_ZERO];
                     for i in 1..x.len() {
-                        trapsum += (Y[i] + Y[i - 1]) * (X[i] - X[i - 1]) / 2.0;
+                        trapsum += (yf[i] + yf[i - 1]) * (xf[i] - xf[i - 1]) / 2.0;
                         cumtrapsum.push(Dynamic::from_float(trapsum));
                     }
                     Ok(cumtrapsum)
@@ -104,11 +102,11 @@ pub mod cum_functions {
     /// ```
     #[rhai_fn(name = "cumtrapz", return_raw, pure)]
     pub fn cumtrapz_unit(y: &mut Array) -> Result<Array, Box<EvalAltResult>> {
-        crate::if_list_convert_to_vec_float_and_do(y, |Y| {
-            let mut trapsum = 0.0;
+        crate::if_list_convert_to_vec_float_and_do(y, |yf| {
+            let mut trapsum = 0.0 as FLOAT;
             let mut cumtrapsum = vec![Dynamic::FLOAT_ZERO];
-            for i in 1..Y.len() {
-                trapsum += (Y[i] + Y[i - 1]) / 2.0;
+            for i in 1..yf.len() {
+                trapsum += (yf[i] + yf[i - 1]) / 2.0;
                 cumtrapsum.push(Dynamic::from_float(trapsum));
             }
             Ok(cumtrapsum)

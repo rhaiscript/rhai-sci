@@ -6,8 +6,6 @@ pub mod stats {
         array_to_vec_float, array_to_vec_int, if_list_convert_to_vec_float_and_do, if_list_do,
         if_list_do_int_or_do_float,
     };
-    #[cfg(feature = "matrix")]
-    use linregress::{FormulaRegressionBuilder, RegressionDataBuilder};
     use rhai::{Array, Dynamic, EvalAltResult, Map, Position, FLOAT, INT};
     use std::collections::BTreeMap;
     use std::collections::HashMap;
@@ -228,21 +226,16 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "mean", return_raw, pure)]
     pub fn mean(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
+        let l = arr.len() as FLOAT;
         if_list_do_int_or_do_float(
             arr,
-            |arr: &mut Array| {
-                let L = arr.len() as FLOAT;
-                match sum(arr) {
-                    Ok(s) => Ok(Dynamic::from_float(s.as_int().unwrap() as FLOAT / L)),
-                    Err(e) => Err(e),
-                }
+            |arr: &mut Array| match sum(arr) {
+                Ok(s) => Ok(Dynamic::from_float(s.as_int().unwrap() as FLOAT / l)),
+                Err(e) => Err(e),
             },
-            |arr: &mut Array| {
-                let L = arr.len() as FLOAT;
-                match sum(arr) {
-                    Ok(s) => Ok(Dynamic::from_float(s.as_float().unwrap() / L)),
-                    Err(e) => Err(e),
-                }
+            |arr: &mut Array| match sum(arr) {
+                Ok(s) => Ok(Dynamic::from_float(s.as_float().unwrap() / l)),
+                Err(e) => Err(e),
             },
         )
     }
@@ -406,7 +399,7 @@ pub mod stats {
             Ok(med) => med.as_float().unwrap(),
             Err(e) => return Err(e),
         };
-        if_list_convert_to_vec_float_and_do(arr, |mut x| {
+        if_list_convert_to_vec_float_and_do(arr, |x| {
             let mut dev = vec![];
             for v in x {
                 dev.push(Dynamic::from_float((v - m).abs()));
@@ -484,7 +477,7 @@ pub mod stats {
         if_list_do_int_or_do_float(
             arr,
             |arr| {
-                let mut v = array_to_vec_int(arr);
+                let v = array_to_vec_int(arr);
 
                 let mut counts: HashMap<INT, usize> = HashMap::new();
 
@@ -500,7 +493,7 @@ pub mod stats {
                 ))
             },
             |arr| {
-                let mut v = array_to_vec_float(arr);
+                let v = array_to_vec_float(arr);
 
                 let mut counts: HashMap<String, usize> = HashMap::new();
 
@@ -533,15 +526,16 @@ pub mod stats {
     /// ```
     #[cfg(feature = "matrix")]
     #[rhai_fn(name = "regress", return_raw, pure)]
-    pub fn regress(X: &mut Array, Y: Array) -> Result<Map, Box<EvalAltResult>> {
-        let x_transposed = match crate::matrix_functions::transpose(X) {
+    pub fn regress(x: &mut Array, y: Array) -> Result<Map, Box<EvalAltResult>> {
+        use linregress::{FormulaRegressionBuilder, RegressionDataBuilder};
+        let x_transposed = match crate::matrix_functions::transpose(x) {
             Ok(mat) => mat,
             Err(e) => return Err(e),
         };
         let mut data: Vec<(String, Vec<f64>)> = vec![];
         let mut vars = vec![];
         for (iter, column) in x_transposed.iter().enumerate() {
-            let var_name = format!("X_{iter}");
+            let var_name = format!("x_{iter}");
             vars.push(var_name.clone());
             data.push((
                 var_name,
@@ -549,15 +543,15 @@ pub mod stats {
             ));
         }
         data.push((
-            "Y".to_string(),
-            crate::array_to_vec_float(&mut crate::matrix_functions::flatten(&mut Y.clone())),
+            "y".to_string(),
+            crate::array_to_vec_float(&mut crate::matrix_functions::flatten(&mut y.clone())),
         ));
 
         let regress_data = RegressionDataBuilder::new().build_from(data).unwrap();
 
         let model = match FormulaRegressionBuilder::new()
             .data(&regress_data)
-            .data_columns("Y", vars)
+            .data_columns("y", vars)
             .fit()
         {
             Ok(m) => m,

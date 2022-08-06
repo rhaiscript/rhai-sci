@@ -2,7 +2,7 @@ use rhai::plugin::*;
 
 #[export_module]
 pub mod validation_functions {
-    use rhai::{Array, Dynamic, EvalAltResult, ImmutableString, Map, Position, FLOAT, INT};
+    use rhai::{Array, Dynamic};
 
     /// Tests whether the input in a simple list array
     /// ```typescript

@@ -1,4 +1,4 @@
-use rhai::{packages::Package, Dynamic, Engine, INT};
+use rhai::{packages::Package, Dynamic, Engine};
 use rhai_sci::SciPackage;
 
 fn main() {
