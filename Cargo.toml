@@ -16,7 +16,7 @@ build = "build.rs"
 [features]
 default = ["io", "rand"]
 metadata = ["rhai/metadata"]
-io = ["polars", "url", "temp-file", "csv-sniffer", "minreq", "nalgebra"]
+io = ["polars", "url", "temp-file", "csv-sniffer", "minreq"]
 nalgebra = ["nalgebralib", "linregress"]
 rand = ["randlib"]
 
