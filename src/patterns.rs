@@ -91,7 +91,7 @@ pub fn array_to_vec_float(arr: &mut Array) -> Vec<FLOAT> {
 }
 
 #[cfg(feature = "nalgebra")]
-pub fn vec_vec_float_to_vec_dynamic(
+pub fn omatrix_to_vec_dynamic(
     mat: nalgebralib::OMatrix<FLOAT, nalgebralib::Dynamic, nalgebralib::Dynamic>,
 ) -> Vec<Dynamic> {
     let mut out = vec![];

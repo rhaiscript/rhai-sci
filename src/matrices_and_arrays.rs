@@ -3,7 +3,7 @@ use rhai::plugin::*;
 #[export_module]
 pub mod matrix_functions {
     #[cfg(feature = "nalgebra")]
-    use crate::vec_vec_float_to_vec_dynamic;
+    use crate::omatrix_to_vec_dynamic;
     use crate::{
         if_int_convert_to_float_and_do, if_int_do_else_if_array_do, if_list_do,
         if_matrices_and_compatible_convert_to_vec_array_and_do,
@@ -56,7 +56,7 @@ pub mod matrix_functions {
                 )
                 .into()),
 
-                Some(mat) => Ok(vec_vec_float_to_vec_dynamic(mat)),
+                Some(mat) => Ok(omatrix_to_vec_dynamic(mat)),
             }
         })
     }
