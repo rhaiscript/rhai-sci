@@ -1,4 +1,3 @@
-use linregress::Error;
 use rhai::plugin::*;
 
 #[export_module]
@@ -7,6 +6,7 @@ pub mod stats {
         array_to_vec_float, array_to_vec_int, if_list_convert_to_vec_float_and_do, if_list_do,
         if_list_do_int_or_do_float,
     };
+    #[cfg(feature = "matrix")]
     use linregress::{FormulaRegressionBuilder, RegressionDataBuilder};
     use rhai::{Array, Dynamic, EvalAltResult, Map, Position, FLOAT, INT};
     use std::collections::BTreeMap;
@@ -531,6 +531,7 @@ pub mod stats {
     ///                 "pvalues": [1.0, 0.1091825535092476],
     ///                 "standard_errors": [0.1118033988749896, 0.17320508075688787]});
     /// ```
+    #[cfg(feature = "matrix")]
     #[rhai_fn(name = "regress", return_raw, pure)]
     pub fn regress(X: &mut Array, Y: Array) -> Result<Map, Box<EvalAltResult>> {
         let x_transposed = match crate::matrix_functions::transpose(X) {

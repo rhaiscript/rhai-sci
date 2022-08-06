@@ -1,10 +1,9 @@
-use rhai::INT;
-
 macro_rules! rhai {
     () => {};
     ($($t:tt)+) => {
         {
-            rhai_sci::eval(
+            let engine = rhai::Engine::new();
+            engine.eval(
                 concat!(
                     $(
                         stringify!($t), " "
@@ -16,11 +15,14 @@ macro_rules! rhai {
 }
 
 fn main() {
+    use rhai::INT;
     let x: INT = rhai!(
-        let data = [43, 42, -500];
-        let x = argmin(data);
-        let y = argmax(data);
-        y - x
+        fn call_me() {
+            return 3;
+        }
+
+        let result = call_me();
+        result
     );
     println!("{x}");
 }

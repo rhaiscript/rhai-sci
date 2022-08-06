@@ -11,9 +11,10 @@ pub mod misc_functions {
     /// let r = rand();
     /// assert(r >= 0.0 && r <= 1.0);
     /// ```
+    #[cfg(feature = "rand")]
     #[rhai_fn(name = "rand")]
     pub fn rand_float() -> FLOAT {
-        rand::random()
+        randlib::random()
     }
 
     /// Returns an array of the unique elements in an array.

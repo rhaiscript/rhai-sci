@@ -2,12 +2,14 @@ use rhai::plugin::*;
 
 #[export_module]
 pub mod matrix_functions {
-    use crate::misc_functions::rand_float;
+    #[cfg(feature = "matrix")]
+    use crate::vec_vec_float_to_vec_dynamic;
     use crate::{
         if_int_convert_to_float_and_do, if_int_do_else_if_array_do, if_list_do,
         if_matrices_and_compatible_convert_to_vec_array_and_do,
-        if_matrix_convert_to_vec_array_and_do, if_matrix_do, vec_vec_float_to_vec_dynamic, FOIL,
+        if_matrix_convert_to_vec_array_and_do, if_matrix_do, FOIL,
     };
+    #[cfg(feature = "matrix")]
     use nalgebra::DMatrix;
     use rhai::{Array, Dynamic, EvalAltResult, ImmutableString, Map, Position, FLOAT, INT};
     use std::collections::BTreeMap;
@@ -32,6 +34,7 @@ pub mod matrix_functions {
     ///                        [1.5, -0.5]]
     /// );
     /// ```
+    #[cfg(feature = "matrix")]
     #[rhai_fn(name = "inv", return_raw, pure)]
     pub fn invert_matrix(matrix: &mut Array) -> Result<Array, Box<EvalAltResult>> {
         if_matrix_convert_to_vec_array_and_do(matrix, |matrix_as_vec| {
@@ -140,7 +143,7 @@ pub mod matrix_functions {
         flatten(matrix).len() as INT
     }
 
-    #[cfg(feature = "io")]
+    #[cfg(all(feature = "io", feature = "matrix"))]
     pub mod read_write {
         use nalgebra::DMatrix;
         use polars::prelude::{CsvReader, DataType, SerReader};
@@ -380,6 +383,7 @@ pub mod matrix_functions {
     /// let matrix = rand([3, 3]);
     /// assert_eq(size(matrix), [3, 3]);
     /// ```
+    #[cfg(feature = "rand")]
     #[rhai_fn(name = "rand", return_raw)]
     pub fn rand_single_input(n: Dynamic) -> Result<Array, Box<EvalAltResult>> {
         crate::if_int_do_else_if_array_do(
@@ -416,13 +420,14 @@ pub mod matrix_functions {
     /// let matrix = rand(3, 3);
     /// assert_eq(size(matrix), [3, 3]);
     /// ```
+    #[cfg(feature = "rand")]
     #[rhai_fn(name = "rand")]
     pub fn rand_double_input(nx: INT, ny: INT) -> Array {
         let mut output = vec![];
         for i in 0..nx {
             let mut row = vec![];
             for j in 0..ny {
-                row.push(Dynamic::from_float(rand_float()));
+                row.push(Dynamic::from_float(crate::misc_functions::rand_float()));
             }
             output.push(Dynamic::from_array(row))
         }
@@ -497,7 +502,7 @@ pub mod matrix_functions {
 
     /// Returns the contents of an multidimensional array as a 1-D array.
     /// ```typescript
-    /// let matrix = rand(3, 5);
+    /// let matrix = ones(3, 5);
     /// let flat = flatten(matrix);
     /// assert_eq(len(flat), 15);
     /// ```
@@ -624,6 +629,7 @@ pub mod matrix_functions {
     /// let c = mtimes(a, b);
     /// assert_eq(b, c);
     /// ```
+    #[cfg(feature = "matrix")]
     #[rhai_fn(name = "mtimes", return_raw)]
     pub fn mtimes(matrix1: Array, matrix2: Array) -> Result<Array, Box<EvalAltResult>> {
         if_matrices_and_compatible_convert_to_vec_array_and_do(
@@ -668,11 +674,12 @@ pub mod matrix_functions {
 
     /// Concatenate two arrays horizontally.
     /// ```typescript
-    /// let arr1 = rand(3);
-    /// let arr2 = rand(3);
+    /// let arr1 = eye(3);
+    /// let arr2 = eye(3);
     /// let combined = horzcat(arr1, arr2);
     /// assert_eq(size(combined), [3, 6]);
     /// ```
+    #[cfg(feature = "matrix")]
     #[rhai_fn(name = "horzcat", return_raw)]
     pub fn horzcat(matrix1: Array, matrix2: Array) -> Result<Array, Box<EvalAltResult>> {
         if_matrices_and_compatible_convert_to_vec_array_and_do(
@@ -726,11 +733,12 @@ pub mod matrix_functions {
 
     /// Concatenates two array vertically.
     /// ```typescript
-    /// let arr1 = rand(3);
-    /// let arr2 = rand(3);
+    /// let arr1 = eye(3);
+    /// let arr2 = eye(3);
     /// let combined = vertcat(arr1, arr2);
     /// assert_eq(size(combined), [6, 3]);
     /// ```
+    #[cfg(feature = "matrix")]
     #[rhai_fn(name = "vertcat", return_raw)]
     pub fn vertcat(matrix1: Array, matrix2: Array) -> Result<Array, Box<EvalAltResult>> {
         if_matrices_and_compatible_convert_to_vec_array_and_do(
@@ -844,10 +852,11 @@ pub mod matrix_functions {
 
     /// Repeats copies of a matrix
     /// ```typescript
-    /// let matrix = rand(3);
+    /// let matrix = eye(3);
     /// let combined = repmat(matrix, 2, 2);
     /// assert_eq(size(combined), [6, 6]);
     /// ```
+    #[cfg(feature = "matrix")]
     #[rhai_fn(name = "repmat", return_raw)]
     pub fn repmat(matrix: &mut Array, nx: INT, ny: INT) -> Result<Array, Box<EvalAltResult>> {
         if_matrix_do(matrix, |matrix| {

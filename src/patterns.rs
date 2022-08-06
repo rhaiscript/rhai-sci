@@ -85,6 +85,7 @@ pub fn array_to_vec_float(arr: &mut Array) -> Vec<FLOAT> {
         .collect::<Vec<FLOAT>>()
 }
 
+#[cfg(feature = "matrix")]
 pub fn vec_vec_float_to_vec_dynamic(
     mat: nalgebra::OMatrix<FLOAT, nalgebra::Dynamic, nalgebra::Dynamic>,
 ) -> Vec<Dynamic> {
