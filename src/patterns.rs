@@ -90,9 +90,9 @@ pub fn array_to_vec_float(arr: &mut Array) -> Vec<FLOAT> {
         .collect::<Vec<FLOAT>>()
 }
 
-#[cfg(feature = "matrix")]
+#[cfg(feature = "nalgebra")]
 pub fn vec_vec_float_to_vec_dynamic(
-    mat: nalgebra::OMatrix<FLOAT, nalgebra::Dynamic, nalgebra::Dynamic>,
+    mat: nalgebralib::OMatrix<FLOAT, nalgebralib::Dynamic, nalgebralib::Dynamic>,
 ) -> Vec<Dynamic> {
     let mut out = vec![];
     for idx in 0..mat.shape().0 {

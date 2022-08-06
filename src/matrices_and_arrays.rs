@@ -2,15 +2,15 @@ use rhai::plugin::*;
 
 #[export_module]
 pub mod matrix_functions {
-    #[cfg(feature = "matrix")]
+    #[cfg(feature = "nalgebra")]
     use crate::vec_vec_float_to_vec_dynamic;
     use crate::{
         if_int_convert_to_float_and_do, if_int_do_else_if_array_do, if_list_do,
         if_matrices_and_compatible_convert_to_vec_array_and_do,
         if_matrix_convert_to_vec_array_and_do, if_matrix_do, FOIL,
     };
-    #[cfg(feature = "matrix")]
-    use nalgebra::DMatrix;
+    #[cfg(feature = "nalgebra")]
+    use nalgebralib::DMatrix;
     use rhai::{Array, Dynamic, EvalAltResult, Map, Position, FLOAT, INT};
     use std::collections::BTreeMap;
 
@@ -34,7 +34,7 @@ pub mod matrix_functions {
     ///                        [1.5, -0.5]]
     /// );
     /// ```
-    #[cfg(feature = "matrix")]
+    #[cfg(feature = "nalgebra")]
     #[rhai_fn(name = "inv", return_raw, pure)]
     pub fn invert_matrix(matrix: &mut Array) -> Result<Array, Box<EvalAltResult>> {
         if_matrix_convert_to_vec_array_and_do(matrix, |matrix_as_vec| {
@@ -143,7 +143,7 @@ pub mod matrix_functions {
         flatten(matrix).len() as INT
     }
 
-    #[cfg(all(feature = "io", feature = "matrix"))]
+    #[cfg(all(feature = "io"))]
     pub mod read_write {
         use polars::prelude::{CsvReader, DataType, SerReader};
         use rhai::{Array, Dynamic, EvalAltResult, ImmutableString, FLOAT};
@@ -628,7 +628,7 @@ pub mod matrix_functions {
     /// let c = mtimes(a, b);
     /// assert_eq(b, c);
     /// ```
-    #[cfg(feature = "matrix")]
+    #[cfg(feature = "nalgebra")]
     #[rhai_fn(name = "mtimes", return_raw)]
     pub fn mtimes(matrix1: Array, matrix2: Array) -> Result<Array, Box<EvalAltResult>> {
         if_matrices_and_compatible_convert_to_vec_array_and_do(
@@ -678,7 +678,7 @@ pub mod matrix_functions {
     /// let combined = horzcat(arr1, arr2);
     /// assert_eq(size(combined), [3, 6]);
     /// ```
-    #[cfg(feature = "matrix")]
+    #[cfg(feature = "nalgebra")]
     #[rhai_fn(name = "horzcat", return_raw)]
     pub fn horzcat(matrix1: Array, matrix2: Array) -> Result<Array, Box<EvalAltResult>> {
         if_matrices_and_compatible_convert_to_vec_array_and_do(
@@ -737,7 +737,7 @@ pub mod matrix_functions {
     /// let combined = vertcat(arr1, arr2);
     /// assert_eq(size(combined), [6, 3]);
     /// ```
-    #[cfg(feature = "matrix")]
+    #[cfg(feature = "nalgebra")]
     #[rhai_fn(name = "vertcat", return_raw)]
     pub fn vertcat(matrix1: Array, matrix2: Array) -> Result<Array, Box<EvalAltResult>> {
         if_matrices_and_compatible_convert_to_vec_array_and_do(
@@ -855,7 +855,7 @@ pub mod matrix_functions {
     /// let combined = repmat(matrix, 2, 2);
     /// assert_eq(size(combined), [6, 6]);
     /// ```
-    #[cfg(feature = "matrix")]
+    #[cfg(feature = "nalgebra")]
     #[rhai_fn(name = "repmat", return_raw)]
     pub fn repmat(matrix: &mut Array, nx: INT, ny: INT) -> Result<Array, Box<EvalAltResult>> {
         if_matrix_do(matrix, |matrix| {

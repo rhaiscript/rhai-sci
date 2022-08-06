@@ -524,7 +524,7 @@ pub mod stats {
     ///                 "pvalues": [1.0, 0.1091825535092476],
     ///                 "standard_errors": [0.1118033988749896, 0.17320508075688787]});
     /// ```
-    #[cfg(feature = "matrix")]
+    #[cfg(feature = "nalgebra")]
     #[rhai_fn(name = "regress", return_raw, pure)]
     pub fn regress(x: &mut Array, y: Array) -> Result<Map, Box<EvalAltResult>> {
         use linregress::{FormulaRegressionBuilder, RegressionDataBuilder};

@@ -39,7 +39,9 @@ let value = engine.eval::<INT>("argmin([43, 42, -500])").unwrap();
 ```
 
 # Features
-| Feature Flag | Description                                                                                  |
-|--------------|----------------------------------------------------------------------------------------------|
-| `metadata`   | Enables exporting function metadata and is necessary for running doc-tests on Rhai examples. |
-| `io`         | Enables the `read_matrix` function but pulls in several additional dependencies.             | 
+| Feature Flag | Default | Description                                                                                                                                                                   |
+|--------------|---------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `metadata`   | No      | Enables exporting function metadata and is ___necessary for running doc-tests on Rhai examples___.                                                                            |
+| `io`         | Yes     | Enables the `read_matrix` function but pulls in several additional dependencies (`polars`, `url`, `temp-file`, `csv-sniffer`, `minreq`). Also actives the `nalgebra` feature. | 
+| `nalgebra`   | Yes     | Enables several functions (`regress`, `inv`, `mtimes`, `horzcat`, `vertcat`, and `repmat`) but brings in the `nalgebra` and `linregress` libraries.                           | 
+| `rand`       | Yes     | Enables the `rand` function for generating random FLOATs values and random matrices, but brings in the `rand` library.                                                        |

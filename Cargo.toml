@@ -14,16 +14,15 @@ documentation = "https://docs.rs/rhai-sci"
 build = "build.rs"
 
 [features]
-default = ["io", "matrix", "rand"]
+default = ["io", "rand"]
 metadata = ["rhai/metadata"]
-io = ["polars", "url", "temp-file", "csv-sniffer", "minreq"]
-matrix = ["nalgebra", "linregress"]
+io = ["polars", "url", "temp-file", "csv-sniffer", "minreq", "nalgebra"]
+nalgebra = ["nalgebralib", "linregress"]
 rand = ["randlib"]
 
 [dependencies]
 rhai = "1.8"
-rustyline = "10.0.0"
-nalgebra = {version = "0.30.1", optional = true }
+nalgebralib = {version = "0.30.1", optional = true, package = "nalgebra" }
 polars = {version = "0.17.0", optional = true }
 url = {version = "2.2.2", optional = true }
 temp-file = {version = "0.1.6", optional = true }
@@ -35,8 +34,7 @@ linregress = { version = "0.5.0", optional = true }
 
 [build-dependencies]
 rhai = "1.8"
-itertools = "0.10.3"
-nalgebra = {version = "0.30.1", optional = true }
+nalgebralib = {version = "0.30.1", optional = true, package = "nalgebra" }
 polars = {version = "0.17.0", optional = true }
 url = {version = "2.2.2", optional = true }
 temp-file = {version = "0.1.6", optional = true }
