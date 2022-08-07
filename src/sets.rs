@@ -2,7 +2,7 @@ use rhai::plugin::*;
 
 #[export_module]
 pub mod set_functions {
-    use rhai::{Array, Dynamic, EvalAltResult, ImmutableString, Position, FLOAT, INT};
+    use rhai::{Array, Dynamic, EvalAltResult};
 
     /// Returns the set union of two arrays.
     /// ```typescript
@@ -14,7 +14,7 @@ pub mod set_functions {
     #[rhai_fn(name = "union", return_raw)]
     pub fn union(arr1: Array, arr2: Array) -> Result<Array, Box<EvalAltResult>> {
         let mut x = arr1.clone();
-        let mut y = arr2.clone();
+        let y = arr2.clone();
         x.extend(y);
         crate::misc_functions::unique(&mut x)
     }

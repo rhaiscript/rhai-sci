@@ -2,7 +2,7 @@ use rhai::plugin::*;
 
 #[export_module]
 pub mod assert_functions {
-    use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT, INT};
+    use rhai::{Dynamic, EvalAltResult, Position};
 
     /// Assert that a statement is true and throw an error if it is not.
     /// ```typescript

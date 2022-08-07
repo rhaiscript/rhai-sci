@@ -3,7 +3,7 @@ use rhai::plugin::*;
 #[export_module]
 pub mod int_and_diff {
     use crate::if_list_convert_to_vec_float_and_do;
-    use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT, INT};
+    use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT};
 
     /// Returns the approximate integral of the curve defined by `y` and `x` using the trapezoidal method.
     /// ```typescript
@@ -27,11 +27,11 @@ pub mod int_and_diff {
             )
             .into())
         } else {
-            if_list_convert_to_vec_float_and_do(&mut y.clone(), |Y| {
-                if_list_convert_to_vec_float_and_do(&mut x.clone(), |X| {
+            if_list_convert_to_vec_float_and_do(&mut y.clone(), |yf| {
+                if_list_convert_to_vec_float_and_do(&mut x.clone(), |xf| {
                     let mut trapsum = 0.0;
                     for i in 1..x.len() {
-                        trapsum += (Y[i] + Y[i - 1]) * (X[i] - X[i - 1]) / 2.0;
+                        trapsum += (yf[i] + yf[i - 1]) * (xf[i] - xf[i - 1]) / 2.0;
                     }
                     Ok(Dynamic::from_float(trapsum))
                 })
@@ -53,10 +53,10 @@ pub mod int_and_diff {
     /// ```
     #[rhai_fn(name = "trapz", return_raw, pure)]
     pub fn trapz_unit(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        if_list_convert_to_vec_float_and_do(arr, |Y| {
+        if_list_convert_to_vec_float_and_do(arr, |y| {
             let mut trapsum = 0.0 as FLOAT;
-            for i in 1..Y.len() {
-                trapsum += (Y[i] + Y[i - 1]) / 2.0;
+            for i in 1..y.len() {
+                trapsum += (y[i] + y[i - 1]) / 2.0;
             }
             Ok(Dynamic::from_float(trapsum))
         })
