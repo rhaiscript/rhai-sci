@@ -1,4 +1,6 @@
 use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT, INT};
+#[cfg(feature = "ml")]
+use smartcore::linalg::naive::dense_matrix::DenseMatrix;
 
 /// Matrix compatibility conditions
 pub enum FOIL {
@@ -231,6 +233,36 @@ where
         .collect::<Vec<Array>>();
     if crate::validation_functions::is_matrix(matrix) {
         f(matrix_as_vec)
+    } else {
+        Err(
+            EvalAltResult::ErrorArithmetic(format!("The input must be a matrix."), Position::NONE)
+                .into(),
+        )
+    }
+}
+
+#[cfg(feature = "ml")]
+pub fn if_matrix_convert_to_dense_matrix_and_do<F, T>(
+    matrix: &mut Array,
+    f: F,
+) -> Result<T, Box<EvalAltResult>>
+where
+    F: Fn(DenseMatrix<FLOAT>) -> Result<T, Box<EvalAltResult>>,
+{
+    if crate::validation_functions::is_matrix(matrix) {
+        let matrix_as_vec = matrix
+            .into_iter()
+            .map(|x| {
+                x.clone().into_array().unwrap().map(|y| {
+                    if y.is::<FLOAT>() {
+                        y.clone().as_float().unwrap()
+                    } else {
+                        y.clone().as_int().unwrap() as FLOAT
+                    }
+                })
+            })
+            .collect::<Vec<Array>>();
+        f(DenseMatrix::from_2d_vec(&matrix_as_vec))
     } else {
         Err(
             EvalAltResult::ErrorArithmetic(format!("The input must be a matrix."), Position::NONE)
