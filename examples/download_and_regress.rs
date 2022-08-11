@@ -2,7 +2,7 @@ use rhai::{packages::Package, Dynamic, Engine};
 use rhai_sci::SciPackage;
 
 fn main() {
-    #[cfg(all(feature = "matrix", feature = "io"))]
+    #[cfg(all(feature = "nalgebra", feature = "io"))]
     {
         // Create a new Rhai engine
         let mut engine = Engine::new();
@@ -11,8 +11,9 @@ fn main() {
         engine.register_global_module(SciPackage::new().as_shared_module());
 
         // Now run your code
-        engine
+        let fitting_results = engine
             .eval_file::<Dynamic>("examples/download_and_regress.rhai".into())
             .unwrap();
+        println!("{:?}", fitting_results);
     }
 }
