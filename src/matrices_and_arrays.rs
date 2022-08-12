@@ -67,19 +67,32 @@ pub mod matrix_functions {
     /// Calculate the eigenvalues for a matrix.
     /// ```typescript
     /// let matrix = eye(5);
-    /// let eigendatamap = eigs(matrix);
-    /// assert_eq(eigendatamap, #{ "eigenvectors": [[1.0, 0.0, 0.0, 0.0, 0.0],
-    ///                                             [0.0, 1.0, 0.0, 0.0, 0.0],
-    ///                                             [0.0, 0.0, 1.0, 0.0, 0.0],
-    ///                                             [0.0, 0.0, 0.0, 1.0, 0.0],
-    ///                                             [0.0, 0.0, 0.0, 0.0, 1.0]],
-    ///                            "imaginary_eigenvalues": [0.0, 0.0, 0.0, 0.0, 0.0],
-    ///                            "real_eigenvalues": [1.0, 1.0, 1.0, 1.0, 1.0]});
+    /// let eig = eigs(matrix);
+    /// assert_eq(eig, #{ "eigenvectors": [[1.0, 0.0, 0.0, 0.0, 0.0],
+    ///                                    [0.0, 1.0, 0.0, 0.0, 0.0],
+    ///                                    [0.0, 0.0, 1.0, 0.0, 0.0],
+    ///                                    [0.0, 0.0, 0.0, 1.0, 0.0],
+    ///                                    [0.0, 0.0, 0.0, 0.0, 1.0]],
+    ///                   "imaginary_eigenvalues": [0.0, 0.0, 0.0, 0.0, 0.0],
+    ///                   "real_eigenvalues": [1.0, 1.0, 1.0, 1.0, 1.0]});
+    /// ```
+    /// ```typescript
+    /// let matrix =
+    ///                  [[0.9000, 0.4000, 0.7000],
+    ///                  [0.4000, 0.5000, 0.3000],
+    ///                  [0.7000, 0.3000, 0.8000]];
+    /// // let eig = eigs(matrix);
+    /// // assert_eq(eig, #{ "eigenvectors": [[],
+    /// //                                   []],
+    /// //                  "imaginary_eigenvalues": [0.0, 0.0],
+    /// //                  "real_eigenvalues": []});
+    /// assert(true)
     /// ```
     #[cfg(all(feature = "nalgebra", feature = "smartcore"))]
     #[rhai_fn(name = "eigs", return_raw, pure)]
     pub fn matrix_eigs(matrix: &mut Array) -> Result<Map, Box<EvalAltResult>> {
         if_matrix_convert_to_dense_matrix_and_do(matrix, |matrix_as_dm| {
+            println!("{:#?}", matrix_as_dm);
             // Try to invert
             let dm = matrix_as_dm.evd(false);
 
