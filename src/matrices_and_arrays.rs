@@ -1,7 +1,11 @@
 use rhai::plugin::*;
+#[cfg(feature = "smartcore")]
+use smartcorelib::linalg::evd::EVDDecomposableMatrix;
 
 #[export_module]
 pub mod matrix_functions {
+    #[cfg(feature = "smartcore")]
+    use crate::{dense_matrix_to_vec_dynamic, if_matrix_convert_to_dense_matrix_and_do};
     use crate::{
         if_int_convert_to_float_and_do, if_int_do_else_if_array_do, if_list_do,
         if_matrices_and_compatible_convert_to_vec_array_and_do,
@@ -63,37 +67,53 @@ pub mod matrix_functions {
     /// Calculate the eigenvalues for a matrix.
     /// ```typescript
     /// let matrix = eye(5);
-    /// let eigen_values = eigs(matrix);
-    /// assert_eq(eigen_values, ones([5]));
+    /// let eigendatamap = eigs(matrix);
+    /// assert_eq(eigendatamap, #{ "eigenvectors": [[1.0, 0.0, 0.0, 0.0, 0.0],
+    ///                                             [0.0, 1.0, 0.0, 0.0, 0.0],
+    ///                                             [0.0, 0.0, 1.0, 0.0, 0.0],
+    ///                                             [0.0, 0.0, 0.0, 1.0, 0.0],
+    ///                                             [0.0, 0.0, 0.0, 0.0, 1.0]],
+    ///                            "imaginary_eigenvalues": [0.0, 0.0, 0.0, 0.0, 0.0],
+    ///                            "real_eigenvalues": [1.0, 1.0, 1.0, 1.0, 1.0]});
     /// ```
-    /// ```typescript
-    /// let matrix = diag([1, 2, 3, 4, 5]);
-    /// let eigen_values = eigs(matrix);
-    /// assert_eq(eigen_values, linspace(1, 5, 5));
-    /// ```
-    #[cfg(feature = "nalgebra")]
+    #[cfg(all(feature = "nalgebra", feature = "smartcore"))]
     #[rhai_fn(name = "eigs", return_raw, pure)]
-    pub fn matrix_eigs(matrix: &mut Array) -> Result<Array, Box<EvalAltResult>> {
-        if_matrix_convert_to_vec_array_and_do(matrix, |matrix_as_vec| {
-            let dm = DMatrix::from_fn(matrix_as_vec.len(), matrix_as_vec[0].len(), |i, j| {
-                if matrix_as_vec[0][0].is::<FLOAT>() {
-                    matrix_as_vec[i][j].as_float().unwrap()
-                } else {
-                    matrix_as_vec[i][j].as_int().unwrap() as FLOAT
-                }
-            });
-
+    pub fn matrix_eigs(matrix: &mut Array) -> Result<Map, Box<EvalAltResult>> {
+        if_matrix_convert_to_dense_matrix_and_do(matrix, |matrix_as_dm| {
             // Try to invert
-            let dm = dm.eigenvalues();
+            let dm = matrix_as_dm.evd(false);
 
             match dm {
-                None => Err(EvalAltResult::ErrorArithmetic(
-                    format!("Matrix cannot be inverted"),
-                    Position::NONE,
-                )
-                .into()),
+                Err(e) => {
+                    Err(EvalAltResult::ErrorArithmetic(format!("{:?}", e), Position::NONE).into())
+                }
 
-                Some(mat) => Ok(ovector_to_vec_dynamic(mat)),
+                Ok(evd) => {
+                    let vecs: Array = dense_matrix_to_vec_dynamic(evd.V);
+                    let real_values: Array = evd
+                        .d
+                        .into_iter()
+                        .map(|x| Dynamic::from_float(x))
+                        .collect::<Vec<Dynamic>>();
+                    let imaginary_values: Array = evd
+                        .e
+                        .into_iter()
+                        .map(|x| Dynamic::from_float(x))
+                        .collect::<Vec<Dynamic>>();
+
+                    let mut result = BTreeMap::new();
+                    let mut vid = smartstring::SmartString::new();
+                    vid.push_str("eigenvectors");
+                    result.insert(vid, Dynamic::from_array(vecs));
+                    let mut did = smartstring::SmartString::new();
+                    did.push_str("real_eigenvalues");
+                    result.insert(did, Dynamic::from_array(real_values));
+                    let mut eid = smartstring::SmartString::new();
+                    eid.push_str("imaginary_eigenvalues");
+                    result.insert(eid, Dynamic::from_array(imaginary_values));
+
+                    Ok(result)
+                }
             }
         })
     }

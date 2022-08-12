@@ -19,6 +19,7 @@ metadata = ["rhai/metadata"]
 io = ["polars", "url", "temp-file", "csv-sniffer", "minreq"]
 nalgebra = ["nalgebralib", "linregress"]
 rand = ["randlib"]
+smartcore = ["smartcorelib"]
 
 [dependencies]
 rhai = "1.8"
@@ -31,6 +32,7 @@ minreq = { version = "2.6.0", features = ["json-using-serde", "https"], optional
 randlib = { version = "0.8", optional = true, package = "rand" }
 smartstring = "1.0.1"
 linregress = { version = "0.5.0", optional = true }
+smartcorelib = {version = "0.2.1", optional = true, package = "smartcore"}
 
 [build-dependencies]
 rhai = "1.8"
@@ -44,7 +46,8 @@ randlib = { version = "0.8", optional = true, package = "rand" }
 serde_json = "1.0.82"
 serde = "1.0.140"
 smartstring = "1.0.1"
-linregress = "0.5.0"
+linregress = { version = "0.5.0", optional = true }
+smartcorelib = {version = "0.2.1", optional = true, package = "smartcore"}
 
 [package.metadata.docs.rs]
 features = ["all-features"]

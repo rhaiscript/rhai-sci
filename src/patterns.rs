@@ -1,6 +1,7 @@
 use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT, INT};
-#[cfg(feature = "ml")]
-use smartcore::linalg::naive::dense_matrix::DenseMatrix;
+#[cfg(feature = "smartcore")]
+use smartcorelib::linalg::naive::dense_matrix::DenseMatrix;
+use smartcorelib::linalg::BaseMatrix;
 
 /// Matrix compatibility conditions
 pub enum FOIL {
@@ -84,6 +85,20 @@ pub fn array_to_vec_int(arr: &mut Array) -> Vec<INT> {
     arr.iter()
         .map(|el| el.as_int().unwrap())
         .collect::<Vec<INT>>()
+}
+
+pub fn dense_matrix_to_vec_dynamic(dm: DenseMatrix<FLOAT>) -> Vec<Dynamic> {
+    let mut output = vec![];
+    for idx in 0..dm.shape().0 {
+        let vec_row = dm.get_row_as_vec(idx);
+        output.push(Dynamic::from_array(
+            vec_row
+                .into_iter()
+                .map(|x| Dynamic::from_float(x))
+                .collect::<Vec<Dynamic>>(),
+        ));
+    }
+    output
 }
 
 pub fn array_to_vec_float(arr: &mut Array) -> Vec<FLOAT> {
@@ -241,7 +256,7 @@ where
     }
 }
 
-#[cfg(feature = "ml")]
+#[cfg(feature = "smartcore")]
 pub fn if_matrix_convert_to_dense_matrix_and_do<F, T>(
     matrix: &mut Array,
     f: F,
@@ -251,17 +266,23 @@ where
 {
     if crate::validation_functions::is_matrix(matrix) {
         let matrix_as_vec = matrix
-            .into_iter()
+            .clone()
+            .iter()
             .map(|x| {
-                x.clone().into_array().unwrap().map(|y| {
-                    if y.is::<FLOAT>() {
-                        y.clone().as_float().unwrap()
-                    } else {
-                        y.clone().as_int().unwrap() as FLOAT
-                    }
-                })
+                x.clone()
+                    .into_array()
+                    .unwrap()
+                    .iter()
+                    .map(|y| {
+                        if y.is::<FLOAT>() {
+                            y.clone().as_float().unwrap()
+                        } else {
+                            y.clone().as_int().unwrap() as FLOAT
+                        }
+                    })
+                    .collect::<Vec<FLOAT>>()
             })
-            .collect::<Vec<Array>>();
+            .collect::<Vec<Vec<FLOAT>>>();
         f(DenseMatrix::from_2d_vec(&matrix_as_vec))
     } else {
         Err(
