@@ -56,6 +56,7 @@ fn main() {
     combine_with_exported_module!(&mut lib, "rhai_sci_sets", set_functions);
     combine_with_exported_module!(&mut lib, "rhai_sci_moving", moving_functions);
     combine_with_exported_module!(&mut lib, "rhai_sci_validate", validation_functions);
+    combine_with_exported_module!(&mut lib, "rhai_sci_machine_learing", ml_functions);
     engine.register_global_module(rhai::Shared::new(lib));
 
     // Extract metadata
@@ -155,6 +156,7 @@ mod functions {
     include!("src/moving.rs");
     include!("src/validate.rs");
     include!("src/patterns.rs");
+    include!("src/machine_learning.rs");
 }
 
 #[cfg(feature = "metadata")]
