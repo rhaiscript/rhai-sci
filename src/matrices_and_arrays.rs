@@ -1,6 +1,6 @@
 use rhai::plugin::*;
 #[cfg(feature = "smartcore")]
-use smartcorelib::linalg::evd::EVDDecomposableMatrix;
+use smartcorelib::linalg::evd::*;
 
 #[export_module]
 pub mod matrix_functions {
@@ -16,6 +16,8 @@ pub mod matrix_functions {
     #[cfg(feature = "nalgebra")]
     use nalgebralib::DMatrix;
     use rhai::{Array, Dynamic, EvalAltResult, Map, Position, FLOAT, INT};
+    #[cfg(feature = "smartcore")]
+    use smartcorelib::linalg::BaseMatrix;
     use std::collections::BTreeMap;
 
     /// Calculates the inverse of a matrix. Fails if the matrix if not invertible, or if the
@@ -76,25 +78,13 @@ pub mod matrix_functions {
     ///                   "imaginary_eigenvalues": [0.0, 0.0, 0.0, 0.0, 0.0],
     ///                   "real_eigenvalues": [1.0, 1.0, 1.0, 1.0, 1.0]});
     /// ```
-    /// ```typescript
-    /// let matrix =
-    ///                  [[0.9000, 0.4000, 0.7000],
-    ///                  [0.4000, 0.5000, 0.3000],
-    ///                  [0.7000, 0.3000, 0.8000]];
-    /// // let eig = eigs(matrix);
-    /// // assert_eq(eig, #{ "eigenvectors": [[],
-    /// //                                   []],
-    /// //                  "imaginary_eigenvalues": [0.0, 0.0],
-    /// //                  "real_eigenvalues": []});
-    /// assert(true)
-    /// ```
-    #[cfg(all(feature = "nalgebra", feature = "smartcore"))]
+    #[cfg(feature = "smartcore")]
     #[rhai_fn(name = "eigs", return_raw, pure)]
     pub fn matrix_eigs(matrix: &mut Array) -> Result<Map, Box<EvalAltResult>> {
         if_matrix_convert_to_dense_matrix_and_do(matrix, |matrix_as_dm| {
-            println!("{:#?}", matrix_as_dm);
             // Try to invert
-            let dm = matrix_as_dm.evd(false);
+            let dm =
+                matrix_as_dm.evd(matrix_as_dm.approximate_eq(&matrix_as_dm.transpose(), 0.0000001));
 
             match dm {
                 Err(e) => {
