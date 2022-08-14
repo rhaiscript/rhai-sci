@@ -29,7 +29,7 @@ pub mod constant_definitions {
     ///  ### `pi: FLOAT`
     /// The ratio of a circle's circumference to its diameter (nondimensional).
     /// ```typescript
-    /// assert_eq(pi,  3.14159265358979323846264338327950288);
+    /// assert_eq(pi, 3.14159265358979323846264338327950288);
     /// ```
     ///  ### `c: FLOAT`
     /// The speed of light in meters per second (m/s).

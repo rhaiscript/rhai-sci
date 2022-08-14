@@ -511,7 +511,7 @@ pub mod stats {
         )
     }
 
-    /// Performs ordinary least squares regression.
+    /// Performs ordinary least squares regression and provides a statistical assessment.
     /// ```typescript
     /// let x = [[1.0, 0.0],
     ///          [1.0, 1.0],
