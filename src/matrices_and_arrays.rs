@@ -52,7 +52,7 @@ pub mod matrix_functions {
                 }
             });
 
-            // Try ot invert
+            // Try to invert
             let dm = dm.try_inverse();
 
             match dm {

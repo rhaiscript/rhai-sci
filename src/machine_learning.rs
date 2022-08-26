@@ -55,7 +55,11 @@ pub mod ml_functions {
         algorithm: ImmutableString,
     ) -> Result<Model, Box<EvalAltResult>> {
         let algorithm_string = algorithm.as_str();
-        let yvec = array_to_vec_float(&mut y.clone());
+        let yvec = y
+            .clone()
+            .into_iter()
+            .map(|el| el.as_float().unwrap())
+            .collect::<Vec<FLOAT>>();
         let Xvec = smartcorelib::linalg::naive::dense_matrix::DenseMatrix::from_2d_vec(
             &X.into_iter()
                 .map(|x| array_to_vec_float(&mut x.clone().into_array().unwrap()))

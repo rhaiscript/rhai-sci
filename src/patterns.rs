@@ -280,7 +280,7 @@ pub fn dense_matrix_to_vec_dynamic(dm: DenseMatrix<FLOAT>) -> Vec<Dynamic> {
 }
 
 pub fn array_to_vec_float(arr: &mut Array) -> Vec<FLOAT> {
-    arr.iter()
+    arr.into_iter()
         .map(|el| el.as_float().unwrap())
         .collect::<Vec<FLOAT>>()
 }
