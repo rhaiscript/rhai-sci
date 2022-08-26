@@ -57,7 +57,9 @@ def_package! {
 /// use rhai::FLOAT;
 /// print!("{:?}", eval::<FLOAT>("let x = max(5, 2); x + min(3, 72)"));
 /// ```
-pub fn eval<T: Clone + 'static>(script: &str) -> Result<T, Box<EvalAltResult>> {
+pub fn eval<T: Clone + std::marker::Send + std::marker::Sync + 'static>(
+    script: &str,
+) -> Result<T, Box<EvalAltResult>> {
     let mut engine = Engine::new();
     engine.register_global_module(SciPackage::new().as_shared_module());
     engine.eval::<T>(script)
