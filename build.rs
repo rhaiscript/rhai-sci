@@ -109,7 +109,7 @@ fn main() {
                         .expect("Cannot write to {doc_file}");
                     indented = true;
                     if idx != function_list.len() - 1 {
-                        write!(doc_file, ", ").expect("Cannot write to {doc_file}");
+                        write!(doc_file, "&nbsp;&nbsp; ").expect("Cannot write to {doc_file}");
                     }
                 }
             }
@@ -119,7 +119,7 @@ fn main() {
                     .expect("Cannot write to {doc_file}");
 
                 if idx != function_list.len() - 1 {
-                    write!(doc_file, ", ").expect("Cannot write to {doc_file}");
+                    write!(doc_file, "&nbsp;&nbsp; ").expect("Cannot write to {doc_file}");
                 }
             }
 
