@@ -1,9 +1,8 @@
-use rhai::{packages::Package, Dynamic, Engine};
-use rhai_sci::SciPackage;
-
 fn main() {
     #[cfg(all(feature = "nalgebra", feature = "io"))]
     {
+        use rhai::{packages::Package, Dynamic, Engine};
+        use rhai_sci::SciPackage;
         // Create a new Rhai engine
         let mut engine = Engine::new();
 
