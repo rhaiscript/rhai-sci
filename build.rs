@@ -201,6 +201,7 @@ fn main() {
 }
 
 #[cfg(feature = "metadata")]
+#[allow(unused_imports)]
 mod functions {
     include!("src/matrices_and_arrays.rs");
     include!("src/statistics.rs");

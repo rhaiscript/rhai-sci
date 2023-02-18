@@ -345,6 +345,21 @@ pub mod matrix_functions {
         /// ```
         #[rhai_fn(name = "read_matrix", return_raw)]
         pub fn read_matrix(file_path: ImmutableString) -> Result<Array, Box<EvalAltResult>> {
+            // We will use this function later
+            fn transpose_internal<T>(v: Vec<Vec<T>>) -> Vec<Vec<T>> {
+                assert!(!v.is_empty());
+                let len = v[0].len();
+                let mut iters: Vec<_> = v.into_iter().map(|n| n.into_iter()).collect();
+                (0..len)
+                    .map(|_| {
+                        iters
+                            .iter_mut()
+                            .map(|n| n.next().unwrap())
+                            .collect::<Vec<T>>()
+                    })
+                    .collect()
+            }
+
             let file_path_as_str = file_path.as_str();
 
             match CsvReader::from_path(file_path_as_str) {
@@ -379,7 +394,7 @@ pub mod matrix_functions {
                         final_output.push(col);
                     }
 
-                    final_output = crate::matrix_functions::transpose_internal(final_output);
+                    final_output = transpose_internal(final_output);
 
                     let matrix_as_array = final_output
                         .into_iter()
@@ -1135,19 +1150,5 @@ pub mod matrix_functions {
                 .collect::<Vec<Dynamic>>()),
             Err(e) => Err(e),
         }
-    }
-
-    fn transpose_internal<T>(v: Vec<Vec<T>>) -> Vec<Vec<T>> {
-        assert!(!v.is_empty());
-        let len = v[0].len();
-        let mut iters: Vec<_> = v.into_iter().map(|n| n.into_iter()).collect();
-        (0..len)
-            .map(|_| {
-                iters
-                    .iter_mut()
-                    .map(|n| n.next().unwrap())
-                    .collect::<Vec<T>>()
-            })
-            .collect()
     }
 }
