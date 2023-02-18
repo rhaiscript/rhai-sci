@@ -1,6 +1,8 @@
 use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT, INT};
 #[cfg(feature = "smartcore")]
-use smartcorelib::linalg::{naive::dense_matrix::DenseMatrix, BaseMatrix};
+use smartcorelib::linalg::basic::{
+    arrays::Array as scArray, arrays::Array2 as scArray2, matrix::DenseMatrix,
+};
 
 /// Matrix compatibility conditions
 #[allow(dead_code)]
@@ -271,11 +273,10 @@ pub fn array_to_vec_int(arr: &mut Array) -> Vec<INT> {
 pub fn dense_matrix_to_vec_dynamic(dm: DenseMatrix<FLOAT>) -> Vec<Dynamic> {
     let mut output = vec![];
     for idx in 0..dm.shape().0 {
-        let vec_row = dm.get_row_as_vec(idx);
         output.push(Dynamic::from_array(
-            vec_row
-                .into_iter()
-                .map(|x| Dynamic::from_float(x))
+            dm.get_row(idx)
+                .iterator(0)
+                .map(|x| Dynamic::from_float(x.clone()))
                 .collect::<Vec<Dynamic>>(),
         ));
     }

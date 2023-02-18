@@ -4,14 +4,14 @@ use rhai::plugin::*;
 pub mod ml_functions {
 
     #[cfg(feature = "smartcore")]
-    use rhai::{Array, Dynamic, EvalAltResult, ImmutableString, Position, FLOAT};
+    use rhai::{Array, Dynamic, EvalAltResult, ImmutableString, Position, FLOAT, INT};
 
     #[cfg(feature = "smartcore")]
     use crate::array_to_vec_float;
 
     #[cfg(feature = "smartcore")]
     use smartcorelib::{
-        linalg::naive::dense_matrix::DenseMatrix,
+        linalg::basic::matrix::DenseMatrix,
         linear::{
             linear_regression::{LinearRegression, LinearRegressionParameters},
             logistic_regression::{LogisticRegression, LogisticRegressionParameters},
@@ -56,12 +56,7 @@ pub mod ml_functions {
         algorithm: ImmutableString,
     ) -> Result<Model, Box<EvalAltResult>> {
         let algorithm_string = algorithm.as_str();
-        let yvec = y
-            .clone()
-            .into_iter()
-            .map(|el| el.as_float().unwrap())
-            .collect::<Vec<FLOAT>>();
-        let xvec = smartcorelib::linalg::naive::dense_matrix::DenseMatrix::from_2d_vec(
+        let xvec = smartcorelib::linalg::basic::matrix::DenseMatrix::from_2d_vec(
             &x.into_iter()
                 .map(|observation| {
                     array_to_vec_float(&mut observation.clone().into_array().unwrap())
@@ -70,6 +65,11 @@ pub mod ml_functions {
         );
         match algorithm_string {
             "linear" => {
+                let yvec = y
+                    .clone()
+                    .into_iter()
+                    .map(|el| el.as_float().unwrap())
+                    .collect::<Vec<FLOAT>>();
                 match LinearRegression::fit(&xvec, &yvec, LinearRegressionParameters::default()) {
                     Ok(model) => Ok(Model {
                         saved_model: bincode::serialize(&model).unwrap(),
@@ -81,6 +81,11 @@ pub mod ml_functions {
                 }
             }
             "logistic" => {
+                let yvec = y
+                    .clone()
+                    .into_iter()
+                    .map(|el| el.as_int().unwrap())
+                    .collect::<Vec<INT>>();
                 match LogisticRegression::fit(&xvec, &yvec, LogisticRegressionParameters::default())
                 {
                     Ok(model) => Ok(Model {
@@ -123,7 +128,7 @@ pub mod ml_functions {
         let algorithm_string = model.model_type.as_str();
         match algorithm_string {
             "linear" => {
-                let model_ready: LinearRegression<FLOAT, DenseMatrix<FLOAT>> =
+                let model_ready: LinearRegression<FLOAT, FLOAT, DenseMatrix<FLOAT>, Vec<FLOAT>> =
                     bincode::deserialize(&*model.saved_model).unwrap();
                 return match model_ready.predict(&xvec) {
                     Ok(y) => Ok(y
@@ -136,12 +141,12 @@ pub mod ml_functions {
                 };
             }
             "logistic" => {
-                let model_ready: LogisticRegression<FLOAT, DenseMatrix<FLOAT>> =
+                let model_ready: LogisticRegression<FLOAT, INT, DenseMatrix<FLOAT>, Vec<INT>> =
                     bincode::deserialize(&*model.saved_model).unwrap();
                 return match model_ready.predict(&xvec) {
                     Ok(y) => Ok(y
                         .into_iter()
-                        .map(|observation| Dynamic::from_float(observation))
+                        .map(|observation| Dynamic::from_int(observation))
                         .collect::<Vec<Dynamic>>()),
                     Err(e) => {
                         Err(EvalAltResult::ErrorArithmetic(format!("{e}"), Position::NONE).into())

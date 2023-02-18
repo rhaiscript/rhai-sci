@@ -17,9 +17,9 @@ pub mod matrix_functions {
     use nalgebralib::DMatrix;
     use rhai::{Array, Dynamic, EvalAltResult, Map, Position, FLOAT, INT};
     #[cfg(feature = "smartcore")]
-    use smartcorelib::linalg::evd::EVDDecomposableMatrix;
+    use smartcorelib::linalg::basic::arrays::Array2;
     #[cfg(feature = "smartcore")]
-    use smartcorelib::linalg::BaseMatrix;
+    use smartcorelib::linalg::traits::evd::EVDDecomposable;
     use std::collections::BTreeMap;
 
     /// Calculates the inverse of a matrix. Fails if the matrix if not invertible, or if the
