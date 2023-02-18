@@ -114,6 +114,7 @@ where
     f(new_x)
 }
 
+#[cfg(feature = "nalgebra")]
 pub fn if_matrix_do<T, F>(matrix: &mut Array, f: F) -> Result<T, Box<EvalAltResult>>
 where
     F: Fn(&mut Array) -> Result<T, Box<EvalAltResult>>,
@@ -127,6 +128,7 @@ where
         .into()))
 }
 
+#[cfg(feature = "nalgebra")]
 pub fn if_matrices_and_compatible_convert_to_vec_array_and_do<T, F>(
     compatibility_condition: FOIL,
     matrix1: &mut Array,

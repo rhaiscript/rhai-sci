@@ -1,6 +1,4 @@
 use rhai::plugin::*;
-#[cfg(feature = "smartcore")]
-use smartcorelib::linalg::evd::*;
 
 #[export_module]
 pub mod matrix_functions {
@@ -8,14 +6,18 @@ pub mod matrix_functions {
     use crate::{dense_matrix_to_vec_dynamic, if_matrix_convert_to_dense_matrix_and_do};
     use crate::{
         if_int_convert_to_float_and_do, if_int_do_else_if_array_do, if_list_do,
-        if_matrices_and_compatible_convert_to_vec_array_and_do,
-        if_matrix_convert_to_vec_array_and_do, if_matrix_do, FOIL,
+        if_matrix_convert_to_vec_array_and_do,
     };
     #[cfg(feature = "nalgebra")]
-    use crate::{omatrix_to_vec_dynamic, ovector_to_vec_dynamic};
+    use crate::{
+        if_matrices_and_compatible_convert_to_vec_array_and_do, if_matrix_do,
+        omatrix_to_vec_dynamic, ovector_to_vec_dynamic, FOIL,
+    };
     #[cfg(feature = "nalgebra")]
     use nalgebralib::DMatrix;
     use rhai::{Array, Dynamic, EvalAltResult, Map, Position, FLOAT, INT};
+    #[cfg(feature = "smartcore")]
+    use smartcorelib::linalg::evd::EVDDecomposableMatrix;
     #[cfg(feature = "smartcore")]
     use smartcorelib::linalg::BaseMatrix;
     use std::collections::BTreeMap;
@@ -377,7 +379,7 @@ pub mod matrix_functions {
                         final_output.push(col);
                     }
 
-                    final_output = super::super::transpose_internal(final_output);
+                    final_output = crate::matrix_functions::transpose_internal(final_output);
 
                     let matrix_as_array = final_output
                         .into_iter()
@@ -1134,18 +1136,18 @@ pub mod matrix_functions {
             Err(e) => Err(e),
         }
     }
-}
 
-fn transpose_internal<T>(v: Vec<Vec<T>>) -> Vec<Vec<T>> {
-    assert!(!v.is_empty());
-    let len = v[0].len();
-    let mut iters: Vec<_> = v.into_iter().map(|n| n.into_iter()).collect();
-    (0..len)
-        .map(|_| {
-            iters
-                .iter_mut()
-                .map(|n| n.next().unwrap())
-                .collect::<Vec<T>>()
-        })
-        .collect()
+    fn transpose_internal<T>(v: Vec<Vec<T>>) -> Vec<Vec<T>> {
+        assert!(!v.is_empty());
+        let len = v[0].len();
+        let mut iters: Vec<_> = v.into_iter().map(|n| n.into_iter()).collect();
+        (0..len)
+            .map(|_| {
+                iters
+                    .iter_mut()
+                    .map(|n| n.next().unwrap())
+                    .collect::<Vec<T>>()
+            })
+            .collect()
+    }
 }
