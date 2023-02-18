@@ -3,6 +3,7 @@ use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT, INT};
 use smartcorelib::linalg::{naive::dense_matrix::DenseMatrix, BaseMatrix};
 
 /// Matrix compatibility conditions
+#[allow(dead_code)]
 pub enum FOIL {
     /// Height of first matrix must match height of second matrix
     First,
