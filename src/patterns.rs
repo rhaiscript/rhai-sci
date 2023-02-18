@@ -290,7 +290,7 @@ pub fn array_to_vec_float(arr: &mut Array) -> Vec<FLOAT> {
 
 #[cfg(feature = "nalgebra")]
 pub fn omatrix_to_vec_dynamic(
-    mat: nalgebralib::OMatrix<FLOAT, nalgebralib::Dynamic, nalgebralib::Dynamic>,
+    mat: nalgebralib::OMatrix<FLOAT, nalgebralib::Dyn, nalgebralib::Dyn>,
 ) -> Vec<Dynamic> {
     let mut out = vec![];
     for idx in 0..mat.shape().0 {
@@ -304,9 +304,7 @@ pub fn omatrix_to_vec_dynamic(
 }
 
 #[cfg(feature = "nalgebra")]
-pub fn ovector_to_vec_dynamic(
-    mat: nalgebralib::OVector<FLOAT, nalgebralib::Dynamic>,
-) -> Vec<Dynamic> {
+pub fn ovector_to_vec_dynamic(mat: nalgebralib::OVector<FLOAT, nalgebralib::Dyn>) -> Vec<Dynamic> {
     let mut out = vec![];
     for idx in 0..mat.shape().0 {
         out.push(Dynamic::from_float(mat[idx]));
