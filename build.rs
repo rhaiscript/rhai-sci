@@ -15,6 +15,7 @@ fn main() {
     use std::collections::HashMap;
     use std::io::Write;
 
+    #[allow(non_snake_case)]
     #[derive(Serialize, Deserialize, Debug, Clone)]
     struct Function {
         pub access: String,
@@ -79,14 +80,6 @@ fn main() {
         // Pull out basic info
         let name = function.name;
         if !name.starts_with("anon") && !name.starts_with("_") {
-            let comments = match function.docComments {
-                None => "".to_owned(),
-                Some(strings) => strings.join("\n"),
-            }
-            .replace("///", "")
-            .replace("/**", "")
-            .replace("**/", "");
-
             let signature = function
                 .signature
                 .replace("Result<", "")
@@ -105,7 +98,7 @@ fn main() {
             // Check if there are multiple arities, and if so add a header and indent
             if idx < function_list.len() - 1 {
                 if name == function_list[idx + 1].name && !indented {
-                    write!(doc_file, "<a href=\"#{name}\">{name}</a>")
+                    write!(doc_file, "<a href=\"#{}\">{}</a>", name, name)
                         .expect("Cannot write to {doc_file}");
                     indented = true;
                     if idx != function_list.len() - 1 {
@@ -115,7 +108,7 @@ fn main() {
             }
 
             if indented == false {
-                write!(doc_file, "<a href=\"#{id}\">{name}</a>")
+                write!(doc_file, "<a href=\"#{}\">{}</a>", id, name)
                     .expect("Cannot write to {doc_file}");
 
                 if idx != function_list.len() - 1 {
@@ -157,13 +150,6 @@ fn main() {
                 .replace("ImmutableString", "String")
                 .replace("_____CONSTANTS_____()", "physical constants");
 
-            let id = signature
-                .replace(": ", "-")
-                .replace(", ", "-")
-                .replace("(", "")
-                .replace(")", "")
-                .replace(" -> ", "---");
-
             // Check if there are multiple arities, and if so add a header and indent
             if idx < function_list.len() - 1 {
                 if name == function_list[idx + 1].name && !indented {
@@ -174,10 +160,10 @@ fn main() {
 
             // Print definition with right level of indentation
             if indented {
-                write!(doc_file, "### `{signature}`\n{comments}\n")
+                write!(doc_file, "### `{}`\n{}\n", signature, comments)
                     .expect("Cannot write to {doc_file}");
             } else {
-                write!(doc_file, "## `{signature}`\n{comments}\n")
+                write!(doc_file, "## `{}`\n{}\n", signature, comments)
                     .expect("Cannot write to {doc_file}");
             }
 
@@ -215,6 +201,7 @@ fn main() {
 }
 
 #[cfg(feature = "metadata")]
+#[allow(unused_imports)]
 mod functions {
     include!("src/matrices_and_arrays.rs");
     include!("src/statistics.rs");

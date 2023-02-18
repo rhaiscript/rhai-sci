@@ -5,21 +5,27 @@ pub mod constant_definitions {
     use rhai::FLOAT;
 
     // The ratio of a circle's circumference to its diameter.
+    #[allow(non_upper_case_globals)]
     pub const pi: FLOAT = 3.14159265358979323846264338327950288;
 
     //Speed of light in meters per second (m/s).
+    #[allow(non_upper_case_globals)]
     pub const c: FLOAT = 299792458.0;
 
     // Euler's number.
+    #[allow(non_upper_case_globals)]
     pub const e: FLOAT = 2.71828182845904523536028747135266250;
 
     // Acceleration due to gravity on Earth in meters per second per second (m/s^2).
+    #[allow(non_upper_case_globals)]
     pub const g: FLOAT = 9.80665;
 
     // The Planck constant in Joules per Hertz (J/Hz)
+    #[allow(non_upper_case_globals)]
     pub const h: FLOAT = 6.62607015e-34;
 
     // The golden ratio
+    #[allow(non_upper_case_globals)]
     pub const phi: FLOAT = 1.61803398874989484820;
 
     // Newtonian gravitational constant

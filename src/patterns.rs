@@ -1,8 +1,11 @@
 use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT, INT};
 #[cfg(feature = "smartcore")]
-use smartcorelib::linalg::{naive::dense_matrix::DenseMatrix, BaseMatrix};
+use smartcorelib::linalg::basic::{
+    arrays::Array as scArray, arrays::Array2 as scArray2, matrix::DenseMatrix,
+};
 
 /// Matrix compatibility conditions
+#[allow(dead_code)]
 pub enum FOIL {
     /// Height of first matrix must match height of second matrix
     First,
@@ -113,6 +116,7 @@ where
     f(new_x)
 }
 
+#[cfg(feature = "nalgebra")]
 pub fn if_matrix_do<T, F>(matrix: &mut Array, f: F) -> Result<T, Box<EvalAltResult>>
 where
     F: Fn(&mut Array) -> Result<T, Box<EvalAltResult>>,
@@ -126,6 +130,7 @@ where
         .into()))
 }
 
+#[cfg(feature = "nalgebra")]
 pub fn if_matrices_and_compatible_convert_to_vec_array_and_do<T, F>(
     compatibility_condition: FOIL,
     matrix1: &mut Array,
@@ -268,11 +273,10 @@ pub fn array_to_vec_int(arr: &mut Array) -> Vec<INT> {
 pub fn dense_matrix_to_vec_dynamic(dm: DenseMatrix<FLOAT>) -> Vec<Dynamic> {
     let mut output = vec![];
     for idx in 0..dm.shape().0 {
-        let vec_row = dm.get_row_as_vec(idx);
         output.push(Dynamic::from_array(
-            vec_row
-                .into_iter()
-                .map(|x| Dynamic::from_float(x))
+            dm.get_row(idx)
+                .iterator(0)
+                .map(|x| Dynamic::from_float(x.clone()))
                 .collect::<Vec<Dynamic>>(),
         ));
     }
@@ -287,7 +291,7 @@ pub fn array_to_vec_float(arr: &mut Array) -> Vec<FLOAT> {
 
 #[cfg(feature = "nalgebra")]
 pub fn omatrix_to_vec_dynamic(
-    mat: nalgebralib::OMatrix<FLOAT, nalgebralib::Dynamic, nalgebralib::Dynamic>,
+    mat: nalgebralib::OMatrix<FLOAT, nalgebralib::Dyn, nalgebralib::Dyn>,
 ) -> Vec<Dynamic> {
     let mut out = vec![];
     for idx in 0..mat.shape().0 {
@@ -301,9 +305,7 @@ pub fn omatrix_to_vec_dynamic(
 }
 
 #[cfg(feature = "nalgebra")]
-pub fn ovector_to_vec_dynamic(
-    mat: nalgebralib::OVector<FLOAT, nalgebralib::Dynamic>,
-) -> Vec<Dynamic> {
+pub fn ovector_to_vec_dynamic(mat: nalgebralib::OVector<FLOAT, nalgebralib::Dyn>) -> Vec<Dynamic> {
     let mut out = vec![];
     for idx in 0..mat.shape().0 {
         out.push(Dynamic::from_float(mat[idx]));
