@@ -1,17 +1,23 @@
 use rhai::plugin::*;
+#[cfg(feature = "smartcore")]
+use smartcorelib::linalg::evd::*;
 
 #[export_module]
 pub mod matrix_functions {
-    #[cfg(feature = "nalgebra")]
-    use crate::omatrix_to_vec_dynamic;
+    #[cfg(feature = "smartcore")]
+    use crate::{dense_matrix_to_vec_dynamic, if_matrix_convert_to_dense_matrix_and_do};
     use crate::{
         if_int_convert_to_float_and_do, if_int_do_else_if_array_do, if_list_do,
         if_matrices_and_compatible_convert_to_vec_array_and_do,
         if_matrix_convert_to_vec_array_and_do, if_matrix_do, FOIL,
     };
     #[cfg(feature = "nalgebra")]
+    use crate::{omatrix_to_vec_dynamic, ovector_to_vec_dynamic};
+    #[cfg(feature = "nalgebra")]
     use nalgebralib::DMatrix;
     use rhai::{Array, Dynamic, EvalAltResult, Map, Position, FLOAT, INT};
+    #[cfg(feature = "smartcore")]
+    use smartcorelib::linalg::BaseMatrix;
     use std::collections::BTreeMap;
 
     /// Calculates the inverse of a matrix. Fails if the matrix if not invertible, or if the
@@ -46,7 +52,7 @@ pub mod matrix_functions {
                 }
             });
 
-            // Try ot invert
+            // Try to invert
             let dm = dm.try_inverse();
 
             match dm {
@@ -58,6 +64,187 @@ pub mod matrix_functions {
 
                 Some(mat) => Ok(omatrix_to_vec_dynamic(mat)),
             }
+        })
+    }
+    /// Calculate the eigenvalues for a matrix.
+    /// ```typescript
+    /// let matrix = eye(5);
+    /// let eig = eigs(matrix);
+    /// assert_eq(eig, #{ "eigenvectors": [[1.0, 0.0, 0.0, 0.0, 0.0],
+    ///                                    [0.0, 1.0, 0.0, 0.0, 0.0],
+    ///                                    [0.0, 0.0, 1.0, 0.0, 0.0],
+    ///                                    [0.0, 0.0, 0.0, 1.0, 0.0],
+    ///                                    [0.0, 0.0, 0.0, 0.0, 1.0]],
+    ///                   "imaginary_eigenvalues": [0.0, 0.0, 0.0, 0.0, 0.0],
+    ///                   "real_eigenvalues": [1.0, 1.0, 1.0, 1.0, 1.0]});
+    /// ```
+    #[cfg(feature = "smartcore")]
+    #[rhai_fn(name = "eigs", return_raw, pure)]
+    pub fn matrix_eigs(matrix: &mut Array) -> Result<Map, Box<EvalAltResult>> {
+        if_matrix_convert_to_dense_matrix_and_do(matrix, |matrix_as_dm| {
+            // Try to invert
+            let dm =
+                matrix_as_dm.evd(matrix_as_dm.approximate_eq(&matrix_as_dm.transpose(), 0.0000001));
+
+            match dm {
+                Err(e) => {
+                    Err(EvalAltResult::ErrorArithmetic(format!("{:?}", e), Position::NONE).into())
+                }
+
+                Ok(evd) => {
+                    let vecs: Array = dense_matrix_to_vec_dynamic(evd.V);
+                    let real_values: Array = evd
+                        .d
+                        .into_iter()
+                        .map(|x| Dynamic::from_float(x))
+                        .collect::<Vec<Dynamic>>();
+                    let imaginary_values: Array = evd
+                        .e
+                        .into_iter()
+                        .map(|x| Dynamic::from_float(x))
+                        .collect::<Vec<Dynamic>>();
+
+                    let mut result = BTreeMap::new();
+                    let mut vid = smartstring::SmartString::new();
+                    vid.push_str("eigenvectors");
+                    result.insert(vid, Dynamic::from_array(vecs));
+                    let mut did = smartstring::SmartString::new();
+                    did.push_str("real_eigenvalues");
+                    result.insert(did, Dynamic::from_array(real_values));
+                    let mut eid = smartstring::SmartString::new();
+                    eid.push_str("imaginary_eigenvalues");
+                    result.insert(eid, Dynamic::from_array(imaginary_values));
+
+                    Ok(result)
+                }
+            }
+        })
+    }
+
+    /// Calculates the singular value decomposition of a matrix
+    /// ```typescript
+    /// let matrix = eye(5);
+    /// let svd_results = svd(matrix);
+    /// assert_eq(svd_results, #{"s": ones([5]), "u": eye(5), "v": eye(5)});
+    /// ```
+    #[cfg(feature = "nalgebra")]
+    #[rhai_fn(name = "svd", return_raw, pure)]
+    pub fn svd_decomp(matrix: &mut Array) -> Result<Map, Box<EvalAltResult>> {
+        if_matrix_convert_to_vec_array_and_do(matrix, |matrix_as_vec| {
+            let dm = DMatrix::from_fn(matrix_as_vec.len(), matrix_as_vec[0].len(), |i, j| {
+                if matrix_as_vec[0][0].is::<FLOAT>() {
+                    matrix_as_vec[i][j].as_float().unwrap()
+                } else {
+                    matrix_as_vec[i][j].as_int().unwrap() as FLOAT
+                }
+            });
+
+            // Try ot invert
+            let svd = nalgebralib::linalg::SVD::new(dm, true, true);
+
+            let mut result = BTreeMap::new();
+            let mut uid = smartstring::SmartString::new();
+            uid.push_str("u");
+            match svd.u {
+                Some(u) => result.insert(uid, Dynamic::from_array(omatrix_to_vec_dynamic(u))),
+                None => {
+                    return Err(EvalAltResult::ErrorArithmetic(
+                        format!("SVD decomposition cannot be computed for this matrix."),
+                        Position::NONE,
+                    )
+                    .into());
+                }
+            };
+
+            let mut vid = smartstring::SmartString::new();
+            vid.push_str("v");
+            match svd.v_t {
+                Some(v) => result.insert(vid, Dynamic::from_array(omatrix_to_vec_dynamic(v))),
+                None => {
+                    return Err(EvalAltResult::ErrorArithmetic(
+                        format!("SVD decomposition cannot be computed for this matrix."),
+                        Position::NONE,
+                    )
+                    .into());
+                }
+            };
+
+            let mut sid = smartstring::SmartString::new();
+            sid.push_str("s");
+            result.insert(
+                sid,
+                Dynamic::from_array(ovector_to_vec_dynamic(svd.singular_values)),
+            );
+
+            Ok(result)
+        })
+    }
+
+    /// Calculates the QR decomposition of a matrix
+    /// ```typescript
+    /// let matrix = eye(5);
+    /// let qr_results = qr(matrix);
+    /// assert_eq(qr_results, #{"q": eye(5), "r": eye(5)});
+    /// ```
+    #[cfg(feature = "nalgebra")]
+    #[rhai_fn(name = "qr", return_raw, pure)]
+    pub fn qr_decomp(matrix: &mut Array) -> Result<Map, Box<EvalAltResult>> {
+        if_matrix_convert_to_vec_array_and_do(matrix, |matrix_as_vec| {
+            let dm = DMatrix::from_fn(matrix_as_vec.len(), matrix_as_vec[0].len(), |i, j| {
+                if matrix_as_vec[0][0].is::<FLOAT>() {
+                    matrix_as_vec[i][j].as_float().unwrap()
+                } else {
+                    matrix_as_vec[i][j].as_int().unwrap() as FLOAT
+                }
+            });
+
+            // Try ot invert
+            let qr = nalgebralib::linalg::QR::new(dm);
+
+            let mut result = BTreeMap::new();
+            let mut qid = smartstring::SmartString::new();
+            qid.push_str("q");
+            result.insert(qid, Dynamic::from_array(omatrix_to_vec_dynamic(qr.q())));
+
+            let mut rid = smartstring::SmartString::new();
+            rid.push_str("r");
+            result.insert(rid, Dynamic::from_array(omatrix_to_vec_dynamic(qr.r())));
+
+            Ok(result)
+        })
+    }
+
+    /// Calculates the QR decomposition of a matrix
+    /// ```typescript
+    /// let matrix = eye(5);
+    /// let h_results = hessenberg(matrix);
+    /// assert_eq(h_results, #{"h": eye(5), "q": eye(5)});
+    /// ```
+    #[cfg(feature = "nalgebra")]
+    #[rhai_fn(name = "hessenberg", return_raw, pure)]
+    pub fn hessenberg(matrix: &mut Array) -> Result<Map, Box<EvalAltResult>> {
+        if_matrix_convert_to_vec_array_and_do(matrix, |matrix_as_vec| {
+            let dm = DMatrix::from_fn(matrix_as_vec.len(), matrix_as_vec[0].len(), |i, j| {
+                if matrix_as_vec[0][0].is::<FLOAT>() {
+                    matrix_as_vec[i][j].as_float().unwrap()
+                } else {
+                    matrix_as_vec[i][j].as_int().unwrap() as FLOAT
+                }
+            });
+
+            // Try ot invert
+            let h = nalgebralib::linalg::Hessenberg::new(dm);
+
+            let mut result = BTreeMap::new();
+            let mut hid = smartstring::SmartString::new();
+            hid.push_str("h");
+            result.insert(hid, Dynamic::from_array(omatrix_to_vec_dynamic(h.h())));
+
+            let mut qid = smartstring::SmartString::new();
+            qid.push_str("q");
+            result.insert(qid, Dynamic::from_array(omatrix_to_vec_dynamic(h.q())));
+
+            Ok(result)
         })
     }
 
@@ -151,9 +338,8 @@ pub mod matrix_functions {
         /// Reads a numeric csv file from a url
         /// ```typescript
         /// let url = "https://raw.githubusercontent.com/plotly/datasets/master/diabetes.csv";
-        /// // let x = read_matrix(url);
-        /// // assert_eq(size(x), [768, 9]);
-        /// assert(true);
+        /// let x = read_matrix(url);
+        /// assert_eq(size(x), [768, 9]);
         /// ```
         #[rhai_fn(name = "read_matrix", return_raw)]
         pub fn read_matrix(file_path: ImmutableString) -> Result<Array, Box<EvalAltResult>> {

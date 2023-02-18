@@ -56,6 +56,7 @@ fn main() {
     combine_with_exported_module!(&mut lib, "rhai_sci_sets", set_functions);
     combine_with_exported_module!(&mut lib, "rhai_sci_moving", moving_functions);
     combine_with_exported_module!(&mut lib, "rhai_sci_validate", validation_functions);
+    combine_with_exported_module!(&mut lib, "rhai_sci_machine_learing", ml_functions);
     engine.register_global_module(rhai::Shared::new(lib));
 
     // Extract metadata
@@ -69,8 +70,71 @@ fn main() {
     let function_list = v["functions"].clone();
 
     // Write functions
-    write!(doc_file, "\n# API\n This package provides a large variety of functions to help with scientific computing.\n").expect("Cannot write to {doc_file}");
+    write!(doc_file, "\n# API\n This package provides a large variety of functions to help with scientific computing:\n").expect("Cannot write to {doc_file}");
     write!(test_file, "#[cfg(test)]\nmod rhai_tests {{\n").expect("Cannot write to {test_file}");
+
+    let mut indented = false;
+    for (idx, function) in function_list.iter().enumerate() {
+        let function = function.clone();
+        // Pull out basic info
+        let name = function.name;
+        if !name.starts_with("anon") && !name.starts_with("_") {
+            let comments = match function.docComments {
+                None => "".to_owned(),
+                Some(strings) => strings.join("\n"),
+            }
+            .replace("///", "")
+            .replace("/**", "")
+            .replace("**/", "");
+
+            let signature = function
+                .signature
+                .replace("Result<", "")
+                .replace(", Box<EvalAltResult>>", "")
+                .replace("&mut ", "")
+                .replace("ImmutableString", "String");
+
+            let id = signature
+                .replace(": ", "-")
+                .replace(", ", "-")
+                .replace("(", "")
+                .replace(")", "")
+                .replace(" -> ", "---")
+                .to_lowercase();
+
+            // Check if there are multiple arities, and if so add a header and indent
+            if idx < function_list.len() - 1 {
+                if name == function_list[idx + 1].name && !indented {
+                    write!(doc_file, "<a href=\"#{name}\">{name}</a>")
+                        .expect("Cannot write to {doc_file}");
+                    indented = true;
+                    if idx != function_list.len() - 1 {
+                        write!(doc_file, "&nbsp;&nbsp; ").expect("Cannot write to {doc_file}");
+                    }
+                }
+            }
+
+            if indented == false {
+                write!(doc_file, "<a href=\"#{id}\">{name}</a>")
+                    .expect("Cannot write to {doc_file}");
+
+                if idx != function_list.len() - 1 {
+                    write!(doc_file, "&nbsp;&nbsp; ").expect("Cannot write to {doc_file}");
+                }
+            }
+
+            if idx == function_list.len() - 1 {
+                write!(doc_file, "\n").expect("Cannot write to {doc_file}");
+            }
+
+            // End indentation when its time
+            if idx != 0 && idx < function_list.len() - 1 {
+                if name == function_list[idx - 1].name && name != function_list[idx + 1].name {
+                    indented = false;
+                }
+            }
+        }
+    }
     let mut indented = false;
     for (idx, function) in function_list.iter().enumerate() {
         let function = function.clone();
@@ -90,7 +154,15 @@ fn main() {
                 .replace("Result<", "")
                 .replace(", Box<EvalAltResult>>", "")
                 .replace("&mut ", "")
+                .replace("ImmutableString", "String")
                 .replace("_____CONSTANTS_____()", "physical constants");
+
+            let id = signature
+                .replace(": ", "-")
+                .replace(", ", "-")
+                .replace("(", "")
+                .replace(")", "")
+                .replace(" -> ", "---");
 
             // Check if there are multiple arities, and if so add a header and indent
             if idx < function_list.len() - 1 {
@@ -155,6 +227,7 @@ mod functions {
     include!("src/moving.rs");
     include!("src/validate.rs");
     include!("src/patterns.rs");
+    include!("src/machine_learning.rs");
 }
 
 #[cfg(feature = "metadata")]
