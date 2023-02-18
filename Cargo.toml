@@ -27,7 +27,7 @@ nalgebralib = {version = "0.32.1", optional = true, package = "nalgebra" }
 polars = {version = "0.27.2", optional = true }
 url = {version = "2.2.2", optional = true }
 temp-file = {version = "0.1.6", optional = true }
-csv-sniffer = {version = "0.1.1", optional = true }
+csv-sniffer = {version = "0.3.1", optional = true }
 minreq = { version = "2.6.0", features = ["json-using-serde", "https"], optional = true }
 randlib = { version = "0.8", optional = true, package = "rand" }
 smartstring = "1.0.1"
