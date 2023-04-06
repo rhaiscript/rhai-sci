@@ -14,7 +14,7 @@ pub mod assert_functions {
             Ok(comparison)
         } else {
             Err(EvalAltResult::ErrorArithmetic(
-                format!("The comparison is not true."),
+                "The comparison is not true".to_string(),
                 Position::NONE,
             )
             .into())
@@ -32,7 +32,7 @@ pub mod assert_functions {
         if lhs_type != rhs_type {
             return Err(EvalAltResult::ErrorArithmetic(
                 format!(
-                    "The left-hand side ({}) and right-hand side ({}) do not have the same type.",
+                    "The left-hand side ({}) and right-hand side ({}) do not have the same type",
                     lhs_type, rhs_type
                 ),
                 Position::NONE,
@@ -48,7 +48,7 @@ pub mod assert_functions {
             println!("LHS: {:?}", lhs);
             println!("RHS: {:?}", rhs);
             Err(EvalAltResult::ErrorArithmetic(
-                format!("The left-hand side and right-hand side are not equal."),
+                "The left-hand side and right-hand side are not equal".to_string(),
                 Position::NONE,
             )
             .into())
@@ -66,7 +66,7 @@ pub mod assert_functions {
         if lhs_type != rhs_type {
             return Err(EvalAltResult::ErrorArithmetic(
                 format!(
-                    "The left-hand side ({}) and right-hand side ({}) do not have the same type.",
+                    "The left-hand side ({}) and right-hand side ({}) do not have the same type",
                     lhs_type, rhs_type
                 ),
                 Position::NONE,
@@ -82,7 +82,7 @@ pub mod assert_functions {
             println!("LHS: {:?}", lhs);
             println!("RHS: {:?}", rhs);
             Err(EvalAltResult::ErrorArithmetic(
-                format!("The left-hand side and right-hand side are equal."),
+                "The left-hand side and right-hand side are equal".to_string(),
                 Position::NONE,
             )
             .into())

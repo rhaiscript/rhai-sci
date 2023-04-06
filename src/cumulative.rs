@@ -10,7 +10,7 @@ pub mod cum_functions {
         G: Fn(&mut Array) -> Dynamic,
     {
         if_list_do(arr, |arr| {
-            let mut new_arr: Vec<Dynamic> = vec![];
+            let mut new_arr: Array = vec![];
             let n = arr.len() as INT;
             for i in 0..n {
                 new_arr.push(f(&mut arr.get(0_usize..=(i as usize)).unwrap().to_vec()))
@@ -74,7 +74,7 @@ pub mod cum_functions {
     pub fn cumtrapz(x: Array, y: Array) -> Result<Array, Box<EvalAltResult>> {
         if x.len() != y.len() {
             Err(EvalAltResult::ErrorArithmetic(
-                format!("The arrays must have the same length"),
+                "The arrays must have the same length".to_string(),
                 Position::NONE,
             )
             .into())
