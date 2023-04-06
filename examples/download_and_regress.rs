@@ -4,8 +4,6 @@ fn main() {
         use rhai::{packages::Package, Engine};
         use rhai_sci::SciPackage;
 
-        const SCRIPT: &str = include_str!("download_and_regress.rhai");
-
         // Create a new Rhai engine
         let mut engine = Engine::new();
 
@@ -13,7 +11,9 @@ fn main() {
         engine.register_global_module(SciPackage::new().as_shared_module());
 
         // Now run your code
-        let fitting_results = engine.run(SCRIPT).unwrap();
+        let fitting_results = engine
+            .run_file("examples/download_and_regress.rhai".into())
+            .unwrap();
         println!("{:?}", fitting_results);
     }
 }
