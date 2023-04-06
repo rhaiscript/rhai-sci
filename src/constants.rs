@@ -1,6 +1,7 @@
 use rhai::plugin::*;
 
 #[export_module]
+#[allow(non_upper_case_globals)]
 pub mod constant_definitions {
     use rhai::FLOAT;
 

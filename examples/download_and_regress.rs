@@ -1,8 +1,10 @@
-use rhai::{packages::Package, Dynamic, Engine};
+use rhai::{packages::Package, Engine};
 use rhai_sci::SciPackage;
 
 fn main() {
-    #[cfg(all(feature = "matrix", feature = "io"))]
+    const SCRIPT: &str = include_str!("download_and_regress.rhai");
+
+    #[cfg(all(feature = "nalgebra", feature = "io"))]
     {
         // Create a new Rhai engine
         let mut engine = Engine::new();
@@ -11,8 +13,6 @@ fn main() {
         engine.register_global_module(SciPackage::new().as_shared_module());
 
         // Now run your code
-        engine
-            .eval_file::<Dynamic>("examples/download_and_regress.rhai".into())
-            .unwrap();
+        engine.run(SCRIPT).unwrap();
     }
 }

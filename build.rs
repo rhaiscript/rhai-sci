@@ -4,8 +4,9 @@ fn main() {
     println!("cargo:rerun-if-changed=src");
     println!("cargo:rerun-if-changed=build.rs");
 
-    // Make empty file for documentation
+    // Make empty file for documentation and tests
     std::fs::File::create(std::env::var("OUT_DIR").unwrap() + "/rhai-sci-docs.md").unwrap();
+    std::fs::File::create("tests/rhai-sci-tests.rs").unwrap();
 }
 
 #[cfg(feature = "metadata")]
@@ -38,8 +39,7 @@ fn main() {
         std::fs::File::create(std::env::var("OUT_DIR").unwrap() + "/rhai-sci-docs.md").unwrap();
 
     // Make a file for tests
-    let mut test_file =
-        std::fs::File::create(std::env::var("OUT_DIR").unwrap() + "/rhai-sci-tests.rs").unwrap();
+    let mut test_file = std::fs::File::create("tests/rhai-sci-tests.rs").unwrap();
 
     // Build an engine for doctests
     let mut engine = Engine::new();

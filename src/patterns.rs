@@ -49,7 +49,7 @@ where
                 } else if el.is_float() {
                     el.as_float().unwrap()
                 } else {
-                    panic!("This should never happen!");
+                    unreachable!("This should never happen!");
                 })
             })
             .collect::<Array>();
@@ -92,7 +92,7 @@ pub fn array_to_vec_float(arr: &mut Array) -> Vec<FLOAT> {
 
 #[cfg(feature = "nalgebra")]
 pub fn omatrix_to_vec_dynamic(
-    mat: nalgebralib::OMatrix<FLOAT, nalgebralib::Dynamic, nalgebralib::Dynamic>,
+    mat: nalgebralib::OMatrix<FLOAT, nalgebralib::Dyn, nalgebralib::Dyn>,
 ) -> Array {
     let mut out = vec![];
     for idx in 0..mat.shape().0 {

@@ -163,16 +163,31 @@ pub mod matrix_functions {
                         .infer_schema(Some(10))
                         .has_header(
                             csv_sniffer::Sniffer::new()
-                                .sniff_path(file_path_as_str.clone())
-                                .expect("Cannot sniff file")
+                                .sniff_path(file_path_as_str)
+                                .map_err(|err| {
+                                    EvalAltResult::ErrorSystem(
+                                        format!("Cannot sniff file: {file_path_as_str}"),
+                                        err.into(),
+                                    )
+                                })?
                                 .dialect
                                 .header
                                 .has_header_row,
                         )
                         .finish()
-                        .expect("Cannot read file as CSV")
+                        .map_err(|err| {
+                            EvalAltResult::ErrorSystem(
+                                format!("Cannot read file as CSV: {file_path_as_str}"),
+                                err.into(),
+                            )
+                        })?
                         .drop_nulls(None)
-                        .expect("Cannot remove null values");
+                        .map_err(|err| {
+                            EvalAltResult::ErrorSystem(
+                                format!("Cannot remove null values from file: {file_path_as_str}"),
+                                err.into(),
+                            )
+                        })?;
 
                     // Convert into vec of vec
 
@@ -180,7 +195,12 @@ pub mod matrix_functions {
                     for series in x.get_columns() {
                         let col: Vec<FLOAT> = series
                             .cast(&DataType::Float64)
-                            .expect("Cannot cast to FLOAT")
+                            .map_err(|err| {
+                                EvalAltResult::ErrorArithmetic(
+                                    format!("Data cannot be cast to FLOAT: {err}"),
+                                    Position::NONE,
+                                )
+                            })?
                             .f64()
                             .unwrap()
                             .into_no_null_iter()
@@ -206,18 +226,27 @@ pub mod matrix_functions {
                 }
                 Err(_) => {
                     if let Ok(_) = url::Url::parse(file_path_as_str) {
-                        let file_contents = minreq::get(file_path_as_str)
-                            .send()
-                            .expect("Could not open URL");
+                        let file_contents =
+                            minreq::get(file_path_as_str).send().map_err(|err| {
+                                EvalAltResult::ErrorSystem(
+                                    format!("Error getting url: {file_path_as_str}"),
+                                    err.into(),
+                                )
+                            })?;
                         let temp = temp_file::with_contents(file_contents.as_bytes());
 
                         let temp_file_name: ImmutableString = temp.path().to_str().unwrap().into();
+
                         read_matrix(temp_file_name)
                     } else {
-                        panic!(
-                            "The string {} is not a valid URL or file path",
-                            file_path_as_str
+                        EvalAltResult::ErrorRuntime(
+                            format!(
+                                "The string {file_path_as_str} is not a valid URL or file path",
+                            )
+                            .into(),
+                            Position::NONE,
                         )
+                        .into()
                     }
                 }
             }
