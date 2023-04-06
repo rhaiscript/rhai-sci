@@ -1,6 +1,5 @@
 #![warn(clippy::all)]
 #![warn(missing_docs)]
-#![warn(rustdoc::missing_doc_code_examples)]
 #![warn(clippy::missing_docs_in_private_items)]
 #![doc = include_str!("../README.md")]
 #![doc = include_str!(concat!(env!("OUT_DIR"), "/rhai-sci-docs.md"))]
@@ -29,6 +28,8 @@ mod sets;
 use sets::set_functions;
 mod validate;
 use validate::validation_functions;
+mod machine_learning;
+use machine_learning::ml_functions;
 
 def_package! {
     /// Package for scientific computing
@@ -44,6 +45,7 @@ def_package! {
         combine_with_exported_module!(lib, "rhai_sci_sets", set_functions);
         combine_with_exported_module!(lib, "rhai_sci_moving", moving_functions);
         combine_with_exported_module!(lib, "rhai_sci_validation", validation_functions);
+        combine_with_exported_module!(lib, "rhai_sci_machine_learing", ml_functions);
     }
 }
 
@@ -54,7 +56,9 @@ def_package! {
 /// use rhai::FLOAT;
 /// print!("{:?}", eval::<FLOAT>("let x = max(5, 2); x + min(3, 72)"));
 /// ```
-pub fn eval<T: Clone + 'static>(script: &str) -> Result<T, Box<EvalAltResult>> {
+pub fn eval<T: Clone + std::marker::Send + std::marker::Sync + 'static>(
+    script: &str,
+) -> Result<T, Box<EvalAltResult>> {
     let mut engine = Engine::new();
     engine.register_global_module(SciPackage::new().as_shared_module());
     engine.eval::<T>(script)

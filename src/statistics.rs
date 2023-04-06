@@ -6,7 +6,11 @@ pub mod stats {
         array_to_vec_float, array_to_vec_int, if_list_convert_to_vec_float_and_do, if_list_do,
         if_list_do_int_or_do_float,
     };
-    use rhai::{Array, Dynamic, EvalAltResult, Map, Position, FLOAT, INT};
+    #[cfg(feature = "nalgebra")]
+    use rhai::Map;
+    use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT, INT};
+
+    #[cfg(feature = "nalgebra")]
     use std::collections::BTreeMap;
     use std::collections::HashMap;
 
@@ -519,7 +523,7 @@ pub mod stats {
         )
     }
 
-    /// Performs ordinary least squares regression.
+    /// Performs ordinary least squares regression and provides a statistical assessment.
     /// ```typescript
     /// let x = [[1.0, 0.0],
     ///          [1.0, 1.0],
