@@ -5,9 +5,9 @@ pub mod cum_functions {
     use crate::{if_list_convert_to_vec_float_and_do, if_list_do};
     use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT, INT};
 
-    fn accumulate<G>(arr: &mut Array, f: G) -> Result<Array, Box<EvalAltResult>>
+    fn accumulate<G>(arr: &mut Array, mut f: G) -> Result<Array, Box<EvalAltResult>>
     where
-        G: Fn(&mut Array) -> Dynamic,
+        G: FnMut(&mut Array) -> Dynamic,
     {
         if_list_do(arr, |arr| {
             let mut new_arr: Array = vec![];
