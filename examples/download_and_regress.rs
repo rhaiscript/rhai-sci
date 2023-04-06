@@ -1,10 +1,11 @@
 fn main() {
-    const SCRIPT: &str = include_str!("download_and_regress.rhai");
-
     #[cfg(all(feature = "nalgebra", feature = "io"))]
     {
-        use rhai::{packages::Package, Dynamic, Engine};
+        use rhai::{packages::Package, Engine};
         use rhai_sci::SciPackage;
+
+        const SCRIPT: &str = include_str!("download_and_regress.rhai");
+
         // Create a new Rhai engine
         let mut engine = Engine::new();
 

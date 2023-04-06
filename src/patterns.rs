@@ -115,7 +115,7 @@ where
 }
 
 #[cfg(feature = "nalgebra")]
-pub fn if_matrix_do<T, F>(matrix: &mut Array, f: F) -> Result<T, Box<EvalAltResult>>
+pub fn if_matrix_do<T, F>(matrix: &mut Array, mut f: F) -> Result<T, Box<EvalAltResult>>
 where
     F: FnMut(&mut Array) -> Result<T, Box<EvalAltResult>>,
 {
@@ -207,46 +207,10 @@ where
 #[cfg(feature = "smartcore")]
 pub fn if_matrix_convert_to_dense_matrix_and_do<F, T>(
     matrix: &mut Array,
-    f: F,
+    mut f: F,
 ) -> Result<T, Box<EvalAltResult>>
 where
-    F: Fn(DenseMatrix<FLOAT>) -> Result<T, Box<EvalAltResult>>,
-{
-    if crate::validation_functions::is_matrix(matrix) {
-        let matrix_as_vec = matrix
-            .clone()
-            .iter()
-            .map(|x| {
-                x.clone()
-                    .into_array()
-                    .unwrap()
-                    .iter()
-                    .map(|y| {
-                        if y.is::<FLOAT>() {
-                            y.clone().as_float().unwrap()
-                        } else {
-                            y.clone().as_int().unwrap() as FLOAT
-                        }
-                    })
-                    .collect::<Vec<FLOAT>>()
-            })
-            .collect::<Vec<Vec<FLOAT>>>();
-        f(DenseMatrix::from_2d_vec(&matrix_as_vec))
-    } else {
-        Err(
-            EvalAltResult::ErrorArithmetic(format!("The input must be a matrix."), Position::NONE)
-                .into(),
-        )
-    }
-}
-
-#[cfg(feature = "smartcore")]
-pub fn if_matrix_convert_to_dense_matrix_and_do<F, T>(
-    matrix: &mut Array,
-    f: F,
-) -> Result<T, Box<EvalAltResult>>
-where
-    F: Fn(DenseMatrix<FLOAT>) -> Result<T, Box<EvalAltResult>>,
+    F: FnMut(DenseMatrix<FLOAT>) -> Result<T, Box<EvalAltResult>>,
 {
     if crate::validation_functions::is_matrix(matrix) {
         let matrix_as_vec = matrix

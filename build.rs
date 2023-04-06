@@ -148,7 +148,7 @@ fn main() {
                 .replace(", Box<EvalAltResult>>", "")
                 .replace("&mut ", "")
                 .replace("ImmutableString", "String")
-                .replace("_____CONSTANTS_____()", "physical constants");
+                .replace("$CONSTANTS$()", "physical constants");
 
             // Check if there are multiple arities, and if so add a header and indent
             if idx < function_list.len() - 1 {
