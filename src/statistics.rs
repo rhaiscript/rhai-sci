@@ -221,7 +221,7 @@ pub mod stats {
         )
     }
 
-    /// Return the average of an array.Fails if the input is not an array, or if
+    /// Return the average of an array. Fails if the input is not an array, or if
     /// it is an array with elements other than INT or FLOAT.
     /// ```typescript
     /// let data = [1, 2, 3];
@@ -233,14 +233,10 @@ pub mod stats {
         let l = arr.len() as FLOAT;
         if_list_do_int_or_do_float(
             arr,
-            |arr: &mut Array| match sum(arr) {
-                Ok(s) => Ok(Dynamic::from_float(s.as_int().unwrap() as FLOAT / l)),
-                Err(e) => Err(e),
+            |arr: &mut Array| {
+                sum(arr).map(|s| Dynamic::from_float(s.as_int().unwrap() as FLOAT / l))
             },
-            |arr: &mut Array| match sum(arr) {
-                Ok(s) => Ok(Dynamic::from_float(s.as_float().unwrap() / l)),
-                Err(e) => Err(e),
-            },
+            |arr: &mut Array| sum(arr).map(|s| Dynamic::from_float(s.as_float().unwrap() / l)),
         )
     }
 
@@ -253,13 +249,14 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "argmax", return_raw, pure)]
     pub fn argmax(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        if_list_do(arr, |arr| match array_max(arr) {
-            Ok(m) => Ok(Dynamic::from_int(
-                arr.iter()
-                    .position(|r| format!("{r}") == format!("{m}"))
-                    .unwrap() as INT,
-            )),
-            Err(e) => Err(e),
+        if_list_do(arr, |arr| {
+            array_max(arr).map(|m| {
+                Dynamic::from_int(
+                    arr.iter()
+                        .position(|r| format!("{r}") == format!("{m}"))
+                        .unwrap() as INT,
+                )
+            })
         })
     }
 
@@ -272,13 +269,14 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "argmin", return_raw, pure)]
     pub fn argmin(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        if_list_do(arr, |arr| match array_min(arr) {
-            Ok(m) => Ok(Dynamic::from_int(
-                arr.iter()
-                    .position(|r| format!("{r}") == format!("{m}"))
-                    .unwrap() as INT,
-            )),
-            Err(e) => Err(e),
+        if_list_do(arr, |arr| {
+            array_min(arr).map(|m| {
+                Dynamic::from_int(
+                    arr.iter()
+                        .position(|r| format!("{r}") == format!("{m}"))
+                        .unwrap() as INT,
+                )
+            })
         })
     }
 
@@ -323,10 +321,8 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "variance", return_raw, pure)]
     pub fn variance(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        let m = match mean(arr) {
-            Ok(med) => med.as_float().unwrap(),
-            Err(e) => return Err(e),
-        };
+        let m = mean(arr).map(|med| med.as_float().unwrap())?;
+
         if_list_convert_to_vec_float_and_do(arr, |x| {
             let mut sum = 0.0 as FLOAT;
 
@@ -346,10 +342,7 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "std", return_raw, pure)]
     pub fn std(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        match variance(arr) {
-            Ok(v) => Ok(Dynamic::from_float(v.as_float().unwrap().sqrt())),
-            Err(e) => Err(e),
-        }
+        variance(arr).map(|v| Dynamic::from_float(v.as_float().unwrap().sqrt()))
     }
 
     /// Returns the variance of a 1-D array.
@@ -399,20 +392,22 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "mad", return_raw, pure)]
     pub fn mad(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        let m = match median(arr) {
-            Ok(med) => med.as_float().unwrap(),
-            Err(e) => return Err(e),
-        };
+        let m = median(arr).map(|med| med.as_float().unwrap())?;
+
         if_list_convert_to_vec_float_and_do(arr, |x| {
             let mut dev = vec![];
             for v in x {
                 dev.push(Dynamic::from_float((v - m).abs()));
             }
-            Ok(median(&mut dev).unwrap())
+            median(&mut dev)
         })
     }
 
     /// Returns a given percentile value for a 1-D array of data.
+    ///
+    /// The array must not be empty.
+    ///
+    /// If the percentile value is <= 0 or >= 100, returns the minimum and maximum values of the array respectively.
     /// ```typescript
     /// let data = [1, 2, 0, 3, 4];
     /// let p = prctile(data, 50);
@@ -420,29 +415,42 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "prctile", return_raw, pure)]
     pub fn prctile(arr: &mut Array, p: Dynamic) -> Result<FLOAT, Box<EvalAltResult>> {
-        let pp = if p.is::<FLOAT>() {
-            p.as_float().unwrap()
-        } else {
-            p.as_int().unwrap() as FLOAT
-        };
-        if_list_convert_to_vec_float_and_do(arr, |mut float_array| {
+        if arr.is_empty() {
+            return Err(EvalAltResult::ErrorArithmetic(
+                "Array must not be empty".to_string(),
+                Position::NONE,
+            )
+            .into());
+        }
+        if !p.is_float() && !p.is_int() {
+            return Err(EvalAltResult::ErrorArithmetic(
+                "Percentile value must either be INT or FLOAT".to_string(),
+                Position::NONE,
+            )
+            .into());
+        }
+
+        if_list_convert_to_vec_float_and_do(arr, move |mut float_array| {
+            match float_array.len() {
+                0 => unreachable!(),
+                1 => return Ok(float_array[0]),
+                _ => (),
+            }
+
             // Sort
             float_array.sort_by(|a, b| a.partial_cmp(b).unwrap());
 
             let sorted_array = float_array
                 .iter()
                 .map(|el| Dynamic::from_float(*el))
-                .collect::<Vec<Dynamic>>();
+                .collect::<Array>();
 
-            let x = match crate::matrix_functions::linspace(
+            let mut x = crate::matrix_functions::linspace(
                 Dynamic::from_int(0),
                 Dynamic::from_int(100),
                 float_array.len() as INT,
-            ) {
-                Ok(lins) => lins,
-                Err(e) => return Err(e),
-            };
-            crate::misc_functions::interp1(x, sorted_array, Dynamic::from_float(pp))
+            )?;
+            crate::misc_functions::interp1(&mut x, sorted_array, p.clone())
         })
     }
 
@@ -532,10 +540,7 @@ pub mod stats {
     #[rhai_fn(name = "regress", return_raw, pure)]
     pub fn regress(x: &mut Array, y: Array) -> Result<Map, Box<EvalAltResult>> {
         use linregress::{FormulaRegressionBuilder, RegressionDataBuilder};
-        let x_transposed = match crate::matrix_functions::transpose(x) {
-            Ok(mat) => mat,
-            Err(e) => return Err(e),
-        };
+        let x_transposed = crate::matrix_functions::transpose(x)?;
         let mut data: Vec<(String, Vec<f64>)> = vec![];
         let mut vars = vec![];
         for (iter, column) in x_transposed.iter().enumerate() {
@@ -553,34 +558,29 @@ pub mod stats {
 
         let regress_data = RegressionDataBuilder::new().build_from(data).unwrap();
 
-        let model = match FormulaRegressionBuilder::new()
+        let model = FormulaRegressionBuilder::new()
             .data(&regress_data)
             .data_columns("y", vars)
             .fit()
-        {
-            Ok(m) => m,
-            Err(e) => {
-                return Err(EvalAltResult::ErrorArithmetic(format!("{e}"), Position::NONE).into())
-            }
-        };
+            .map_err(|e| EvalAltResult::ErrorArithmetic(e.to_string(), Position::NONE))?;
 
         let parameters = Dynamic::from_array(
             model
                 .iter_parameter_pairs()
                 .map(|x| Dynamic::from_float(x.1))
-                .collect::<Vec<Dynamic>>(),
+                .collect::<Array>(),
         );
         let pvalues = Dynamic::from_array(
             model
                 .iter_p_value_pairs()
                 .map(|x| Dynamic::from_float(x.1))
-                .collect::<Vec<Dynamic>>(),
+                .collect::<Array>(),
         );
         let standard_errors = Dynamic::from_array(
             model
                 .iter_se_pairs()
                 .map(|x| Dynamic::from_float(x.1))
-                .collect::<Vec<Dynamic>>(),
+                .collect::<Array>(),
         );
 
         let mut result = BTreeMap::new();

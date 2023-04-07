@@ -22,7 +22,7 @@ pub mod int_and_diff {
     pub fn trapz(x: Array, y: Array) -> Result<Dynamic, Box<EvalAltResult>> {
         if x.len() != y.len() {
             Err(EvalAltResult::ErrorArithmetic(
-                format!("The arrays must have the same length"),
+                "The arrays must have the same length".to_string(),
                 Position::NONE,
             )
             .into())

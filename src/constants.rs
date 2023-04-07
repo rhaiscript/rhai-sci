@@ -1,6 +1,7 @@
 use rhai::plugin::*;
 
 #[export_module]
+#[allow(non_upper_case_globals)]
 pub mod constant_definitions {
     use rhai::FLOAT;
 
@@ -33,7 +34,7 @@ pub mod constant_definitions {
 
     /// Physical constants useful for science.
     ///  ### `pi: FLOAT`
-    /// The ratio of a circle's circumference to its diameter (nondimensional).
+    /// The ratio of a circle's circumference to its diameter (non-dimensional).
     /// ```typescript
     /// assert_eq(pi, 3.14159265358979323846264338327950288);
     /// ```
@@ -43,7 +44,7 @@ pub mod constant_definitions {
     /// assert_eq(c, 299792458.0);
     /// ```
     /// ### `e: FLOAT`
-    /// Euler's number (nondimensional).
+    /// Euler's number (non-dimensional).
     /// ```typescript
     /// assert_eq(e, 2.71828182845904523536028747135266250);
     /// ```
@@ -58,15 +59,15 @@ pub mod constant_definitions {
     /// assert_eq(h, 6.62607015e-34);
     /// ```
     /// ### `phi: FLOAT`
-    /// The golden ratio (nondimensional).
+    /// The golden ratio (non-dimensional).
     /// ```typescript
     /// assert_eq(phi, 1.61803398874989484820);
     /// ```
     /// ### `G: FLOAT`
-    /// The Newtonian gravitational constant (nondimensional).
+    /// The Newtonian gravitational constant (non-dimensional).
     /// ```typescript
     /// assert_eq(G, 6.6743015e-11);
     /// ```
-    #[rhai_fn(name = "_____CONSTANTS_____")]
+    #[rhai_fn(name = "$CONSTANTS$")]
     pub fn constants() {}
 }

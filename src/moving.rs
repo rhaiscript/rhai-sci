@@ -5,9 +5,9 @@ pub mod moving_functions {
     use crate::if_list_do;
     use rhai::{Array, Dynamic, EvalAltResult, INT};
 
-    fn mov<G>(arr: &mut Array, k: INT, f: G) -> Result<Array, Box<EvalAltResult>>
+    fn mov<G>(arr: &mut Array, k: INT, mut f: G) -> Result<Array, Box<EvalAltResult>>
     where
-        G: Fn(&mut Array) -> Dynamic,
+        G: FnMut(&mut Array) -> Dynamic,
     {
         if_list_do(arr, |arr| {
             // First, validate the inputs
@@ -85,7 +85,7 @@ pub mod moving_functions {
     }
 
     /// Returns an array of the moving product (with a given width) across the input array.
-    /// ```javascript
+    /// ```typescript
     /// let data = [1, 2, 3, 4, 5, 6];
     /// let m = movprod(data, 3);
     /// assert_eq(m, [2, 6, 24, 60, 120, 30]);
@@ -96,7 +96,7 @@ pub mod moving_functions {
     }
 
     /// Returns an array of the moving standard deviation (with a given width) across the input array.
-    /// ```javascript
+    /// ```typescript
     /// let data = [1, 2, 3, 4, 5, 6];
     /// let m = movstd(data, 3);
     /// assert_eq(m, [0.7071067811865476, 1.0, 1.0, 1.0, 1.0, 0.7071067811865476]);
@@ -107,7 +107,7 @@ pub mod moving_functions {
     }
 
     /// Returns an array of the moving variance (with a given width) across the input array.
-    /// ```javascript
+    /// ```typescript
     /// let data = [1, 2, 3, 4, 5, 6];
     /// let m = movvar(data, 3);
     /// assert_eq(m, [0.5, 1.0, 1.0, 1.0, 1.0, 0.5]);
@@ -118,7 +118,7 @@ pub mod moving_functions {
     }
 
     /// Returns an array of the moving sum (with a given width) across the input array.
-    /// ```javascript
+    /// ```typescript
     /// let data = [1, 2, 3, 4, 5, 6];
     /// let m = movsum(data, 3);
     /// assert_eq(m, [3, 6, 9, 12, 15, 11]);

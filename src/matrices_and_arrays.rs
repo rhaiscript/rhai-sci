@@ -47,7 +47,7 @@ pub mod matrix_functions {
     pub fn invert_matrix(matrix: &mut Array) -> Result<Array, Box<EvalAltResult>> {
         if_matrix_convert_to_vec_array_and_do(matrix, |matrix_as_vec| {
             let dm = DMatrix::from_fn(matrix_as_vec.len(), matrix_as_vec[0].len(), |i, j| {
-                if matrix_as_vec[0][0].is::<FLOAT>() {
+                if matrix_as_vec[0][0].is_float() {
                     matrix_as_vec[i][j].as_float().unwrap()
                 } else {
                     matrix_as_vec[i][j].as_int().unwrap() as FLOAT
@@ -57,15 +57,13 @@ pub mod matrix_functions {
             // Try to invert
             let dm = dm.try_inverse();
 
-            match dm {
-                None => Err(EvalAltResult::ErrorArithmetic(
-                    format!("Matrix cannot be inverted"),
+            dm.map(omatrix_to_vec_dynamic).ok_or_else(|| {
+                EvalAltResult::ErrorArithmetic(
+                    "Matrix cannot be inverted".to_string(),
                     Position::NONE,
                 )
-                .into()),
-
-                Some(mat) => Ok(omatrix_to_vec_dynamic(mat)),
-            }
+                .into()
+            })
         })
     }
     /// Calculate the eigenvalues for a matrix.
@@ -266,7 +264,7 @@ pub mod matrix_functions {
     #[rhai_fn(name = "transpose", pure, return_raw)]
     pub fn transpose(matrix: &mut Array) -> Result<Array, Box<EvalAltResult>> {
         if_matrix_convert_to_vec_array_and_do(matrix, |matrix_as_vec| {
-            // Turn into Vec<Dynamic>
+            // Turn into Array
             let mut out = vec![];
             for idx in 0..matrix_as_vec[0].len() {
                 let mut new_row = vec![];
@@ -294,7 +292,7 @@ pub mod matrix_functions {
 
         let mut shape = vec![Dynamic::from_int(new_matrix.len() as INT)];
         loop {
-            if new_matrix[0].is::<Array>() {
+            if new_matrix[0].is_array() {
                 new_matrix = new_matrix[0].clone().into_array().unwrap();
                 shape.push(Dynamic::from_int(new_matrix.len() as INT));
             } else {
@@ -368,16 +366,31 @@ pub mod matrix_functions {
                         .infer_schema(Some(10))
                         .has_header(
                             csv_sniffer::Sniffer::new()
-                                .sniff_path(file_path_as_str.clone())
-                                .expect("Cannot sniff file")
+                                .sniff_path(file_path_as_str)
+                                .map_err(|err| {
+                                    EvalAltResult::ErrorSystem(
+                                        format!("Cannot sniff file: {file_path_as_str}"),
+                                        err.into(),
+                                    )
+                                })?
                                 .dialect
                                 .header
                                 .has_header_row,
                         )
                         .finish()
-                        .expect("Cannot read file as CSV")
+                        .map_err(|err| {
+                            EvalAltResult::ErrorSystem(
+                                format!("Cannot read file as CSV: {file_path_as_str}"),
+                                err.into(),
+                            )
+                        })?
                         .drop_nulls(None)
-                        .expect("Cannot remove null values");
+                        .map_err(|err| {
+                            EvalAltResult::ErrorSystem(
+                                format!("Cannot remove null values from file: {file_path_as_str}"),
+                                err.into(),
+                            )
+                        })?;
 
                     // Convert into vec of vec
 
@@ -385,7 +398,12 @@ pub mod matrix_functions {
                     for series in x.get_columns() {
                         let col: Vec<FLOAT> = series
                             .cast(&DataType::Float64)
-                            .expect("Cannot cast to FLOAT")
+                            .map_err(|err| {
+                                EvalAltResult::ErrorArithmetic(
+                                    format!("Data cannot be cast to FLOAT: {err}"),
+                                    Position::NONE,
+                                )
+                            })?
                             .f64()
                             .unwrap()
                             .into_no_null_iter()
@@ -405,24 +423,33 @@ pub mod matrix_functions {
                             }
                             Dynamic::from_array(y)
                         })
-                        .collect::<Vec<Dynamic>>();
+                        .collect::<Array>();
 
                     Ok(matrix_as_array)
                 }
                 Err(_) => {
                     if let Ok(_) = url::Url::parse(file_path_as_str) {
-                        let file_contents = minreq::get(file_path_as_str)
-                            .send()
-                            .expect("Could not open URL");
+                        let file_contents =
+                            minreq::get(file_path_as_str).send().map_err(|err| {
+                                EvalAltResult::ErrorSystem(
+                                    format!("Error getting url: {file_path_as_str}"),
+                                    err.into(),
+                                )
+                            })?;
                         let temp = temp_file::with_contents(file_contents.as_bytes());
 
                         let temp_file_name: ImmutableString = temp.path().to_str().unwrap().into();
+
                         read_matrix(temp_file_name)
                     } else {
-                        panic!(
-                            "The string {} is not a valid URL or file path.",
-                            file_path_as_str
+                        EvalAltResult::ErrorRuntime(
+                            format!(
+                                "The string {file_path_as_str} is not a valid URL or file path",
+                            )
+                            .into(),
+                            Position::NONE,
                         )
+                        .into()
                     }
                 }
             }
@@ -471,8 +498,7 @@ pub mod matrix_functions {
                         m[1].as_int().unwrap(),
                     ))
                 } else if m.len() > 2 {
-                    let l = m[0].clone();
-                    m.remove(0);
+                    let l = m.remove(0);
                     Ok(vec![
                         Dynamic::from_array(
                             zeros_single_input(Dynamic::from_array(m.to_vec())).unwrap()
@@ -544,8 +570,7 @@ pub mod matrix_functions {
                         m[1].as_int().unwrap(),
                     ))
                 } else if m.len() > 2 {
-                    let l = m[0].clone();
-                    m.remove(0);
+                    let l = m.remove(0);
                     Ok(vec![
                         Dynamic::from_array(
                             ones_single_input(Dynamic::from_array(m.to_vec())).unwrap()
@@ -598,8 +623,7 @@ pub mod matrix_functions {
                         m[1].as_int().unwrap(),
                     ))
                 } else if m.len() > 2 {
-                    let l = m[0].clone();
-                    m.remove(0);
+                    let l = m.remove(0);
                     Ok(vec![
                         Dynamic::from_array(
                             rand_single_input(Dynamic::from_array(m.to_vec())).unwrap()
@@ -668,7 +692,7 @@ pub mod matrix_functions {
                     ))
                 } else {
                     Err(EvalAltResult::ErrorMismatchDataType(
-                        format!("Cannot create an identity matrix with more than 2 dimensions."),
+                        format!("Cannot create an identity matrix with more than 2 dimensions"),
                         format!(""),
                         Position::NONE,
                     )
@@ -715,9 +739,9 @@ pub mod matrix_functions {
     /// ```
     #[rhai_fn(name = "flatten", pure)]
     pub fn flatten(matrix: &mut Array) -> Array {
-        let mut flat: Vec<Dynamic> = vec![];
+        let mut flat: Array = vec![];
         for el in matrix {
-            if el.is::<Array>() {
+            if el.is_array() {
                 flat.extend(flatten(&mut el.clone().into_array().unwrap()))
             } else {
                 flat.push(el.clone());
@@ -739,7 +763,7 @@ pub mod matrix_functions {
             let w = matrix_as_vec[0].len();
             let h = matrix_as_vec.len();
 
-            // Turn into Vec<Dynamic>
+            // Turn into Array
             let mut out = vec![];
             for idx in 0..h {
                 let mut new_row = vec![];
@@ -765,7 +789,7 @@ pub mod matrix_functions {
             let w = matrix_as_vec[0].len();
             let h = matrix_as_vec.len();
 
-            // Turn into Vec<Dynamic>
+            // Turn into Array
             let mut out = vec![];
             for idx in 0..h {
                 let mut new_row = vec![];
@@ -791,7 +815,7 @@ pub mod matrix_functions {
             let w = matrix_as_vec[0].len();
             let h = matrix_as_vec.len();
 
-            // Turn into Vec<Dynamic>
+            // Turn into Array
             let mut out = vec![];
             for idx in 0..w {
                 let mut new_row = vec![];
@@ -814,14 +838,19 @@ pub mod matrix_functions {
     /// ```
     #[rhai_fn(name = "rot90", return_raw)]
     pub fn rot90_ktimes(matrix: &mut Array, k: INT) -> Result<Array, Box<EvalAltResult>> {
-        if k > 1 {
-            match rot90_once(matrix) {
-                Ok(mut mat) => rot90_ktimes(&mut mat, k - 1),
-                Err(e) => Err(e),
-            }
-        } else {
-            rot90_once(matrix)
+        if k <= 0 {
+            return Ok(matrix.clone());
         }
+
+        let mut result = matrix;
+        let mut result_base = Array::new();
+
+        for _ in 0..k {
+            result_base = rot90_once(result)?;
+            result = &mut result_base;
+        }
+
+        Ok(result_base)
     }
 
     /// Perform matrix multiplication.
@@ -841,7 +870,7 @@ pub mod matrix_functions {
             |matrix_as_vec1, matrix_as_vec2| {
                 let dm1 =
                     DMatrix::from_fn(matrix_as_vec1.len(), matrix_as_vec1[0].len(), |i, j| {
-                        if matrix_as_vec1[0][0].is::<FLOAT>() {
+                        if matrix_as_vec1[0][0].is_float() {
                             matrix_as_vec1[i][j].as_float().unwrap()
                         } else {
                             matrix_as_vec1[i][j].as_int().unwrap() as FLOAT
@@ -850,7 +879,7 @@ pub mod matrix_functions {
 
                 let dm2 =
                     DMatrix::from_fn(matrix_as_vec2.len(), matrix_as_vec2[0].len(), |i, j| {
-                        if matrix_as_vec2[0][0].is::<FLOAT>() {
+                        if matrix_as_vec2[0][0].is_float() {
                             matrix_as_vec2[i][j].as_float().unwrap()
                         } else {
                             matrix_as_vec2[i][j].as_int().unwrap() as FLOAT
@@ -860,7 +889,7 @@ pub mod matrix_functions {
                 // Try to multiply
                 let mat = dm1 * dm2;
 
-                // Turn into Vec<Dynamic>
+                // Turn into Array
                 let mut out = vec![];
                 for idx in 0..mat.shape().0 {
                     let mut new_row = vec![];
@@ -891,7 +920,7 @@ pub mod matrix_functions {
             |matrix_as_vec1, matrix_as_vec2| {
                 let dm1 =
                     DMatrix::from_fn(matrix_as_vec1.len(), matrix_as_vec1[0].len(), |i, j| {
-                        if matrix_as_vec1[0][0].is::<FLOAT>() {
+                        if matrix_as_vec1[0][0].is_float() {
                             matrix_as_vec1[i][j].as_float().unwrap()
                         } else {
                             matrix_as_vec1[i][j].as_int().unwrap() as FLOAT
@@ -900,7 +929,7 @@ pub mod matrix_functions {
 
                 let dm2 =
                     DMatrix::from_fn(matrix_as_vec2.len(), matrix_as_vec2[0].len(), |i, j| {
-                        if matrix_as_vec2[0][0].is::<FLOAT>() {
+                        if matrix_as_vec2[0][0].is_float() {
                             matrix_as_vec2[i][j].as_float().unwrap()
                         } else {
                             matrix_as_vec2[i][j].as_int().unwrap() as FLOAT
@@ -919,7 +948,7 @@ pub mod matrix_functions {
                     }
                 });
 
-                // Turn into Vec<Dynamic>
+                // Turn into Array
                 let mut out = vec![];
                 for idx in 0..h {
                     let mut new_row = vec![];
@@ -950,7 +979,7 @@ pub mod matrix_functions {
             |matrix_as_vec1, matrix_as_vec2| {
                 let dm1 =
                     DMatrix::from_fn(matrix_as_vec1.len(), matrix_as_vec1[0].len(), |i, j| {
-                        if matrix_as_vec1[0][0].is::<FLOAT>() {
+                        if matrix_as_vec1[0][0].is_float() {
                             matrix_as_vec1[i][j].as_float().unwrap()
                         } else {
                             matrix_as_vec1[i][j].as_int().unwrap() as FLOAT
@@ -959,7 +988,7 @@ pub mod matrix_functions {
 
                 let dm2 =
                     DMatrix::from_fn(matrix_as_vec2.len(), matrix_as_vec2[0].len(), |i, j| {
-                        if matrix_as_vec2[0][0].is::<FLOAT>() {
+                        if matrix_as_vec2[0][0].is_float() {
                             matrix_as_vec2[i][j].as_float().unwrap()
                         } else {
                             matrix_as_vec2[i][j].as_int().unwrap() as FLOAT
@@ -978,7 +1007,7 @@ pub mod matrix_functions {
                     }
                 });
 
-                // Turn into Vec<Dynamic>
+                // Turn into Array
                 let mut out = vec![];
                 for idx in 0..h {
                     let mut new_row = vec![];
@@ -1013,7 +1042,7 @@ pub mod matrix_functions {
     #[rhai_fn(name = "diag", return_raw)]
     pub fn diag(matrix: Array) -> Result<Array, Box<EvalAltResult>> {
         if ndims_by_reference(&mut matrix.clone()) == 2 {
-            // Turn into Vec<Vec<Dynamic>>
+            // Turn into Vec<Array>
             let matrix_as_vec = matrix
                 .into_iter()
                 .map(|x| x.into_array().unwrap())
@@ -1033,7 +1062,7 @@ pub mod matrix_functions {
                     if idx == jdx {
                         new_row.push(matrix[idx].clone());
                     } else {
-                        if matrix[idx].is::<INT>() {
+                        if matrix[idx].is_int() {
                             new_row.push(Dynamic::ZERO);
                         } else {
                             new_row.push(Dynamic::FLOAT_ZERO);
@@ -1045,7 +1074,7 @@ pub mod matrix_functions {
             Ok(out)
         } else {
             return Err(EvalAltResult::ErrorArithmetic(
-                format!("Argument must be a 2-D matrix (to extract the diagonal) or a 1-D array (to create a matrix with that diagonal."),
+                "Argument must be a 2-D matrix (to extract the diagonal) or a 1-D array (to create a matrix with that diagonal".to_string(),
                 Position::NONE,
             )
                 .into());
@@ -1064,17 +1093,11 @@ pub mod matrix_functions {
         if_matrix_do(matrix, |matrix| {
             let mut row_matrix = matrix.clone();
             for _ in 1..ny {
-                match horzcat(row_matrix, matrix.clone()) {
-                    Ok(mat) => row_matrix = mat,
-                    Err(e) => return Err(e),
-                };
+                row_matrix = horzcat(row_matrix, matrix.clone())?;
             }
             let mut new_matrix = row_matrix.clone();
             for _ in 1..nx {
-                match vertcat(new_matrix, row_matrix.clone()) {
-                    Ok(mat) => new_matrix = mat,
-                    Err(e) => return Err(e),
-                }
+                new_matrix = vertcat(new_matrix, row_matrix.clone())?;
             }
             Ok(new_matrix)
         })
@@ -1097,8 +1120,8 @@ pub mod matrix_functions {
             if_list_do(&mut y.clone(), |y| {
                 let nx = x.len();
                 let ny = y.len();
-                let x_dyn: Vec<Dynamic> = vec![Dynamic::from_array(x.to_vec()); nx];
-                let mut y_dyn: Vec<Dynamic> = vec![Dynamic::from_array(y.to_vec()); ny];
+                let x_dyn: Array = vec![Dynamic::from_array(x.to_vec()); nx];
+                let mut y_dyn: Array = vec![Dynamic::from_array(y.to_vec()); ny];
 
                 let mut result = BTreeMap::new();
                 let mut xid = smartstring::SmartString::new();
@@ -1143,12 +1166,10 @@ pub mod matrix_functions {
     /// ```
     #[rhai_fn(name = "logspace", return_raw)]
     pub fn logspace(a: Dynamic, b: Dynamic, n: INT) -> Result<Array, Box<EvalAltResult>> {
-        match linspace(a, b, n) {
-            Ok(arr) => Ok(arr
-                .iter()
+        linspace(a, b, n).map(|arr| {
+            arr.iter()
                 .map(|e| Dynamic::from_float((10 as FLOAT).powf(e.as_float().unwrap())))
-                .collect::<Vec<Dynamic>>()),
-            Err(e) => Err(e),
-        }
+                .collect::<Array>()
+        })
     }
 }
