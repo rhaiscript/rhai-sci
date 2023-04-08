@@ -401,7 +401,7 @@ pub mod matrix_functions {
                             .map_err(|err| {
                                 EvalAltResult::ErrorArithmetic(
                                     format!("Data cannot be cast to FLOAT: {err}"),
-                                    Position::NONE,
+                                    rhai::Position::NONE,
                                 )
                             })?
                             .f64()
@@ -447,7 +447,7 @@ pub mod matrix_functions {
                                 "The string {file_path_as_str} is not a valid URL or file path",
                             )
                             .into(),
-                            Position::NONE,
+                            rhai::Position::NONE,
                         )
                         .into()
                     }
