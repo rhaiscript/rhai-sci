@@ -410,8 +410,18 @@ pub mod stats {
     /// If the percentile value is <= 0 or >= 100, returns the minimum and maximum values of the array respectively.
     /// ```typescript
     /// let data = [1, 2, 0, 3, 4];
+    /// let p = prctile(data, 0);
+    /// assert_eq(p, 0.0);
+    /// ```
+    /// ```typescript
+    /// let data = [1, 2, 0, 3, 4];
     /// let p = prctile(data, 50);
     /// assert_eq(p, 2.0);
+    /// ```
+    /// ```typescript
+    /// let data = [1, 2, 0, 3, 4];
+    /// let p = prctile(data, 100);
+    /// assert_eq(p, 4.0);
     /// ```
     #[rhai_fn(name = "prctile", return_raw, pure)]
     pub fn prctile(arr: &mut Array, p: Dynamic) -> Result<FLOAT, Box<EvalAltResult>> {
