@@ -28,8 +28,6 @@ mod sets;
 use sets::set_functions;
 mod validate;
 use validate::validation_functions;
-mod machine_learning;
-use machine_learning::ml_functions;
 
 def_package! {
     /// Package for scientific computing
@@ -45,7 +43,6 @@ def_package! {
         combine_with_exported_module!(lib, "rhai_sci_sets", set_functions);
         combine_with_exported_module!(lib, "rhai_sci_moving", moving_functions);
         combine_with_exported_module!(lib, "rhai_sci_validation", validation_functions);
-        combine_with_exported_module!(lib, "rhai_sci_machine_learing", ml_functions);
     }
 }
 
