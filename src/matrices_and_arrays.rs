@@ -1,9 +1,8 @@
+use nalgebralib::{Dyn, OMatrix};
 use rhai::plugin::*;
 
 #[export_module]
 pub mod matrix_functions {
-    #[cfg(feature = "smartcore")]
-    use crate::{dense_matrix_to_vec_dynamic, if_matrix_convert_to_dense_matrix_and_do};
     use crate::{
         if_int_convert_to_float_and_do, if_int_do_else_if_array_do, if_list_do,
         if_matrix_convert_to_vec_array_and_do,
@@ -16,10 +15,6 @@ pub mod matrix_functions {
     #[cfg(feature = "nalgebra")]
     use nalgebralib::DMatrix;
     use rhai::{Array, Dynamic, EvalAltResult, Map, Position, FLOAT, INT};
-    #[cfg(feature = "smartcore")]
-    use smartcorelib::linalg::basic::arrays::Array2;
-    #[cfg(feature = "smartcore")]
-    use smartcorelib::linalg::traits::evd::EVDDecomposable;
     use std::collections::BTreeMap;
 
     /// Calculates the inverse of a matrix. Fails if the matrix if not invertible, or if the
@@ -66,58 +61,90 @@ pub mod matrix_functions {
             })
         })
     }
-    /// Calculate the eigenvalues for a matrix.
+
+    /// Calculate the eigenvalues and eigenvectors for a matrix. Specifically, the output is an
+    /// object map with entries for real_eigenvalues, imaginary_eigenvalues, eigenvectors, and
+    /// residuals.
     /// ```typescript
     /// let matrix = eye(5);
     /// let eig = eigs(matrix);
-    /// assert_eq(eig, #{ "eigenvectors": [[1.0, 0.0, 0.0, 0.0, 0.0],
-    ///                                    [0.0, 1.0, 0.0, 0.0, 0.0],
-    ///                                    [0.0, 0.0, 1.0, 0.0, 0.0],
-    ///                                    [0.0, 0.0, 0.0, 1.0, 0.0],
-    ///                                    [0.0, 0.0, 0.0, 0.0, 1.0]],
-    ///                   "imaginary_eigenvalues": [0.0, 0.0, 0.0, 0.0, 0.0],
-    ///                   "real_eigenvalues": [1.0, 1.0, 1.0, 1.0, 1.0]});
+    /// assert(sum(eig.residuals) < 0.000001);
     /// ```
-    #[cfg(feature = "smartcore")]
+    /// ```typescript
+    /// let matrix = [[ 0.0,  1.0],
+    ///               [-2.0, -3.0]];
+    /// let eig = eigs(matrix);
+    /// assert(sum(eig.residuals) < 0.000001);
+    /// ```
+    #[cfg(feature = "nalgebra")]
     #[rhai_fn(name = "eigs", return_raw, pure)]
-    pub fn matrix_eigs(matrix: &mut Array) -> Result<Map, Box<EvalAltResult>> {
-        if_matrix_convert_to_dense_matrix_and_do(matrix, |matrix_as_dm| {
-            // Try to invert
-            let dm =
-                matrix_as_dm.evd(matrix_as_dm.approximate_eq(&matrix_as_dm.transpose(), 0.0000001));
-
-            match dm {
-                Err(e) => {
-                    Err(EvalAltResult::ErrorArithmetic(format!("{:?}", e), Position::NONE).into())
+    pub fn matrix_eigs_alt(matrix: &mut Array) -> Result<Map, Box<EvalAltResult>> {
+        if_matrix_convert_to_vec_array_and_do(matrix, |matrix_as_vec| {
+            // Convert vec_array to omatrix
+            let mut dm = DMatrix::from_fn(matrix_as_vec.len(), matrix_as_vec[0].len(), |i, j| {
+                if matrix_as_vec[0][0].is_float() {
+                    matrix_as_vec[i][j].as_float().unwrap()
+                } else {
+                    matrix_as_vec[i][j].as_int().unwrap() as FLOAT
                 }
+            });
 
-                Ok(evd) => {
-                    let vecs: Array = dense_matrix_to_vec_dynamic(evd.V);
-                    let real_values: Array = evd
-                        .d
-                        .into_iter()
-                        .map(|x| Dynamic::from_float(x))
-                        .collect::<Vec<Dynamic>>();
-                    let imaginary_values: Array = evd
-                        .e
-                        .into_iter()
-                        .map(|x| Dynamic::from_float(x))
-                        .collect::<Vec<Dynamic>>();
+            // Grab shape for later
+            let dms = dm.shape().1;
 
-                    let mut result = BTreeMap::new();
-                    let mut vid = smartstring::SmartString::new();
-                    vid.push_str("eigenvectors");
-                    result.insert(vid, Dynamic::from_array(vecs));
-                    let mut did = smartstring::SmartString::new();
-                    did.push_str("real_eigenvalues");
-                    result.insert(did, Dynamic::from_array(real_values));
-                    let mut eid = smartstring::SmartString::new();
-                    eid.push_str("imaginary_eigenvalues");
-                    result.insert(eid, Dynamic::from_array(imaginary_values));
+            // Get teh eigenvalues
+            let eigenvalues = dm.complex_eigenvalues();
 
-                    Ok(result)
-                }
+            // Iterate through eigenvalues to get eigenvectors
+            let mut imaginary_values = vec![Dynamic::from_float(1.0); 0];
+            let mut real_values = vec![Dynamic::from_float(1.0); 0];
+            let mut residuals = vec![Dynamic::from_float(1.0); 0];
+            let mut eigenvectors = DMatrix::from_element(dms, 0, 0.0);
+            for (idx, ev) in eigenvalues.iter().enumerate() {
+                // Eigenvalue components
+                imaginary_values.push(Dynamic::from_float(ev.im));
+                real_values.push(Dynamic::from_float(ev.re));
+
+                // Get eigenvector
+                let mut A = dm.clone() - DMatrix::from_diagonal_element(dms, dms, ev.re);
+                A = A.insert_column(0, 0.0);
+                A = A.insert_row(0, 0.0);
+                A[(0, idx + 1)] = 1.0;
+                let mut b = DMatrix::from_element(dms + 1, 1, 0.0);
+                b[(0, 0)] = 1.0;
+                let eigenvector = A
+                    .svd(true, true)
+                    .solve(&b, 1e-10)
+                    .unwrap()
+                    .remove_rows(0, 1)
+                    .normalize();
+
+                // Verify solution
+                residuals.push(Dynamic::from_float(
+                    (dm.clone() * eigenvector.clone() - ev.re * eigenvector.clone()).amax(),
+                ));
+
+                eigenvectors.extend(eigenvector.column_iter());
             }
+
+            let mut result = BTreeMap::new();
+            let mut vid = smartstring::SmartString::new();
+            vid.push_str("eigenvectors");
+            result.insert(
+                vid,
+                Dynamic::from_array(omatrix_to_vec_dynamic(eigenvectors)),
+            );
+            let mut did = smartstring::SmartString::new();
+            did.push_str("real_eigenvalues");
+            result.insert(did, Dynamic::from_array(real_values));
+            let mut eid = smartstring::SmartString::new();
+            eid.push_str("imaginary_eigenvalues");
+            result.insert(eid, Dynamic::from_array(imaginary_values));
+            let mut rid = smartstring::SmartString::new();
+            rid.push_str("residuals");
+            result.insert(rid, Dynamic::from_array(residuals));
+
+            Ok(result)
         })
     }
 

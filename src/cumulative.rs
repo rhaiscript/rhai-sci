@@ -102,7 +102,7 @@ pub mod cum_functions {
     /// ```
     #[rhai_fn(name = "cumtrapz", return_raw, pure)]
     pub fn cumtrapz_unit(y: &mut Array) -> Result<Array, Box<EvalAltResult>> {
-        crate::if_list_convert_to_vec_float_and_do(y, |yf| {
+        if_list_convert_to_vec_float_and_do(y, |yf| {
             let mut trapsum = 0.0 as FLOAT;
             let mut cumtrapsum = vec![Dynamic::FLOAT_ZERO];
             for i in 1..yf.len() {

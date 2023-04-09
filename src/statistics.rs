@@ -558,12 +558,12 @@ pub mod stats {
             vars.push(var_name.clone());
             data.push((
                 var_name,
-                crate::array_to_vec_float(&mut column.clone().into_array().unwrap()),
+                array_to_vec_float(&mut column.clone().into_array().unwrap()),
             ));
         }
         data.push((
             "y".to_string(),
-            crate::array_to_vec_float(&mut crate::matrix_functions::flatten(&mut y.clone())),
+            array_to_vec_float(&mut crate::matrix_functions::flatten(&mut y.clone())),
         ));
 
         let regress_data = RegressionDataBuilder::new().build_from(data).unwrap();
