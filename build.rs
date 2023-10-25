@@ -69,7 +69,7 @@ fn main() {
     let json_fns = engine.gen_fn_metadata_to_json(false).unwrap();
     println!("{json_fns}");
     let v: Metadata = serde_json::from_str(&json_fns).unwrap();
-    for function in v.functions {
+    for function in &v.functions {
         println!("{:?}", function);
     }
 
