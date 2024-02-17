@@ -68,6 +68,7 @@ where
     }
 }
 
+/// Does a function if the input is a list, otherwise throws an error.
 pub fn if_list_do<F, T>(arr: &mut Array, mut f: F) -> Result<T, Box<EvalAltResult>>
 where
     F: FnMut(&mut Array) -> Result<T, Box<EvalAltResult>>,
@@ -96,6 +97,8 @@ where
     .and_then(f)
 }
 
+/// If the input is an int, convert to a float and do the function. if the input is a float already,
+/// the function is still performed.
 pub fn if_int_convert_to_float_and_do<F, T>(x: Dynamic, mut f: F) -> Result<T, Box<EvalAltResult>>
 where
     F: FnMut(FLOAT) -> Result<T, Box<EvalAltResult>>,
@@ -182,6 +185,7 @@ where
     }
 }
 
+/// If the input is a
 pub fn if_matrix_convert_to_vec_array_and_do<F, T>(
     matrix: &mut Array,
     mut f: F,
