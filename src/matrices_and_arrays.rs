@@ -5,7 +5,7 @@ use rhai::plugin::*;
 pub mod matrix_functions {
     use crate::{
         if_int_convert_to_float_and_do, if_int_do_else_if_array_do, if_list_do,
-        if_matrix_convert_to_vec_array_and_do,
+        if_matrix_convert_to_vec_array_and_do, array_to_vec_float
     };
     #[cfg(feature = "nalgebra")]
     use crate::{
@@ -355,6 +355,22 @@ pub mod matrix_functions {
     #[rhai_fn(name = "numel", pure)]
     pub fn numel_by_reference(matrix: &mut Array) -> INT {
         flatten(matrix).len() as INT
+    }
+
+    /// Returns the number of non-zero elements in a matrix, passed by reference.
+    /// ```typescript
+    /// let matrix = ones(4, 6);
+    /// let n = nnz(matrix);
+    /// assert_eq(n, 24);
+    /// ```
+    /// ```typescript
+    /// let matrix = eye(4);
+    /// let n = nnz(matrix);
+    /// assert_eq(n, 4);
+    /// ```
+    #[rhai_fn(name = "nnz", pure)]
+    pub fn nnz_by_reference(matrix: &mut Array) -> INT {
+        array_to_vec_float(&mut flatten(matrix)).iter().filter(|&n| *n > 0.0).count() as INT
     }
 
     #[cfg(all(feature = "io"))]
