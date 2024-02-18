@@ -8,6 +8,26 @@ pub mod trig_functions {
     use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT, INT};
 
 
+
+    /// Converts the argument from degrees to radians
+    /// ```typescript
+    /// assert_eq(deg2rad(180.0), pi);
+    /// ```
+    #[rhai_fn(name = "deg2rad")]
+    pub fn deg2rad(degrees: FLOAT) -> FLOAT {
+        degrees * std::f64::consts::PI / 180.0
+    }
+
+
+    /// Converts the argument from radians to degrees
+    /// ```typescript
+    /// assert_eq(rad2deg(pi), 180.0);
+    /// ```
+    #[rhai_fn(name = "rad2deg")]
+    pub fn rad2deg(radians: FLOAT) -> FLOAT {
+        radians * 180.0 / std::f64::consts::PI
+    }
+
     /// Returns the sine of an argument given in degrees
     /// ```typescript
     /// assert_eq(sind(0.0),  0.0);
@@ -23,7 +43,7 @@ pub mod trig_functions {
     /// ```
     #[rhai_fn(name = "sind")]
     pub fn sind(x: FLOAT) -> FLOAT {
-        FLOAT::sin(x * std::f64::consts::PI / 180.0)
+        FLOAT::sin(deg2rad(x))
     }
 
     //
@@ -42,7 +62,7 @@ pub mod trig_functions {
     /// ```
     #[rhai_fn(name = "cosd")]
     pub fn cosd(x: FLOAT) -> FLOAT {
-        FLOAT::cos(x * std::f64::consts::PI / 180.0)
+        FLOAT::cos(deg2rad(x))
     }
 
 
@@ -58,7 +78,7 @@ pub mod trig_functions {
     /// ```
     #[rhai_fn(name = "tand")]
     pub fn tand(x: FLOAT) -> FLOAT {
-        FLOAT::tan(x * std::f64::consts::PI / 180.0)
+        FLOAT::tan(deg2rad(x))
     }
 
 }
