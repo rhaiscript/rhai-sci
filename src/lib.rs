@@ -29,6 +29,9 @@ pub use sets::set_functions;
 mod validate;
 pub use validate::validation_functions;
 
+mod trig;
+pub use trig::trig_functions;
+
 def_package! {
     /// Package for scientific computing
     pub SciPackage(lib) {
@@ -43,6 +46,7 @@ def_package! {
         combine_with_exported_module!(lib, "rhai_sci_sets", set_functions);
         combine_with_exported_module!(lib, "rhai_sci_moving", moving_functions);
         combine_with_exported_module!(lib, "rhai_sci_validation", validation_functions);
+        combine_with_exported_module!(lib, "rhai_sci_trig", trig_functions);
     }
 }
 
