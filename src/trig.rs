@@ -91,6 +91,9 @@ pub mod trig_functions {
     }
 
     /// Extends the built-in hypot function to compute distance in 3D cartesian space
+    /// ```typescript
+    /// assert_eq(hypot(2.0, 3.0, 6.0), 7.0);
+    /// ```
     #[rhai_fn(name = "hypot")]
     pub fn hypot3(x: FLOAT, y: FLOAT, z: FLOAT) -> FLOAT {
         (x.powf(2.0) + y.powf(2.0) + z.powf(2.0)).sqrt()
