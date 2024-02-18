@@ -119,13 +119,4 @@ pub mod trig_functions {
     pub fn atand(x: FLOAT) -> FLOAT {
         rad2deg(FLOAT::atan(x))
     }
-
-    /// Returns the square root of the sum of squares of the arguments
-    /// ```typescript
-    /// assert_eq(hypot(3.0, 4.0), 5.0);
-    /// ```
-    #[rhai_fn(name = "hypot")]
-    pub fn hypot(x: FLOAT, y: FLOAT) -> FLOAT {
-        x.hypot(y)
-    }
 }
