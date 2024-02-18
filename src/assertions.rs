@@ -2,7 +2,7 @@ use rhai::plugin::*;
 
 #[export_module]
 pub mod assert_functions {
-    use rhai::{Dynamic, EvalAltResult, Position};
+    use rhai::{FLOAT, Dynamic, EvalAltResult, Position};
 
     /// Assert that a statement is true and throw an error if it is not.
     /// ```typescript
@@ -87,5 +87,33 @@ pub mod assert_functions {
             )
             .into())
         }
+    }
+
+
+    /// Assert that two floats are approximately equal and throw an error if they are not.
+    /// ```typescript
+    /// assert_approx_eq(2.0, 2.000000000000000001, 10e-10);
+    /// ```
+    /// ```typescript
+    /// assert_approx_eq(2.0, 2.000000000000000001);
+    /// ```
+    #[rhai_fn(name = "assert_approx_eq", return_raw)]
+    pub fn assert_approx_eq(lhs: FLOAT, rhs: FLOAT, eps: FLOAT) -> Result<bool, Box<EvalAltResult>> {
+
+        if (lhs - rhs).abs() < eps {
+            Ok(true)
+        } else {
+            println!("LHS: {:?}", lhs);
+            println!("RHS: {:?}", rhs);
+            Err(EvalAltResult::ErrorArithmetic(
+                "The left-hand side and right-hand side are not equal".to_string(),
+                Position::NONE,
+            )
+                .into())
+        }
+    }
+    #[rhai_fn(name = "assert_approx_eq", return_raw)]
+    pub fn assert_approx_eq_with_default(lhs: FLOAT, rhs: FLOAT) -> Result<bool, Box<EvalAltResult>> {
+        assert_approx_eq(lhs, rhs, 10e-10)
     }
 }
