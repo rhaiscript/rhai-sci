@@ -128,7 +128,7 @@ pub mod trig_functions {
         FLOAT::tan(deg2rad(degrees))
     }
 
-    /// Returns the tangent of an argument given in degrees
+    /// Returns the tangent in degrees of the given argument
     /// ```typescript
     /// assert_approx_eq(atand(-1.0), -45.0);
     /// ```
@@ -143,13 +143,28 @@ pub mod trig_functions {
         rad2deg(FLOAT::atan(x))
     }
 
+    /// Returns the tangent in degrees of the given argument
+    /// ```typescript
+    /// assert_approx_eq(atand(-1.0, 1.0), -45.0);
+    /// ```
+    /// ```typescript
+    /// assert_eq(atand(0.0, 1.0), 0.0);
+    /// ```
+    /// ```typescript
+    /// assert_approx_eq(atand(1.0, 1.0), 45.0);
+    /// ```
+    #[rhai_fn(name = "atand")]
+    pub fn atand2(x: FLOAT, y: FLOAT) -> FLOAT {
+        rad2deg(FLOAT::atan2(x, y))
+    }
+
     /// Returns the hyperbolic tangent of the argument given in degrees
     #[rhai_fn(name = "tanhd")]
     pub fn tanhd(degrees: FLOAT) -> FLOAT {
         FLOAT::tanh(deg2rad(degrees))
     }
 
-    /// Returns the inverse hyperbolic tangent of the argument given in degrees
+    /// Returns the inverse hyperbolic tangent in degrees of the given argument
     #[rhai_fn(name = "atanhd")]
     pub fn atanhd(x: FLOAT) -> FLOAT {
         rad2deg(FLOAT::atanh(x))
