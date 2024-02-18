@@ -119,4 +119,148 @@ pub mod trig_functions {
     pub fn atand(x: FLOAT) -> FLOAT {
         rad2deg(FLOAT::atan(x))
     }
+
+    /// Returns the cosecant of the argument given in radians
+    #[rhai_fn(name = "csc")]
+    pub fn csc(radians: FLOAT) -> FLOAT {
+        1.0 / FLOAT::sin(radians)
+    }
+
+    /// Returns the cosecant of the argument given in degrees
+    #[rhai_fn(name = "cscd")]
+    pub fn cscd(degrees: FLOAT) -> FLOAT {
+        1.0 / FLOAT::sin(deg2rad(degrees))
+    }
+
+    /// Returns the inverse of the cosecant in radians
+    #[rhai_fn(name = "acsc")]
+    pub fn acsc(x: FLOAT) -> FLOAT {
+        FLOAT::asin(1.0 / x)
+    }
+
+    /// Returns the inverse of the cosecant in degrees
+    #[rhai_fn(name = "acscd")]
+    pub fn acscd(x: FLOAT) -> FLOAT {
+        rad2deg(FLOAT::asin(1.0 / x))
+    }
+
+    /// Returns the hyperbolic cosecant of the argument given in radians
+    #[rhai_fn(name = "csch")]
+    pub fn csch(radians: FLOAT) -> FLOAT {
+        1.0 / FLOAT::sinh(radians)
+    }
+
+    /// Returns the hyperbolic cosecant of the argument given in degrees
+    #[rhai_fn(name = "cschd")]
+    pub fn cschd(degrees: FLOAT) -> FLOAT {
+        1.0 / FLOAT::sinh(deg2rad(degrees))
+    }
+
+    /// Returns the inverse hyperbolic cosecant of the argument in radians
+    #[rhai_fn(name = "acsch")]
+    pub fn acsch(x: FLOAT) -> FLOAT {
+        FLOAT::asinh(1.0 / x)
+    }
+
+    /// Returns the inverse hyperbolic cosecant of the argument in degrees
+    #[rhai_fn(name = "acschd")]
+    pub fn acschd(x: FLOAT) -> FLOAT {
+        rad2deg(FLOAT::asinh(1.0 / x))
+    }
+
+    /// Returns the secant of the argument given in radians
+    #[rhai_fn(name = "sec")]
+    pub fn sec(radians: FLOAT) -> FLOAT {
+        1.0 / FLOAT::cos(radians)
+    }
+
+    /// Returns the secant of the argument given in degrees
+    #[rhai_fn(name = "secd")]
+    pub fn secd(degrees: FLOAT) -> FLOAT {
+        1.0 / FLOAT::cos(deg2rad(degrees))
+    }
+
+    /// Returns the inverse of the secant in radians
+    #[rhai_fn(name = "asec")]
+    pub fn asec(x: FLOAT) -> FLOAT {
+        FLOAT::acos(1.0 / x)
+    }
+
+    /// Returns the inverse of the secant in degrees
+    #[rhai_fn(name = "asecd")]
+    pub fn asecd(x: FLOAT) -> FLOAT {
+        rad2deg(FLOAT::acos(1.0 / x))
+    }
+
+    /// Returns the hyperbolic secant of the argument given in radians
+    #[rhai_fn(name = "sech")]
+    pub fn sech(radians: FLOAT) -> FLOAT {
+        1.0 / FLOAT::cosh(radians)
+    }
+
+    /// Returns the hyperbolic secant of the argument given in degrees
+    #[rhai_fn(name = "sechd")]
+    pub fn sechd(degrees: FLOAT) -> FLOAT {
+        1.0 / FLOAT::cosh(deg2rad(degrees))
+    }
+
+    /// Returns the inverse hyperbolic secant of the argument in radians
+    #[rhai_fn(name = "asech")]
+    pub fn asech(x: FLOAT) -> FLOAT {
+        FLOAT::acosh(1.0 / x)
+    }
+
+    /// Returns the inverse hyperbolic secant of the argument in degrees
+    #[rhai_fn(name = "asechd")]
+    pub fn asechd(x: FLOAT) -> FLOAT {
+        rad2deg(FLOAT::acosh(1.0 / x))
+    }
+
+    /// Returns the cotangent of the argument given in radians
+    #[rhai_fn(name = "cot")]
+    pub fn cot(radians: FLOAT) -> FLOAT {
+        1.0 / FLOAT::tan(radians)
+    }
+
+    /// Returns the cotangent of the argument given in degrees
+    #[rhai_fn(name = "cotd")]
+    pub fn cotd(degrees: FLOAT) -> FLOAT {
+        1.0 / FLOAT::tan(deg2rad(degrees))
+    }
+
+    /// Returns the inverse of the cotangent in radians
+    #[rhai_fn(name = "acot")]
+    pub fn acot(x: FLOAT) -> FLOAT {
+        FLOAT::atan(1.0 / x)
+    }
+
+    /// Returns the inverse of the cotangent in degrees
+    #[rhai_fn(name = "acotd")]
+    pub fn acotd(x: FLOAT) -> FLOAT {
+        rad2deg(FLOAT::atan(1.0 / x))
+    }
+
+    /// Returns the hyperbolic cotangent of the argument given in radians
+    #[rhai_fn(name = "coth")]
+    pub fn coth(radians: FLOAT) -> FLOAT {
+        1.0 / FLOAT::tanh(radians)
+    }
+
+    /// Returns the hyperbolic cotangent of the argument given in degrees
+    #[rhai_fn(name = "cothd")]
+    pub fn cothd(degrees: FLOAT) -> FLOAT {
+        1.0 / FLOAT::tanh(deg2rad(degrees))
+    }
+
+    /// Returns the inverse hyperbolic cotangent of the argument in radians
+    #[rhai_fn(name = "acoth")]
+    pub fn acoth(x: FLOAT) -> FLOAT {
+        FLOAT::atanh(1.0 / x)
+    }
+
+    /// Returns the inverse hyperbolic cotangent of the argument in degrees
+    #[rhai_fn(name = "acothd")]
+    pub fn acothd(x: FLOAT) -> FLOAT {
+        rad2deg(FLOAT::atanh(1.0 / x))
+    }
 }
