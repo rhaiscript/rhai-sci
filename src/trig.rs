@@ -71,6 +71,9 @@ pub mod trig_functions {
     }
 
     /// Convert the argument from 3D Cartesian coordinates to spherical coordinates.
+    /// ```typescript
+    /// assert_approx_eq(cart2sph(1.0, 0.0, 1.0), [0.0, pi/4, sqrt(2.0)])
+    /// ```
     #[rhai_fn(name = "cart2sph")]
     pub fn cart2sph(x: FLOAT, y: FLOAT, z: FLOAT) -> Array {
         vec![
@@ -81,10 +84,13 @@ pub mod trig_functions {
     }
 
     /// Convert the argument from spherical coordinates to 3D Cartesian coordinates.
+    /// ```typescript
+    /// assert_approx_eq(sph2cart(0.0, pi/4, sqrt(2.0)), [1.0, 0.0, 1.0])
+    /// ```
     #[rhai_fn(name = "sph2cart")]
     pub fn sph2cart(azimuth: FLOAT, elevation: FLOAT, r: FLOAT) -> Array {
         vec![
-            Dynamic::from(r * elevation.cos() * azimuth.sin()),
+            Dynamic::from(r * elevation.cos() * azimuth.cos()),
             Dynamic::from(r * elevation.cos() * azimuth.sin()),
             Dynamic::from(r * elevation.sin()),
         ]
