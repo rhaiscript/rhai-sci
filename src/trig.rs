@@ -41,7 +41,7 @@ pub mod trig_functions {
         FLOAT::sin(deg2rad(degrees))
     }
 
-    /// Returns the inverse sine of an argument in degrees
+    /// Returns the inverse sine in degrees
     /// ```typescript
     /// assert_eq(asind(-1.0), -90.0);
     /// ```
@@ -62,7 +62,7 @@ pub mod trig_functions {
         FLOAT::sinh(deg2rad(degrees))
     }
 
-    /// Returns the inverse hyperbolic sine of the argument given in degrees
+    /// Returns the inverse hyperbolic sine in degrees
     #[rhai_fn(name = "asinhd")]
     pub fn asinhd(x: FLOAT) -> FLOAT {
         rad2deg(FLOAT::asinh(x))
@@ -86,7 +86,7 @@ pub mod trig_functions {
         FLOAT::cos(deg2rad(degrees))
     }
 
-    /// Returns the inverse cosine of an argument in degrees
+    /// Returns the inverse cosine in degrees
     /// ```typescript
     /// assert_eq(acosd(-1.0), 180.0);
     /// ```
@@ -107,7 +107,7 @@ pub mod trig_functions {
         FLOAT::cosh(deg2rad(degrees))
     }
 
-    /// Returns the inverse hyperbolic cosine of the argument given in degrees
+    /// Returns the inverse hyperbolic cosine in degrees
     #[rhai_fn(name = "acoshd")]
     pub fn acoshd(x: FLOAT) -> FLOAT {
         rad2deg(FLOAT::acosh(x))
@@ -128,7 +128,7 @@ pub mod trig_functions {
         FLOAT::tan(deg2rad(degrees))
     }
 
-    /// Returns the tangent in degrees of the given argument
+    /// Returns the inverse tangent in degrees
     /// ```typescript
     /// assert_approx_eq(atand(-1.0), -45.0);
     /// ```
@@ -143,7 +143,7 @@ pub mod trig_functions {
         rad2deg(FLOAT::atan(x))
     }
 
-    /// Returns the tangent in degrees of the given argument
+    /// Returns the inverse tangent in degrees , taking two arguments as input.
     /// ```typescript
     /// assert_approx_eq(atand(-1.0, 1.0), -45.0);
     /// ```
@@ -164,7 +164,7 @@ pub mod trig_functions {
         FLOAT::tanh(deg2rad(degrees))
     }
 
-    /// Returns the inverse hyperbolic tangent in degrees of the given argument
+    /// Returns the inverse hyperbolic tangent in degrees
     #[rhai_fn(name = "atanhd")]
     pub fn atanhd(x: FLOAT) -> FLOAT {
         rad2deg(FLOAT::atanh(x))
@@ -182,13 +182,13 @@ pub mod trig_functions {
         1.0 / FLOAT::sin(deg2rad(degrees))
     }
 
-    /// Returns the inverse of the cosecant in radians
+    /// Returns the inverse cosecant in radians
     #[rhai_fn(name = "acsc")]
     pub fn acsc(x: FLOAT) -> FLOAT {
         FLOAT::asin(1.0 / x)
     }
 
-    /// Returns the inverse of the cosecant in degrees
+    /// Returns the inverse cosecant in degrees
     #[rhai_fn(name = "acscd")]
     pub fn acscd(x: FLOAT) -> FLOAT {
         rad2deg(FLOAT::asin(1.0 / x))
@@ -206,13 +206,13 @@ pub mod trig_functions {
         1.0 / FLOAT::sinh(deg2rad(degrees))
     }
 
-    /// Returns the inverse hyperbolic cosecant of the argument in radians
+    /// Returns the inverse hyperbolic cosecant in radians
     #[rhai_fn(name = "acsch")]
     pub fn acsch(x: FLOAT) -> FLOAT {
         FLOAT::asinh(1.0 / x)
     }
 
-    /// Returns the inverse hyperbolic cosecant of the argument in degrees
+    /// Returns the inverse hyperbolic cosecant in degrees
     #[rhai_fn(name = "acschd")]
     pub fn acschd(x: FLOAT) -> FLOAT {
         rad2deg(FLOAT::asinh(1.0 / x))
@@ -230,13 +230,13 @@ pub mod trig_functions {
         1.0 / FLOAT::cos(deg2rad(degrees))
     }
 
-    /// Returns the inverse of the secant in radians
+    /// Returns the inverse secant in radians
     #[rhai_fn(name = "asec")]
     pub fn asec(x: FLOAT) -> FLOAT {
         FLOAT::acos(1.0 / x)
     }
 
-    /// Returns the inverse of the secant in degrees
+    /// Returns the inverse secant in degrees
     #[rhai_fn(name = "asecd")]
     pub fn asecd(x: FLOAT) -> FLOAT {
         rad2deg(FLOAT::acos(1.0 / x))
@@ -254,7 +254,7 @@ pub mod trig_functions {
         1.0 / FLOAT::cosh(deg2rad(degrees))
     }
 
-    /// Returns the inverse hyperbolic secant of the argument in radians
+    /// Returns the inverse hyperbolic secant in radians
     #[rhai_fn(name = "asech")]
     pub fn asech(x: FLOAT) -> FLOAT {
         FLOAT::acosh(1.0 / x)
