@@ -56,7 +56,18 @@ pub mod trig_functions {
         rad2deg(FLOAT::asin(x))
     }
 
-    //
+    /// Returns the hyperbolic sine of the argument given in degrees
+    #[rhai_fn(name = "sinhd")]
+    pub fn sinhd(degrees: FLOAT) -> FLOAT {
+        FLOAT::sinh(deg2rad(degrees))
+    }
+
+    /// Returns the inverse hyperbolic sine of the argument given in degrees
+    #[rhai_fn(name = "asinhd")]
+    pub fn asinhd(x: FLOAT) -> FLOAT {
+        rad2deg(FLOAT::asinh(x))
+    }
+
     /// Returns the cosine of an argument given in degrees
     /// ```typescript
     /// assert_eq(cosd(0.0), 1.0);
@@ -90,6 +101,18 @@ pub mod trig_functions {
         rad2deg(FLOAT::acos(x))
     }
 
+    /// Returns the hyperbolic cosine of the argument given in degrees
+    #[rhai_fn(name = "coshd")]
+    pub fn coshd(degrees: FLOAT) -> FLOAT {
+        FLOAT::cosh(deg2rad(degrees))
+    }
+
+    /// Returns the inverse hyperbolic cosine of the argument given in degrees
+    #[rhai_fn(name = "acoshd")]
+    pub fn acoshd(x: FLOAT) -> FLOAT {
+        rad2deg(FLOAT::acosh(x))
+    }
+
     /// Returns the tangent of an argument given in degrees
     /// ```typescript
     /// assert_approx_eq(tand(-45.0), -1.0);
@@ -118,6 +141,18 @@ pub mod trig_functions {
     #[rhai_fn(name = "atand")]
     pub fn atand(x: FLOAT) -> FLOAT {
         rad2deg(FLOAT::atan(x))
+    }
+
+    /// Returns the hyperbolic tangent of the argument given in degrees
+    #[rhai_fn(name = "tanhd")]
+    pub fn tanhd(degrees: FLOAT) -> FLOAT {
+        FLOAT::tanh(deg2rad(degrees))
+    }
+
+    /// Returns the inverse hyperbolic tangent of the argument given in degrees
+    #[rhai_fn(name = "atanhd")]
+    pub fn atanhd(x: FLOAT) -> FLOAT {
+        rad2deg(FLOAT::atanh(x))
     }
 
     /// Returns the cosecant of the argument given in radians
