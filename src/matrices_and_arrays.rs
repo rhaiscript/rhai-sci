@@ -4,8 +4,8 @@ use rhai::plugin::*;
 #[export_module]
 pub mod matrix_functions {
     use crate::{
-        if_int_convert_to_float_and_do, if_int_do_else_if_array_do, if_list_do,
-        if_matrix_convert_to_vec_array_and_do, array_to_vec_float
+        array_to_vec_float, if_int_convert_to_float_and_do, if_int_do_else_if_array_do, if_list_do,
+        if_matrix_convert_to_vec_array_and_do,
     };
     #[cfg(feature = "nalgebra")]
     use crate::{
@@ -370,7 +370,10 @@ pub mod matrix_functions {
     /// ```
     #[rhai_fn(name = "nnz", pure)]
     pub fn nnz_by_reference(matrix: &mut Array) -> INT {
-        array_to_vec_float(&mut flatten(matrix)).iter().filter(|&n| *n > 0.0).count() as INT
+        array_to_vec_float(&mut flatten(matrix))
+            .iter()
+            .filter(|&n| *n > 0.0)
+            .count() as INT
     }
 
     #[cfg(all(feature = "io"))]
@@ -769,7 +772,7 @@ pub mod matrix_functions {
         output
     }
 
-    /// Returns the contents of an multidimensional array as a 1-D array.
+    /// Returns the contents of a multidimensional array as a 1-D array.
     /// ```typescript
     /// let matrix = ones(3, 5);
     /// let flat = flatten(matrix);
