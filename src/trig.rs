@@ -23,6 +23,73 @@ pub mod trig_functions {
         radians * 180.0 / std::f64::consts::PI
     }
 
+    /// Convert the argument from 3D Cartesian coordinates to polar coordinates.
+    /// ```typescript
+    /// assert_eq(cart2pol(1.0, 1.0, 1.0), [pi/4, sqrt(2.0), 1.0])
+    /// ```
+    #[rhai_fn(name = "cart2pol")]
+    pub fn cart2pol3d(x: FLOAT, y: FLOAT, z: FLOAT) -> Array {
+        vec![
+            Dynamic::from(y.atan2(x)),
+            Dynamic::from(y.hypot(x)),
+            Dynamic::from(z),
+        ]
+    }
+
+    /// Convert the argument from 2D Cartesian coordinates to polar coordinates.
+    /// ```typescript
+    /// assert_eq(cart2pol(1.0, 1.0), [pi/4, sqrt(2.0)])
+    /// ```
+    #[rhai_fn(name = "cart2pol")]
+    pub fn cart2pol2d(x: FLOAT, y: FLOAT) -> Array {
+        vec![Dynamic::from(y.atan2(x)), Dynamic::from(y.hypot(x))]
+    }
+
+    /// Convert the argument from 3D polar coordinates to Cartesian coordinates.
+    #[rhai_fn(name = "pol2cart")]
+    pub fn pol2cart3d(theta: FLOAT, r: FLOAT, z: FLOAT) -> Array {
+        vec![
+            Dynamic::from(r * theta.cos()),
+            Dynamic::from(r * theta.sin()),
+            Dynamic::from(z),
+        ]
+    }
+
+    /// Convert the argument from 2D polar coordinates to Cartesian coordinates.
+    #[rhai_fn(name = "pol2cart")]
+    pub fn pol2cart2d(theta: FLOAT, r: FLOAT) -> Array {
+        vec![
+            Dynamic::from(r * theta.cos()),
+            Dynamic::from(r * theta.sin()),
+        ]
+    }
+
+    /// Convert the argument from 3D Cartesian coordinates to spherical coordinates.
+    #[rhai_fn(name = "cart2sph")]
+    pub fn cart2sph(x: FLOAT, y: FLOAT, z: FLOAT) -> Array {
+        vec![
+            Dynamic::from(y.atan2(x)),
+            Dynamic::from(z.atan2(y.hypot(x))),
+            Dynamic::from(hypot3(x, y, z)),
+        ]
+    }
+
+    /// Convert the argument from spherical coordinates to 3D Cartesian coordinates.
+    #[rhai_fn(name = "sph2cart")]
+    pub fn sph2cart(azimuth: FLOAT, elevation: FLOAT, r: FLOAT) -> Array {
+        vec![
+            Dynamic::from(r * elevation.cos() * azimuth.sin()),
+            Dynamic::from(r * elevation.cos() * azimuth.sin()),
+            Dynamic::from(r * elevation.sin()),
+        ]
+    }
+
+    /// Extends the built-in hypot function to compute distance in 3D cartesian space
+    #[rhai_fn(name = "hypot")]
+    pub fn hypot3(x: FLOAT, y: FLOAT, z: FLOAT) -> FLOAT {
+        (x.powf(2.0) + y.powf(2.0) + z.powf(2.0)).sqrt()
+    }
+
     /// Returns the sine of an argument given in degrees
     /// ```typescript
     /// assert_eq(sind(0.0),  0.0);
