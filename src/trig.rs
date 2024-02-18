@@ -46,6 +46,9 @@ pub mod trig_functions {
     }
 
     /// Convert the argument from 3D polar coordinates to Cartesian coordinates.
+    /// ```typescript
+    /// assert_approx_eq(pol2cart(pi/4, sqrt(2.0), 1.0), [1.0, 1.0, 1.0])
+    /// ```
     #[rhai_fn(name = "pol2cart")]
     pub fn pol2cart3d(theta: FLOAT, r: FLOAT, z: FLOAT) -> Array {
         vec![
@@ -56,6 +59,9 @@ pub mod trig_functions {
     }
 
     /// Convert the argument from 2D polar coordinates to Cartesian coordinates.
+    /// ```typescript
+    /// assert_approx_eq(pol2cart(pi/4, sqrt(2.0)), [1.0, 1.0])
+    /// ```
     #[rhai_fn(name = "pol2cart")]
     pub fn pol2cart2d(theta: FLOAT, r: FLOAT) -> Array {
         vec![
