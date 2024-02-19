@@ -184,12 +184,24 @@ pub mod trig_functions {
     }
 
     /// Returns the hyperbolic cosine of the argument given in degrees
+    /// ```typescript
+    /// assert_eq(coshd(0.0), 1.0)
+    /// ```
+    /// ```typescript
+    /// assert_eq(coshd(10.0), cosh(10.0*pi/180.0))
+    /// ```
     #[rhai_fn(name = "coshd")]
     pub fn coshd(degrees: FLOAT) -> FLOAT {
         FLOAT::cosh(deg2rad(degrees))
     }
 
     /// Returns the inverse hyperbolic cosine in degrees
+    /// ```typescript
+    /// assert_eq(acoshd(1.0), 0.0)
+    /// ```
+    /// ```typescript
+    /// assert_eq(acoshd(10.0), 180.0/pi*acosh(10.0))
+    /// ```
     #[rhai_fn(name = "acoshd")]
     pub fn acoshd(x: FLOAT) -> FLOAT {
         rad2deg(FLOAT::acosh(x))
@@ -241,12 +253,24 @@ pub mod trig_functions {
     }
 
     /// Returns the hyperbolic tangent of the argument given in degrees
+    /// ```typescript
+    /// assert_eq(tanhd(0.0), 0.0)
+    /// ```
+    /// ```typescript
+    /// assert_eq(tanhd(10.0), tanh(10.0*pi/180.0))
+    /// ```
     #[rhai_fn(name = "tanhd")]
     pub fn tanhd(degrees: FLOAT) -> FLOAT {
         FLOAT::tanh(deg2rad(degrees))
     }
 
     /// Returns the inverse hyperbolic tangent in degrees
+    /// ```typescript
+    /// assert_eq(atanhd(0.0), 0.0)
+    /// ```
+    /// ```typescript
+    /// assert_eq(atanhd(10.0), 180.0/pi*atanh(10.0))
+    /// ```
     #[rhai_fn(name = "atanhd")]
     pub fn atanhd(x: FLOAT) -> FLOAT {
         rad2deg(FLOAT::atanh(x))
