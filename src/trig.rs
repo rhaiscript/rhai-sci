@@ -139,12 +139,24 @@ pub mod trig_functions {
     }
 
     /// Returns the hyperbolic sine of the argument given in degrees
+    /// ```typescript
+    /// assert_eq(sinhd(0.0), 0.0)
+    /// ```
+    /// ```typescript
+    /// assert_eq(sinhd(10.0), sinh(10.0*pi/180.0))
+    /// ```
     #[rhai_fn(name = "sinhd")]
     pub fn sinhd(degrees: FLOAT) -> FLOAT {
         FLOAT::sinh(deg2rad(degrees))
     }
 
     /// Returns the inverse hyperbolic sine in degrees
+    /// ```typescript
+    /// assert_eq(asinhd(0.0), 0.0)
+    /// ```
+    /// ```typescript
+    /// assert_eq(asinhd(10.0), 180.0/pi*asinh(10.0))
+    /// ```
     #[rhai_fn(name = "asinhd")]
     pub fn asinhd(x: FLOAT) -> FLOAT {
         rad2deg(FLOAT::asinh(x))
@@ -322,30 +334,51 @@ pub mod trig_functions {
     }
 
     /// Returns the inverse cosecant in degrees
+    /// ```typescript
+    /// assert_eq(acscd(-1.0), -90.0)
+    /// ```
+    /// ```typescript
+    /// assert_eq(acscd(inf), 0.0)
+    /// ```
+    /// ```typescript
+    /// assert_eq(acscd(1.0), 90.0)
+    /// ```
     #[rhai_fn(name = "acscd")]
     pub fn acscd(x: FLOAT) -> FLOAT {
         rad2deg(FLOAT::asin(1.0 / x))
     }
 
     /// Returns the hyperbolic cosecant of the argument given in radians
+    /// ```typescript
+    /// assert_eq(csch(0.0), inf)
+    /// ```
     #[rhai_fn(name = "csch")]
     pub fn csch(radians: FLOAT) -> FLOAT {
         1.0 / FLOAT::sinh(radians)
     }
 
     /// Returns the hyperbolic cosecant of the argument given in degrees
+    /// ```typescript
+    /// assert_eq(cschd(0.0), inf)
+    /// ```
     #[rhai_fn(name = "cschd")]
     pub fn cschd(degrees: FLOAT) -> FLOAT {
         1.0 / FLOAT::sinh(deg2rad(degrees))
     }
 
     /// Returns the inverse hyperbolic cosecant in radians
+    /// ```typescript
+    /// assert_eq(acsch(inf), 0.0)
+    /// ```
     #[rhai_fn(name = "acsch")]
     pub fn acsch(x: FLOAT) -> FLOAT {
         FLOAT::asinh(1.0 / x)
     }
 
     /// Returns the inverse hyperbolic cosecant in degrees
+    /// ```typescript
+    /// assert_eq(acschd(inf), 0.0)
+    /// ```
     #[rhai_fn(name = "acschd")]
     pub fn acschd(x: FLOAT) -> FLOAT {
         rad2deg(FLOAT::asinh(1.0 / x))
