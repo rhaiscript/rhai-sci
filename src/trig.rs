@@ -307,6 +307,15 @@ pub mod trig_functions {
     }
 
     /// Returns the inverse cosecant in radians
+    /// ```typescript
+    /// assert_eq(acsc(-1.0), -pi/2)
+    /// ```
+    /// ```typescript
+    /// assert_eq(acsc(1.0/0.0), 0.0)
+    /// ```
+    /// ```typescript
+    /// assert_eq(acsc(1.0), pi/2)
+    /// ```
     #[rhai_fn(name = "acsc")]
     pub fn acsc(x: FLOAT) -> FLOAT {
         FLOAT::asin(1.0 / x)
