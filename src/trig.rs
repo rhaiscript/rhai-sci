@@ -281,7 +281,7 @@ pub mod trig_functions {
     /// assert_eq(csc(-pi/2), -1.0)
     /// ```
     /// ```typescript
-    /// assert_eq(csc(0.0), 1.0/0.0)
+    /// assert_eq(csc(0.0), inf)
     /// ```
     /// ```typescript
     /// assert_eq(csc(pi/2), 1.0)
@@ -296,7 +296,7 @@ pub mod trig_functions {
     /// assert_eq(cscd(-90.0), -1.0)
     /// ```
     /// ```typescript
-    /// assert_eq(cscd(0.0), 1.0/0.0)
+    /// assert_eq(cscd(0.0), inf)
     /// ```
     /// ```typescript
     /// assert_eq(cscd(90.0), 1.0)
@@ -311,7 +311,7 @@ pub mod trig_functions {
     /// assert_eq(acsc(-1.0), -pi/2)
     /// ```
     /// ```typescript
-    /// assert_eq(acsc(1.0/0.0), 0.0)
+    /// assert_eq(acsc(inf), 0.0)
     /// ```
     /// ```typescript
     /// assert_eq(acsc(1.0), pi/2)
