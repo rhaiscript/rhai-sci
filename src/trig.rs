@@ -277,12 +277,30 @@ pub mod trig_functions {
     }
 
     /// Returns the cosecant of the argument given in radians
+    /// ```typescript
+    /// assert_eq(csc(-pi/2), -1.0)
+    /// ```
+    /// ```typescript
+    /// assert_eq(csc(0.0), 1.0/0.0)
+    /// ```
+    /// ```typescript
+    /// assert_eq(csc(pi/2), 1.0)
+    /// ```
     #[rhai_fn(name = "csc")]
     pub fn csc(radians: FLOAT) -> FLOAT {
         1.0 / FLOAT::sin(radians)
     }
 
     /// Returns the cosecant of the argument given in degrees
+    /// ```typescript
+    /// assert_eq(cscd(-90.0), -1.0)
+    /// ```
+    /// ```typescript
+    /// assert_eq(cscd(0.0), 1.0/0.0)
+    /// ```
+    /// ```typescript
+    /// assert_eq(cscd(90.0), 1.0)
+    /// ```
     #[rhai_fn(name = "cscd")]
     pub fn cscd(degrees: FLOAT) -> FLOAT {
         1.0 / FLOAT::sin(deg2rad(degrees))
