@@ -85,7 +85,7 @@ fn main() {
         let function = function.clone();
         // Pull out basic info
         let name = function.name;
-        if !name.starts_with("anon") && !name.starts_with("_") {
+        if !name.starts_with("anon") && !name.starts_with("_") && !name.starts_with("$CONSTANTS$"){
             let signature = function
                 .signature
                 .replace("Result<", "")
