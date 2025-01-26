@@ -13,7 +13,7 @@ check [the docs](https://docs.rs/rhai-sci).
 To use the latest released version of `rhai-sci`, add this to your `Cargo.toml`:
 
 ```toml
-rhai-sci = "0.2.1"
+rhai-sci = "0.2.2"
 ```
 
 # Usage
