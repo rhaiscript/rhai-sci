@@ -378,7 +378,7 @@ pub mod matrix_functions {
 
     #[cfg(all(feature = "io"))]
     pub mod read_write {
-        use polars::prelude::{CsvReader, DataType, SerReader};
+        use polars::prelude::{CsvReadOptions, DataType, SerReader};
         use rhai::{Array, Dynamic, EvalAltResult, ImmutableString, FLOAT};
 
         /// Reads a numeric csv file from a url
@@ -406,11 +406,13 @@ pub mod matrix_functions {
 
             let file_path_as_str = file_path.as_str();
 
-            match CsvReader::from_path(file_path_as_str) {
-                Ok(csv) => {
-                    let x = csv
-                        .infer_schema(Some(10))
-                        .has_header(
+            // Determine path is url
+            let path_is_url = url::Url::parse(file_path_as_str);
+
+            match path_is_url {
+                Err(_) => {
+                    let x = CsvReadOptions::default()
+                        .with_has_header(
                             csv_sniffer::Sniffer::new()
                                 .sniff_path(file_path_as_str)
                                 .map_err(|err| {
@@ -423,14 +425,21 @@ pub mod matrix_functions {
                                 .header
                                 .has_header_row,
                         )
-                        .finish()
+                        .try_into_reader_with_file_path(Some(file_path_as_str.into()))
                         .map_err(|err| {
                             EvalAltResult::ErrorSystem(
                                 format!("Cannot read file as CSV: {file_path_as_str}"),
                                 err.into(),
                             )
                         })?
-                        .drop_nulls(None)
+                        .finish()
+                        .map_err(|err| {
+                            EvalAltResult::ErrorSystem(
+                                format!("Cannot read file: {file_path_as_str}"),
+                                err.into(),
+                            )
+                        })?
+                        .drop_nulls::<String>(None)
                         .map_err(|err| {
                             EvalAltResult::ErrorSystem(
                                 format!("Cannot remove null values from file: {file_path_as_str}"),
@@ -439,7 +448,6 @@ pub mod matrix_functions {
                         })?;
 
                     // Convert into vec of vec
-
                     let mut final_output = vec![];
                     for series in x.get_columns() {
                         let col: Vec<FLOAT> = series
@@ -473,7 +481,7 @@ pub mod matrix_functions {
 
                     Ok(matrix_as_array)
                 }
-                Err(_) => {
+                Ok(_) => {
                     if let Ok(_) = url::Url::parse(file_path_as_str) {
                         let file_contents =
                             minreq::get(file_path_as_str).send().map_err(|err| {
