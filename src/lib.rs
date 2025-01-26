@@ -28,7 +28,6 @@ mod sets;
 pub use sets::set_functions;
 mod validate;
 pub use validate::validation_functions;
-
 mod trig;
 pub use trig::trig_functions;
 

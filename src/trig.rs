@@ -352,6 +352,12 @@ pub mod trig_functions {
     /// ```typescript
     /// assert_eq(csch(0.0), inf)
     /// ```
+    /// ```typescript
+    /// assert_eq(csch(10.0), 1.0/sinh(10.0))
+    /// ```
+    /// ```typescript
+    /// assert_eq(csch(pi/2), 1.0/sinh(pi/2))
+    /// ```
     #[rhai_fn(name = "csch")]
     pub fn csch(radians: FLOAT) -> FLOAT {
         1.0 / FLOAT::sinh(radians)
@@ -360,6 +366,12 @@ pub mod trig_functions {
     /// Returns the hyperbolic cosecant of the argument given in degrees
     /// ```typescript
     /// assert_eq(cschd(0.0), inf)
+    /// ```
+    /// ```typescript
+    /// assert_eq(cschd(10.0), 1.0/sinhd(10.0))
+    /// ```
+    /// ```typescript
+    /// assert_eq(cschd(90.0), 1.0/sinhd(90.0))
     /// ```
     #[rhai_fn(name = "cschd")]
     pub fn cschd(degrees: FLOAT) -> FLOAT {
@@ -370,6 +382,12 @@ pub mod trig_functions {
     /// ```typescript
     /// assert_eq(acsch(inf), 0.0)
     /// ```
+    /// ```typescript
+    /// assert_eq(acsch(1.0), asinh(1.0))
+    /// ```
+    /// ```typescript
+    /// assert_eq(acsch(-1.0), asinh(-1.0))
+    /// ```
     #[rhai_fn(name = "acsch")]
     pub fn acsch(x: FLOAT) -> FLOAT {
         FLOAT::asinh(1.0 / x)
@@ -379,102 +397,238 @@ pub mod trig_functions {
     /// ```typescript
     /// assert_eq(acschd(inf), 0.0)
     /// ```
+    /// ```typescript
+    /// assert_eq(acschd(1.0), asinhd(1.0))
+    /// ```
+    /// ```typescript
+    /// assert_eq(acschd(-1.0), asinhd(-1.0))
+    /// ```
     #[rhai_fn(name = "acschd")]
     pub fn acschd(x: FLOAT) -> FLOAT {
         rad2deg(FLOAT::asinh(1.0 / x))
     }
 
     /// Returns the secant of the argument given in radians
+    /// ```typescript
+    /// assert_eq(sec(0.0), 1.0);
+    /// ```
+    /// ```typescript
+    /// assert_eq(sec(pi/2), 1/cos(pi/2));
+    /// ```
+    /// ```typescript
+    /// assert_eq(sec(pi), -1.0);
     #[rhai_fn(name = "sec")]
     pub fn sec(radians: FLOAT) -> FLOAT {
         1.0 / FLOAT::cos(radians)
     }
 
     /// Returns the secant of the argument given in degrees
+    /// ```typescript
+    /// assert_eq(secd(0.0), 1.0);
+    /// ```
+    /// ```typescript
+    /// assert_eq(secd(90.0), 1/cosd(90.0));
+    /// ```
+    /// ```typescript
+    /// assert_eq(secd(180.0), -1.0);
+    /// ```
     #[rhai_fn(name = "secd")]
     pub fn secd(degrees: FLOAT) -> FLOAT {
         1.0 / FLOAT::cos(deg2rad(degrees))
     }
 
     /// Returns the inverse secant in radians
+    /// ```typescript
+    /// assert_eq(asec(1.0), 0.0);
+    /// ```
+    /// ```typescript
+    /// assert_eq(asec(-1.0), pi);
+    /// ```
+    /// ```typescript
+    /// assert_eq(asec(0.5), acos(2.0));
+    /// ```
     #[rhai_fn(name = "asec")]
     pub fn asec(x: FLOAT) -> FLOAT {
         FLOAT::acos(1.0 / x)
     }
 
     /// Returns the inverse secant in degrees
+    /// ```typescript
+    /// assert_eq(asecd(1.0), 0.0);
+    /// ```
+    /// ```typescript
+    /// assert_eq(asecd(-1.0), 180.0);
+    /// ```
+    /// ```typescript
+    /// assert_eq(asecd(0.5), acosd(2.0));
+    /// ```
     #[rhai_fn(name = "asecd")]
     pub fn asecd(x: FLOAT) -> FLOAT {
         rad2deg(FLOAT::acos(1.0 / x))
     }
 
     /// Returns the hyperbolic secant of the argument given in radians
+    /// ```typescript
+    /// assert_eq(sech(0.0), 1.0);
+    /// ```
+    /// ```typescript
+    /// assert_eq(sech(10.0), 1.0/cosh(10.0));
+    /// ```
+    /// ```typescript
+    /// assert_eq(sech(pi/2), 1.0/cosh(pi/2));
+    /// ```
     #[rhai_fn(name = "sech")]
     pub fn sech(radians: FLOAT) -> FLOAT {
         1.0 / FLOAT::cosh(radians)
     }
-
     /// Returns the hyperbolic secant of the argument given in degrees
+    /// ```typescript
+    /// assert_eq(sechd(0.0), 1.0);
+    /// ```
+    /// ```typescript
+    /// assert_eq(sechd(10.0), 1.0/coshd(10.0));
+    /// ```
+    /// ```typescript
+    /// assert_eq(sechd(90.0), 1.0/coshd(90.0));
+    /// ```
     #[rhai_fn(name = "sechd")]
     pub fn sechd(degrees: FLOAT) -> FLOAT {
         1.0 / FLOAT::cosh(deg2rad(degrees))
     }
 
     /// Returns the inverse hyperbolic secant in radians
+    /// ```typescript
+    /// assert_eq(asech(1.0), 0.0);
+    /// ```
+    /// ```typescript
+    /// assert_eq(asech(0.5), acosh(2.0));
+    /// ```
+    /// ```typescript
+    /// assert_eq(asech(0.1), acosh(10.0));
+    /// ```
     #[rhai_fn(name = "asech")]
     pub fn asech(x: FLOAT) -> FLOAT {
         FLOAT::acosh(1.0 / x)
     }
 
     /// Returns the inverse hyperbolic secant of the argument in degrees
+    /// ```typescript
+    /// assert_eq(asechd(1.0), 0.0);
+    /// ```
     #[rhai_fn(name = "asechd")]
     pub fn asechd(x: FLOAT) -> FLOAT {
         rad2deg(FLOAT::acosh(1.0 / x))
     }
 
     /// Returns the cotangent of the argument given in radians
+    /// ```typescript
+    /// assert_approx_eq(cot(pi/4), 1.0, 1e-10);
+    /// ```
+    /// ```typescript
+    /// assert_approx_eq(cot(pi/2), 0.0, 1e-10);
+    /// ```
+    /// ```typescript
+    /// assert_approx_eq(cot(3*pi/4), -1.0, 1e-10);
+    /// ```
     #[rhai_fn(name = "cot")]
     pub fn cot(radians: FLOAT) -> FLOAT {
         1.0 / FLOAT::tan(radians)
     }
 
     /// Returns the cotangent of the argument given in degrees
+    /// ```typescript
+    /// assert_approx_eq(cotd(45.0), 1.0, 1e-10);
+    /// ```
+    /// ```typescript
+    /// assert_approx_eq(cotd(90.0), 0.0, 1e-10);
+    /// ```
+    /// ```typescript
+    /// assert_approx_eq(cotd(135.0), -1.0, 1e-10);
+    /// ```
     #[rhai_fn(name = "cotd")]
     pub fn cotd(degrees: FLOAT) -> FLOAT {
         1.0 / FLOAT::tan(deg2rad(degrees))
     }
 
     /// Returns the inverse of the cotangent in radians
+    /// ```typescript
+    /// assert_eq(acot(1.0), pi/4);
+    /// ```
+    /// ```typescript
+    /// assert_eq(acot(-1.0), -pi/4);
+    /// ```
+    /// ```typescript
+    /// assert_eq(acot(0.0), pi/2);
+    /// ```
     #[rhai_fn(name = "acot")]
     pub fn acot(x: FLOAT) -> FLOAT {
         FLOAT::atan(1.0 / x)
     }
 
     /// Returns the inverse of the cotangent in degrees
+    /// ```typescript
+    /// assert_eq(acotd(1.0), 45.0);
+    /// ```
+    /// ```typescript
+    /// assert_eq(acotd(-1.0), -45.0);
+    /// ```
+    /// ```typescript
+    /// assert_eq(acotd(0.0), 90.0);
+    /// ```
     #[rhai_fn(name = "acotd")]
     pub fn acotd(x: FLOAT) -> FLOAT {
         rad2deg(FLOAT::atan(1.0 / x))
     }
 
     /// Returns the hyperbolic cotangent of the argument given in radians
+    /// ```typescript
+    /// assert_approx_eq(coth(1.0), cosh(1.0)/sinh(1.0), 1e-10);
+    /// ```
+    /// ```typescript
+    /// assert_approx_eq(coth(0.5), cosh(0.5)/sinh(0.5), 1e-10);
+    /// ```
+    /// ```typescript
+    /// assert_approx_eq(coth(0.1), cosh(0.1)/sinh(0.1), 1e-10);
+    /// ```
     #[rhai_fn(name = "coth")]
     pub fn coth(radians: FLOAT) -> FLOAT {
         1.0 / FLOAT::tanh(radians)
     }
 
     /// Returns the hyperbolic cotangent of the argument given in degrees
+    /// ```typescript
+    /// assert_approx_eq(cothd(1.0), coshd(1.0)/sinhd(1.0), 1e-10);
+    /// ```
+    /// ```typescript
+    /// assert_approx_eq(cothd(0.5), coshd(0.5)/sinhd(0.5), 1e-10);
+    /// ```
+    /// ```typescript
+    /// assert_approx_eq(cothd(0.1), coshd(0.1)/sinhd(0.1), 1e-10);
+    /// ```
     #[rhai_fn(name = "cothd")]
     pub fn cothd(degrees: FLOAT) -> FLOAT {
         1.0 / FLOAT::tanh(deg2rad(degrees))
     }
 
     /// Returns the inverse hyperbolic cotangent of the argument in radians
+    /// ```typescript
+    /// assert_eq(acoth(1.0), atanh(1.0));
+    /// ```
+    /// ```typescript
+    /// assert_eq(acoth(-1.0), atanh(-1.0));
+    /// ```
     #[rhai_fn(name = "acoth")]
     pub fn acoth(x: FLOAT) -> FLOAT {
         FLOAT::atanh(1.0 / x)
     }
 
     /// Returns the inverse hyperbolic cotangent of the argument in degrees
+    /// ```typescript
+    /// assert_eq(acothd(1.0), atanhd(1.0));
+    /// ```
+    /// ```typescript
+    /// assert_eq(acothd(-1.0), atanhd(-1.0));
+    /// ```
     #[rhai_fn(name = "acothd")]
     pub fn acothd(x: FLOAT) -> FLOAT {
         rad2deg(FLOAT::atanh(1.0 / x))

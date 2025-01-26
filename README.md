@@ -5,8 +5,8 @@
 # About `rhai-sci`
 
 This crate provides some basic scientific computing utilities for the [`Rhai`](https://rhai.rs/) scripting language,
-inspired by languages
-like MATLAB, Octave, and R. For a complete API reference, check [the docs](https://docs.rs/rhai-sci).
+inspired by languages like MATLAB, Octave, and R. For a complete API reference,
+check [the docs](https://docs.rs/rhai-sci).
 
 # Install
 
