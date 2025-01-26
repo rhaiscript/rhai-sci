@@ -4,7 +4,7 @@ use rhai::plugin::*;
 #[export_module]
 pub mod matrix_functions {
     use crate::{
-        if_int_convert_to_float_and_do, if_int_do_else_if_array_do, if_list_do,
+        array_to_vec_float, if_int_convert_to_float_and_do, if_int_do_else_if_array_do, if_list_do,
         if_matrix_convert_to_vec_array_and_do,
     };
     #[cfg(feature = "nalgebra")]
@@ -357,9 +357,28 @@ pub mod matrix_functions {
         flatten(matrix).len() as INT
     }
 
+    /// Returns the number of non-zero elements in a matrix, passed by reference.
+    /// ```typescript
+    /// let matrix = ones(4, 6);
+    /// let n = nnz(matrix);
+    /// assert_eq(n, 24);
+    /// ```
+    /// ```typescript
+    /// let matrix = eye(4);
+    /// let n = nnz(matrix);
+    /// assert_eq(n, 4);
+    /// ```
+    #[rhai_fn(name = "nnz", pure)]
+    pub fn nnz_by_reference(matrix: &mut Array) -> INT {
+        array_to_vec_float(&mut flatten(matrix))
+            .iter()
+            .filter(|&n| *n > 0.0)
+            .count() as INT
+    }
+
     #[cfg(all(feature = "io"))]
     pub mod read_write {
-        use polars::prelude::{CsvReader, DataType, SerReader};
+        use polars::prelude::{CsvReadOptions, DataType, SerReader};
         use rhai::{Array, Dynamic, EvalAltResult, ImmutableString, FLOAT};
 
         /// Reads a numeric csv file from a url
@@ -387,11 +406,13 @@ pub mod matrix_functions {
 
             let file_path_as_str = file_path.as_str();
 
-            match CsvReader::from_path(file_path_as_str) {
-                Ok(csv) => {
-                    let x = csv
-                        .infer_schema(Some(10))
-                        .has_header(
+            // Determine path is url
+            let path_is_url = url::Url::parse(file_path_as_str);
+
+            match path_is_url {
+                Err(_) => {
+                    let x = CsvReadOptions::default()
+                        .with_has_header(
                             csv_sniffer::Sniffer::new()
                                 .sniff_path(file_path_as_str)
                                 .map_err(|err| {
@@ -404,14 +425,21 @@ pub mod matrix_functions {
                                 .header
                                 .has_header_row,
                         )
-                        .finish()
+                        .try_into_reader_with_file_path(Some(file_path_as_str.into()))
                         .map_err(|err| {
                             EvalAltResult::ErrorSystem(
                                 format!("Cannot read file as CSV: {file_path_as_str}"),
                                 err.into(),
                             )
                         })?
-                        .drop_nulls(None)
+                        .finish()
+                        .map_err(|err| {
+                            EvalAltResult::ErrorSystem(
+                                format!("Cannot read file: {file_path_as_str}"),
+                                err.into(),
+                            )
+                        })?
+                        .drop_nulls::<String>(None)
                         .map_err(|err| {
                             EvalAltResult::ErrorSystem(
                                 format!("Cannot remove null values from file: {file_path_as_str}"),
@@ -420,7 +448,6 @@ pub mod matrix_functions {
                         })?;
 
                     // Convert into vec of vec
-
                     let mut final_output = vec![];
                     for series in x.get_columns() {
                         let col: Vec<FLOAT> = series
@@ -454,7 +481,7 @@ pub mod matrix_functions {
 
                     Ok(matrix_as_array)
                 }
-                Err(_) => {
+                Ok(_) => {
                     if let Ok(_) = url::Url::parse(file_path_as_str) {
                         let file_contents =
                             minreq::get(file_path_as_str).send().map_err(|err| {
@@ -753,7 +780,7 @@ pub mod matrix_functions {
         output
     }
 
-    /// Returns the contents of an multidimensional array as a 1-D array.
+    /// Returns the contents of a multidimensional array as a 1-D array.
     /// ```typescript
     /// let matrix = ones(3, 5);
     /// let flat = flatten(matrix);

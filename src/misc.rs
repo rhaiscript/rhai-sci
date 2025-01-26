@@ -5,6 +5,10 @@ pub mod misc_functions {
     use crate::{if_list_convert_to_vec_float_and_do, if_list_do_int_or_do_float};
     use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT};
 
+    /// Infinity
+    #[allow(non_upper_case_globals)]
+    pub const inf: FLOAT = FLOAT::INFINITY;
+
     /// Returns a random number between zero and one.
     /// ```typescript
     /// let r = rand();

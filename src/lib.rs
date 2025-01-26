@@ -6,28 +6,30 @@
 #![doc = include_str!("../docs/highlight.html")]
 
 mod patterns;
-use patterns::*;
+pub use patterns::*;
 use rhai::{def_package, packages::Package, plugin::*, Engine, EvalAltResult};
 mod matrices_and_arrays;
-use matrices_and_arrays::matrix_functions;
+pub use matrices_and_arrays::matrix_functions;
 mod statistics;
-use statistics::stats;
+pub use statistics::stats;
 mod misc;
-use misc::misc_functions;
+pub use misc::misc_functions;
 mod cumulative;
-use cumulative::cum_functions;
+pub use cumulative::cum_functions;
 mod integration_and_differentiation;
-use integration_and_differentiation::int_and_diff;
+pub use integration_and_differentiation::int_and_diff;
 mod assertions;
-use assertions::assert_functions;
+pub use assertions::assert_functions;
 mod constants;
-use constants::constant_definitions;
+pub use constants::constant_definitions;
 mod moving;
-use moving::moving_functions;
+pub use moving::moving_functions;
 mod sets;
-use sets::set_functions;
+pub use sets::set_functions;
 mod validate;
-use validate::validation_functions;
+pub use validate::validation_functions;
+mod trig;
+pub use trig::trig_functions;
 
 def_package! {
     /// Package for scientific computing
@@ -43,6 +45,7 @@ def_package! {
         combine_with_exported_module!(lib, "rhai_sci_sets", set_functions);
         combine_with_exported_module!(lib, "rhai_sci_moving", moving_functions);
         combine_with_exported_module!(lib, "rhai_sci_validation", validation_functions);
+        combine_with_exported_module!(lib, "rhai_sci_trig", trig_functions);
     }
 }
 

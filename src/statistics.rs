@@ -542,9 +542,9 @@ pub mod stats {
     ///          [0.8],
     ///          [2.1]];
     /// let b = regress(x, y);
-    /// assert_eq(b,  #{"parameters": [5.551115123125783e-16, 1.0000000000000002],
-    ///                 "pvalues": [1.0, 0.1091825535092476],
-    ///                 "standard_errors": [0.1118033988749896, 0.17320508075688787]});
+    /// assert_eq(b,  #{"parameters": [-2.220446049250313e-16, 1.0000000000000002],
+    ///                 "pvalues": [1.0, 0.10918255350924745],
+    ///                 "standard_errors": [0.11180339887498947, 0.17320508075688767]});
     /// ```
     #[cfg(feature = "nalgebra")]
     #[rhai_fn(name = "regress", return_raw, pure)]

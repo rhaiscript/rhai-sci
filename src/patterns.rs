@@ -1,8 +1,4 @@
 use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT, INT};
-#[cfg(feature = "smartcore")]
-use smartcorelib::linalg::basic::{
-    arrays::Array as scArray, arrays::Array2 as scArray2, matrix::DenseMatrix,
-};
 
 /// Matrix compatibility conditions
 #[allow(dead_code)]
@@ -68,6 +64,7 @@ where
     }
 }
 
+/// Does a function if the input is a list, otherwise throws an error.
 pub fn if_list_do<F, T>(arr: &mut Array, mut f: F) -> Result<T, Box<EvalAltResult>>
 where
     F: FnMut(&mut Array) -> Result<T, Box<EvalAltResult>>,
@@ -96,6 +93,8 @@ where
     .and_then(f)
 }
 
+/// If the input is an int, convert to a float and do the function. if the input is a float already,
+/// the function is still performed.
 pub fn if_int_convert_to_float_and_do<F, T>(x: Dynamic, mut f: F) -> Result<T, Box<EvalAltResult>>
 where
     F: FnMut(FLOAT) -> Result<T, Box<EvalAltResult>>,
@@ -182,6 +181,7 @@ where
     }
 }
 
+/// If the input is a
 pub fn if_matrix_convert_to_vec_array_and_do<F, T>(
     matrix: &mut Array,
     mut f: F,
@@ -201,42 +201,6 @@ where
             Position::NONE,
         )
         .into())
-    }
-}
-
-#[cfg(feature = "smartcore")]
-pub fn if_matrix_convert_to_dense_matrix_and_do<F, T>(
-    matrix: &mut Array,
-    mut f: F,
-) -> Result<T, Box<EvalAltResult>>
-where
-    F: FnMut(DenseMatrix<FLOAT>) -> Result<T, Box<EvalAltResult>>,
-{
-    if crate::validation_functions::is_matrix(matrix) {
-        let matrix_as_vec = matrix
-            .clone()
-            .iter()
-            .map(|x| {
-                x.clone()
-                    .into_array()
-                    .unwrap()
-                    .iter()
-                    .map(|y| {
-                        if y.is::<FLOAT>() {
-                            y.clone().as_float().unwrap()
-                        } else {
-                            y.clone().as_int().unwrap() as FLOAT
-                        }
-                    })
-                    .collect::<Vec<FLOAT>>()
-            })
-            .collect::<Vec<Vec<FLOAT>>>();
-        f(DenseMatrix::from_2d_vec(&matrix_as_vec))
-    } else {
-        Err(
-            EvalAltResult::ErrorArithmetic(format!("The input must be a matrix."), Position::NONE)
-                .into(),
-        )
     }
 }
 
@@ -266,20 +230,6 @@ pub fn array_to_vec_int(arr: &mut Array) -> Vec<INT> {
     arr.iter()
         .map(|el| el.as_int().unwrap())
         .collect::<Vec<INT>>()
-}
-
-#[cfg(feature = "smartcore")]
-pub fn dense_matrix_to_vec_dynamic(dm: DenseMatrix<FLOAT>) -> Vec<Dynamic> {
-    let mut output = vec![];
-    for idx in 0..dm.shape().0 {
-        output.push(Dynamic::from_array(
-            dm.get_row(idx)
-                .iterator(0)
-                .map(|x| Dynamic::from_float(x.clone()))
-                .collect::<Vec<Dynamic>>(),
-        ));
-    }
-    output
 }
 
 pub fn array_to_vec_float(arr: &mut Array) -> Vec<FLOAT> {
