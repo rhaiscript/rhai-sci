@@ -1,6 +1,62 @@
 #[cfg(feature = "nalgebra")]
 use nalgebralib::{DMatrix, DVector};
-use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT};
+#[cfg(feature = "nalgebra")]
+use rhai::FLOAT;
+use rhai::{Array, Dynamic, EvalAltResult, Position};
+
+/// Inspect every row rather than inferring a rectangular shape from the first row.
+pub(crate) fn matrix_dimensions(values: &Array) -> Option<(usize, usize)> {
+    let first = values.first()?.clone().into_array().ok()?;
+    let cols = first.len();
+    if cols == 0 {
+        return None;
+    }
+    for value in values {
+        let row = value.clone().into_array().ok()?;
+        if row.len() != cols || row.iter().any(Dynamic::is_array) {
+            return None;
+        }
+    }
+    Some((values.len(), cols))
+}
+
+/// Normalize a nonempty numeric list, row, or column without changing its values.
+pub(crate) fn numeric_vector_data(values: &Array) -> Result<Array, Box<EvalAltResult>> {
+    let numeric = |value: &Dynamic| value.is_int() || value.is_float();
+    let data = if values.iter().all(|value| !value.is_array()) {
+        values.clone()
+    } else {
+        match matrix_dimensions(values) {
+            Some((1, _)) => values[0].clone().into_array().unwrap(),
+            Some((_, 1)) => values
+                .iter()
+                .map(|value| value.clone().into_array().unwrap().remove(0))
+                .collect(),
+            _ => {
+                return Err(EvalAltResult::ErrorArithmetic(
+                    "Expected a numeric list, row vector, or column vector".into(),
+                    Position::NONE,
+                )
+                .into())
+            }
+        }
+    };
+    if data.is_empty() {
+        return Err(EvalAltResult::ErrorArithmetic(
+            "Numeric vectors must contain at least one value".into(),
+            Position::NONE,
+        )
+        .into());
+    }
+    if !data.iter().all(numeric) {
+        return Err(EvalAltResult::ErrorArithmetic(
+            "Vector elements must be INT or FLOAT".into(),
+            Position::NONE,
+        )
+        .into());
+    }
+    Ok(data)
+}
 
 /// Wrapper around [`rhai::Array`] representing a matrix.
 ///
@@ -77,19 +133,12 @@ impl RhaiMatrix {
     /// ```
     #[must_use]
     pub fn as_row(&self) -> Option<Self> {
-        let mut arr = self.0.clone();
-        let shape = crate::matrix_functions::matrix_size_by_reference(&mut arr.clone());
-        if shape.len() == 2 {
-            if shape[0].as_int().unwrap() == 1_i64 {
-                Some(self.clone())
-            } else if shape[1].as_int().unwrap() == 1_i64 {
-                let flat = crate::matrix_functions::flatten(&mut arr);
-                Some(Self::row_vector(flat))
-            } else {
-                None
-            }
-        } else {
-            None
+        match matrix_dimensions(&self.0) {
+            Some((1, _)) => Some(self.clone()),
+            Some((_, 1)) => Some(Self::row_vector(crate::matrix_functions::flatten(
+                &mut self.0.clone(),
+            ))),
+            _ => None,
         }
     }
 
@@ -108,19 +157,10 @@ impl RhaiMatrix {
     /// ```
     #[must_use]
     pub fn as_column(&self) -> Option<Self> {
-        let mut arr = self.0.clone();
-        let shape = crate::matrix_functions::matrix_size_by_reference(&mut arr.clone());
-        if shape.len() == 2 {
-            if shape[1].as_int().unwrap() == 1_i64 {
-                Some(self.clone())
-            } else if shape[0].as_int().unwrap() == 1_i64 {
-                let flat = crate::matrix_functions::flatten(&mut arr);
-                Some(Self::column_vector(flat))
-            } else {
-                None
-            }
-        } else {
-            None
+        match matrix_dimensions(&self.0) {
+            Some((_, 1)) => Some(self.clone()),
+            Some((1, _)) => Some(Self::column_vector(self.0[0].clone().into_array().unwrap())),
+            _ => None,
         }
     }
 

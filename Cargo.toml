@@ -1,6 +1,6 @@
 [package]
 name = "rhai-sci"
-version = "0.3.0"
+version = "0.4.0"
 edition = "2021"
 authors = ["Chris McComb <ccmcc2012@gmail.com>"]
 description = "Scientific computing in the Rhai scripting language"
@@ -23,7 +23,7 @@ rand = ["randlib"]
 [dependencies]
 rhai = "1.8.0"
 nalgebralib = { version = ">=0.33.2,<1", optional = true, package = "nalgebra" }
-polars = { version = ">=0.45.1,<1", optional = true }
+polars = { version = "0.45.1", default-features = false, features = ["csv"], optional = true }
 url = { version = "2.0.0", optional = true }
 temp-file = { version = "0.2.0", optional = true }
 csv-sniffer = { version = "0.3.1", optional = true }
@@ -35,7 +35,7 @@ linregress = { version = "0.5.0", optional = true }
 [build-dependencies]
 rhai = "1.8.0"
 nalgebralib = { version = ">=0.33.2,<1", optional = true, package = "nalgebra" }
-polars = { version = ">=0.45.1,<1", optional = true }
+polars = { version = "0.45.1", default-features = false, features = ["csv"], optional = true }
 url = { version = "2.0.0", optional = true }
 temp-file = { version = "0.2.0", optional = true }
 csv-sniffer = { version = "0.3.1", optional = true }

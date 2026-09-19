@@ -2,7 +2,7 @@ use rhai::plugin::*;
 
 #[export_module]
 pub mod validation_functions {
-    use crate::matrix::RhaiMatrix;
+    use crate::matrix::{matrix_dimensions, numeric_vector_data};
     use rhai::Array;
 
     /// Tests whether the input is a simple list or a numeric vector.
@@ -16,16 +16,7 @@ pub mod validation_functions {
     /// ```
     #[rhai_fn(name = "is_list", pure)]
     pub fn is_list(arr: &mut Array) -> bool {
-        let shape = crate::matrix_functions::matrix_size_by_reference(arr);
-        if shape.len() == 1 {
-            true
-        } else if shape.len() == 2 {
-            let (ints, floats, total) = crate::int_and_float_totals(arr);
-            let numeric = ints + floats == total;
-            numeric && (is_row_vector(arr) || is_column_vector(arr))
-        } else {
-            false
-        }
+        arr.iter().all(|value| !value.is_array()) || numeric_vector_data(arr).is_ok()
     }
 
     /// Determines if the entire array is numeric (ints or floats).
@@ -101,12 +92,7 @@ pub mod validation_functions {
     /// ```
     #[rhai_fn(name = "is_numeric_list", pure)]
     pub fn is_numeric_list(arr: &mut Array) -> bool {
-        let (int, float, total) = crate::int_and_float_totals(arr);
-        if (int == total || float == total) && is_list(arr) {
-            true
-        } else {
-            false
-        }
+        numeric_vector_data(arr).is_ok()
     }
 
     /// Tests whether the input is a row vector.
@@ -120,13 +106,7 @@ pub mod validation_functions {
     /// ```
     #[rhai_fn(name = "is_row_vector", pure)]
     pub fn is_row_vector(arr: &mut Array) -> bool {
-        let matrix = RhaiMatrix::from_array(arr.clone());
-        if matrix.as_row().is_some() {
-            let s = crate::matrix_functions::matrix_size_by_reference(arr);
-            s.len() == 2 && s[0].as_int().unwrap() == 1_i64
-        } else {
-            false
-        }
+        matches!(matrix_dimensions(arr), Some((1, _)))
     }
 
     /// Tests whether the input is a column vector.
@@ -140,13 +120,7 @@ pub mod validation_functions {
     /// ```
     #[rhai_fn(name = "is_column_vector", pure)]
     pub fn is_column_vector(arr: &mut Array) -> bool {
-        let matrix = RhaiMatrix::from_array(arr.clone());
-        if matrix.as_column().is_some() {
-            let s = crate::matrix_functions::matrix_size_by_reference(arr);
-            s.len() == 2 && s[1].as_int().unwrap() == 1_i64
-        } else {
-            false
-        }
+        matches!(matrix_dimensions(arr), Some((_, 1)))
     }
 
     /// Tests whether the input is a matrix
@@ -160,19 +134,6 @@ pub mod validation_functions {
     /// ```
     #[rhai_fn(name = "is_matrix", pure)]
     pub fn is_matrix(arr: &mut Array) -> bool {
-        if crate::matrix_functions::matrix_size_by_reference(arr).len() != 2 {
-            false
-        } else {
-            if crate::stats::prod(&mut crate::matrix_functions::matrix_size_by_reference(arr))
-                .unwrap()
-                .as_int()
-                .unwrap()
-                == crate::matrix_functions::numel_by_reference(arr)
-            {
-                true
-            } else {
-                false
-            }
-        }
+        matrix_dimensions(arr).is_some()
     }
 }

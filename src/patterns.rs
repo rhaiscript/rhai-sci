@@ -1,3 +1,4 @@
+#[cfg(feature = "nalgebra")]
 use crate::matrix::{RhaiMatrix, RhaiVector};
 use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT, INT};
 
@@ -37,6 +38,8 @@ where
     FA: FnMut(&mut Array) -> Result<T, Box<EvalAltResult>>,
     FB: FnMut(&mut Array) -> Result<T, Box<EvalAltResult>>,
 {
+    let mut normalized = crate::matrix::numeric_vector_data(arr)?;
+    let arr = &mut normalized;
     let (int, float, total) = int_and_float_totals(arr);
     if int == total {
         f_int(arr)
@@ -65,58 +68,13 @@ where
     }
 }
 
-fn list_error(message: &str) -> Box<EvalAltResult> {
-    EvalAltResult::ErrorArithmetic(message.to_string(), Position::NONE).into()
-}
-
-fn normalize_numeric_list(arr: &mut Array) -> Result<Array, Box<EvalAltResult>> {
-    if arr.len() == 1 {
-        arr.first()
-            .ok_or_else(|| list_error("Row vector inputs must contain scalar values."))?
-            .clone()
-            .into_array()
-            .map_err(|_| list_error("Row vector inputs must contain scalar values."))
-    } else {
-        arr.iter()
-            .map(|row| {
-                row.clone()
-                    .into_array()
-                    .map_err(|_| list_error("Column vector inputs must contain scalar values."))
-                    .and_then(|inner| {
-                        inner.into_iter().next().ok_or_else(|| {
-                            list_error("Column vector inputs must contain scalar values.")
-                        })
-                    })
-            })
-            .collect::<Result<Array, _>>()
-    }
-}
-
 /// Does a function if the input is a list, otherwise throws an error.
 pub fn if_list_do<F, T>(arr: &mut Array, mut f: F) -> Result<T, Box<EvalAltResult>>
 where
     F: FnMut(&mut Array) -> Result<T, Box<EvalAltResult>>,
 {
-    if !crate::validation_functions::is_list(arr) {
-        return Err(list_error(
-            "Input must be a 1-D array, row vector, or column vector.",
-        ));
-    }
-
-    let (int, float, total) = int_and_float_totals(arr);
-    if !(int == total || float == total) {
-        return Err(list_error(
-            "The elements of the input array must either be INT or FLOAT.",
-        ));
-    }
-
-    let needs_normalization = crate::matrix_functions::matrix_size_by_reference(arr).len() == 2;
-    if needs_normalization {
-        let mut normalized = normalize_numeric_list(arr)?;
-        f(&mut normalized)
-    } else {
-        f(arr)
-    }
+    let mut normalized = crate::matrix::numeric_vector_data(arr)?;
+    f(&mut normalized)
 }
 
 pub fn if_list_convert_to_vec_float_and_do<F, T>(
@@ -230,11 +188,11 @@ pub fn if_matrix_convert_to_vec_array_and_do<F, T>(
 where
     F: FnMut(Vec<Array>) -> Result<T, Box<EvalAltResult>>,
 {
-    let matrix_as_vec = matrix
-        .into_iter()
-        .map(|x| x.clone().into_array().unwrap())
-        .collect::<Vec<Array>>();
     if crate::validation_functions::is_matrix(matrix) {
+        let matrix_as_vec = matrix
+            .iter()
+            .map(|x| x.clone().into_array().unwrap())
+            .collect::<Vec<Array>>();
         f(matrix_as_vec)
     } else {
         Err(EvalAltResult::ErrorArithmetic(
@@ -268,20 +226,22 @@ where
 }
 
 pub fn array_to_vec_int(arr: &mut Array) -> Vec<INT> {
-    RhaiVector::from_array(arr.clone())
-        .to_dvector()
-        .expect("Array elements must be numeric")
-        .iter()
-        .map(|v| *v as INT)
+    arr.iter()
+        .map(|value| {
+            value.as_int().unwrap_or_else(|_| {
+                value.as_float().expect("Array elements must be numeric") as INT
+            })
+        })
         .collect()
 }
 
 pub fn array_to_vec_float(arr: &mut Array) -> Vec<FLOAT> {
-    RhaiVector::from_array(arr.clone())
-        .to_dvector()
-        .expect("Array elements must be numeric")
-        .iter()
-        .copied()
+    arr.iter()
+        .map(|value| {
+            value.as_float().unwrap_or_else(|_| {
+                value.as_int().expect("Array elements must be numeric") as FLOAT
+            })
+        })
         .collect()
 }
 

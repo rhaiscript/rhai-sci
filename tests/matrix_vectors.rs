@@ -1,3 +1,5 @@
+#![cfg(feature = "nalgebra")]
+
 use rhai::{Array, Dynamic};
 use rhai_sci::matrix::RhaiMatrix;
 use rhai_sci::matrix_functions::{horzcat, matrix_size_by_reference, transpose, vertcat};

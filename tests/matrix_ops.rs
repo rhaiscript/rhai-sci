@@ -1,3 +1,5 @@
+#![cfg(feature = "nalgebra")]
+
 use rhai::{Array, Dynamic, EvalAltResult, FLOAT, INT};
 use rhai_sci::matrix::RhaiMatrix;
 use rhai_sci::matrix_functions::{

@@ -1,91 +1,121 @@
-use rhai::{packages::Package, Array, Engine, EvalAltResult};
+use rhai::{packages::Package, Array, Dynamic, Engine, EvalAltResult};
 use rhai_sci::SciPackage;
 
 #[test]
-fn constructors_make_vector_orientation_explicit() {
-    assert_matrix_eq(eval_array("row([1, 2, 3])").unwrap(), &[&[1.0, 2.0, 3.0]]);
-    assert_matrix_eq(
-        eval_array("col([1, 2, 3])").unwrap(),
-        &[&[1.0], &[2.0], &[3.0]],
-    );
-    assert_matrix_eq(
-        eval_array("vec([1, 2, 3])").unwrap(),
-        &[&[1.0], &[2.0], &[3.0]],
-    );
+fn constructors_preserve_values_and_convert_vector_orientation() {
+    for script in ["row([1, 2.5, 3])", "row(col([1, 2.5, 3]))"] {
+        assert_matrix_eq(eval_array(script).unwrap(), &[&[1.0, 2.5, 3.0]]);
+    }
+    for script in ["col([1, 2.5, 3])", "col(row([1, 2.5, 3]))"] {
+        assert_matrix_eq(eval_array(script).unwrap(), &[&[1.0], &[2.5], &[3.0]]);
+    }
+    let values = eval_array("mat([[1, 2.5]])").unwrap()[0]
+        .clone()
+        .into_array()
+        .unwrap();
+    assert!(values[0].is_int());
+    assert!(values[1].is_float());
 }
 
 #[test]
-fn string_literals_accept_spaces_commas_and_semicolons() {
-    assert_matrix_eq(
-        eval_array("mat(\"1, 2; 3, 4\")").unwrap(),
-        &[&[1.0, 2.0], &[3.0, 4.0]],
+fn dot_is_a_scalar_inner_product_independent_of_orientation() {
+    let mut engine = Engine::new();
+    engine.register_global_module(SciPackage::new().as_shared_module());
+    for left in ["[1, 2]", "row([1, 2])", "col([1, 2])"] {
+        for right in ["[3, 4.0]", "row([3, 4.0])", "col([3, 4.0])"] {
+            let value = engine
+                .eval::<f64>(&format!("dot({left}, {right})"))
+                .unwrap();
+            assert_eq!(value, 11.0);
+        }
+    }
+    assert_eq!(
+        engine.eval::<f64>("col([1, 2]).dot(row([3, 4]))").unwrap(),
+        11.0
     );
-    assert_matrix_eq(
-        eval_array("M(\"1 2; 3 4\")").unwrap(),
-        &[&[1.0, 2.0], &[3.0, 4.0]],
-    );
-    assert_matrix_eq(eval_array("R(\"1 2 3\")").unwrap(), &[&[1.0, 2.0, 3.0]]);
-    assert_matrix_eq(
-        eval_array("C(\"1; 2; 3\")").unwrap(),
-        &[&[1.0], &[2.0], &[3.0]],
-    );
+    for script in [
+        "dot([1], [1, 2])",
+        "dot([], [])",
+        "dot([[1, 2], [3, 4]], [1, 2])",
+        "dot([1, \"x\"], [1, 2])",
+    ] {
+        assert!(engine.eval::<Dynamic>(script).is_err(), "{script}");
+    }
 }
 
+#[cfg(feature = "nalgebra")]
 #[test]
-fn aliases_read_like_linear_algebra() {
-    let product = eval_array(
-        r#"
-            let A = mat("1 2; 3 4");
-            let x = col([5, 6]);
-            dot(A, x)
-        "#,
-    )
-    .unwrap();
-    assert_matrix_eq(product, &[&[17.0], &[39.0]]);
-
-    let method_product = eval_array(
-        r#"
-            let A = mat("1 2; 3 4");
-            let x = col([5, 6]);
-            A.dot(x)
-        "#,
-    )
-    .unwrap();
-    assert_matrix_eq(method_product, &[&[17.0], &[39.0]]);
-
-    assert_matrix_eq(eval_array("T(row([1, 2]))").unwrap(), &[&[1.0], &[2.0]]);
-    assert_matrix_eq(eval_array("T(vec([1, 2]))").unwrap(), &[&[1.0, 2.0]]);
+fn matrix_products_and_concatenation_compose_with_constructors() {
     assert_matrix_eq(
-        eval_array("dot(T(vec([1, 2])), vec([3, 4]))").unwrap(),
+        eval_array("mtimes(mat([[1, 2], [3, 4]]), col([5, 6]))").unwrap(),
+        &[&[17.0], &[39.0]],
+    );
+    assert_matrix_eq(
+        eval_array("transpose(row([1, 2]))").unwrap(),
+        &[&[1.0], &[2.0]],
+    );
+    assert_matrix_eq(
+        eval_array("transpose(col([1, 2]))").unwrap(),
+        &[&[1.0, 2.0]],
+    );
+    assert_matrix_eq(
+        eval_array("transpose(transpose(col([1, 2])))").unwrap(),
+        &[&[1.0], &[2.0]],
+    );
+    assert_matrix_eq(
+        eval_array("mtimes(row([1, 2]), col([3, 4]))").unwrap(),
         &[&[11.0]],
     );
     assert_matrix_eq(
-        eval_array("hcat(mat(\"1 2; 3 4\"), col([5, 6]))").unwrap(),
+        eval_array("horzcat(mat([[1, 2], [3, 4]]), col([5, 6]))").unwrap(),
         &[&[1.0, 2.0, 5.0], &[3.0, 4.0, 6.0]],
     );
     assert_matrix_eq(
-        eval_array("vcat(mat(\"1 2; 3 4\"), row([5, 6]))").unwrap(),
+        eval_array("vertcat(mat([[1, 2], [3, 4]]), row([5, 6]))").unwrap(),
         &[&[1.0, 2.0], &[3.0, 4.0], &[5.0, 6.0]],
+    );
+    assert_error_contains("horzcat(row([1, 2]), col([3, 4]))", "same number of rows");
+    assert_error_contains(
+        "vertcat(row([1, 2]), col([3, 4]))",
+        "same number of columns",
+    );
+    assert_error_contains("mtimes(col([1, 2]), col([3, 4]))", "not compatible");
+    assert_error_contains(
+        "let A = mat([[1, 2], [3, 4]]); A[1] = [3]; mtimes(A, col([1, 2]))",
+        "matrix",
     );
 }
 
 #[test]
-fn matrix_constructor_rejects_ragged_literals() {
-    assert_error_contains("mat(\"1 2; 3\")", "equal length");
-}
-
-#[test]
-fn matrix_constructor_rejects_invalid_arrays() {
+fn constructors_reject_invalid_shapes_and_values() {
     assert_error_contains("mat([[1, 2], [3]])", "equal length");
     assert_error_contains("mat([[1, \"x\"]])", "INT or FLOAT");
-    assert_error_contains("mat([[]])", "at least one value");
+    assert_error_contains("mat([[]])", "nonempty");
+    assert_error_contains("mat([])", "nonempty");
+    assert_error_contains("row([])", "at least one value");
+    assert_error_contains("col([])", "at least one value");
+    for constructor in ["row", "col"] {
+        assert_error_contains(&format!("{constructor}([[1], [2, 3]])"), "vector");
+        assert_error_contains(&format!("{constructor}([[1, 2], [3, 4]])"), "vector");
+    }
 }
 
 #[test]
-fn vector_constructors_reject_empty_arrays() {
-    assert_error_contains("vec([])", "at least one value");
-    assert_error_contains("row([])", "at least one value");
-    assert_error_contains("col([])", "at least one value");
+fn shape_predicates_check_every_row() {
+    let mut engine = Engine::new();
+    engine.register_global_module(SciPackage::new().as_shared_module());
+    engine
+        .run(
+            r#"
+        assert_eq(is_matrix([[1], [2, 3]]), false);
+        assert_eq(is_column_vector([[1], [2, 3]]), false);
+        assert_eq(is_matrix([[1, 2], [3], [4, 5, 6]]), false);
+        assert_eq(is_row_vector([[[1, 2]]]), false);
+        assert_eq(is_numeric_list(row([1, 2.5])), true);
+        assert_eq(is_numeric_list(col([1, 2.5])), true);
+    "#,
+        )
+        .unwrap();
 }
 
 fn eval_array(script: &str) -> Result<Array, Box<EvalAltResult>> {

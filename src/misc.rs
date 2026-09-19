@@ -28,6 +28,9 @@ pub mod misc_functions {
     /// ```
     #[rhai_fn(name = "unique", return_raw, pure)]
     pub fn unique(arr: &mut Array) -> Result<Array, Box<EvalAltResult>> {
+        if arr.is_empty() {
+            return Ok(Array::new());
+        }
         if_list_do_int_or_do_float(
             arr,
             |arr| {
@@ -71,25 +74,25 @@ pub mod misc_functions {
             .into());
         };
 
-        if x.len() < 2 {
-            return Err(EvalAltResult::ErrorArithmetic(
-                "The arrays must have at least 2 elements".to_string(),
-                Position::NONE,
-            )
-            .into());
-        }
-        if x.len() != y.len() {
-            return Err(EvalAltResult::ErrorArithmetic(
-                "The arrays must have the same length".to_string(),
-                Position::NONE,
-            )
-            .into());
-        }
-
         let mut y = y;
 
         if_list_convert_to_vec_float_and_do(&mut y, |new_y| {
             if_list_convert_to_vec_float_and_do(x, |new_x| {
+                if new_x.len() < 2 {
+                    return Err(EvalAltResult::ErrorArithmetic(
+                        "The arrays must have at least 2 elements".to_string(),
+                        Position::NONE,
+                    )
+                    .into());
+                }
+                if new_x.len() != new_y.len() {
+                    return Err(EvalAltResult::ErrorArithmetic(
+                        "The arrays must have the same length".to_string(),
+                        Position::NONE,
+                    )
+                    .into());
+                }
+
                 if new_xq >= *new_x.last().unwrap() {
                     return Ok(*new_y.last().unwrap());
                 } else if new_xq <= *new_x.first().unwrap() {

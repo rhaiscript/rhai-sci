@@ -1,11 +1,31 @@
 use rhai::plugin::*;
 
+fn extremum_index<T: PartialOrd>(
+    values: &[T],
+    direction: std::cmp::Ordering,
+) -> Result<rhai::Dynamic, Box<rhai::EvalAltResult>> {
+    let mut best = 0;
+    for (index, value) in values.iter().enumerate() {
+        let ordering = value.partial_cmp(&values[best]).ok_or_else(|| {
+            rhai::EvalAltResult::ErrorArithmetic(
+                "Cannot compare NaN values".into(),
+                rhai::Position::NONE,
+            )
+        })?;
+        if ordering == direction {
+            best = index;
+        }
+    }
+    Ok(rhai::Dynamic::from_int(best as rhai::INT))
+}
+
 #[export_module]
 pub mod stats {
+    use super::extremum_index;
     #[cfg(feature = "nalgebra")]
     use crate::matrix::RhaiMatrix;
     use crate::{
-        array_to_vec_float, array_to_vec_int, if_list_convert_to_vec_float_and_do, if_list_do,
+        array_to_vec_float, array_to_vec_int, if_list_convert_to_vec_float_and_do,
         if_list_do_int_or_do_float,
     };
     #[cfg(feature = "nalgebra")]
@@ -210,6 +230,9 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "sum", return_raw, pure)]
     pub fn sum(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
+        if arr.is_empty() {
+            return Ok(Dynamic::from_int(0));
+        }
         if_list_do_int_or_do_float(
             arr,
             |arr| {
@@ -232,13 +255,15 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "mean", return_raw, pure)]
     pub fn mean(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        let l = arr.len() as FLOAT;
         if_list_do_int_or_do_float(
             arr,
             |arr: &mut Array| {
-                sum(arr).map(|s| Dynamic::from_float(s.as_int().unwrap() as FLOAT / l))
+                sum(arr)
+                    .map(|s| Dynamic::from_float(s.as_int().unwrap() as FLOAT / arr.len() as FLOAT))
             },
-            |arr: &mut Array| sum(arr).map(|s| Dynamic::from_float(s.as_float().unwrap() / l)),
+            |arr: &mut Array| {
+                sum(arr).map(|s| Dynamic::from_float(s.as_float().unwrap() / arr.len() as FLOAT))
+            },
         )
     }
 
@@ -251,15 +276,11 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "argmax", return_raw, pure)]
     pub fn argmax(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        if_list_do(arr, |arr| {
-            array_max(arr).map(|m| {
-                Dynamic::from_int(
-                    arr.iter()
-                        .position(|r| format!("{r}") == format!("{m}"))
-                        .unwrap() as INT,
-                )
-            })
-        })
+        if_list_do_int_or_do_float(
+            arr,
+            |values| extremum_index(&array_to_vec_int(values), std::cmp::Ordering::Greater),
+            |values| extremum_index(&array_to_vec_float(values), std::cmp::Ordering::Greater),
+        )
     }
 
     /// Return the index of the smallest array element. Fails if the input is not an array, or if
@@ -271,15 +292,11 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "argmin", return_raw, pure)]
     pub fn argmin(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        if_list_do(arr, |arr| {
-            array_min(arr).map(|m| {
-                Dynamic::from_int(
-                    arr.iter()
-                        .position(|r| format!("{r}") == format!("{m}"))
-                        .unwrap() as INT,
-                )
-            })
-        })
+        if_list_do_int_or_do_float(
+            arr,
+            |values| extremum_index(&array_to_vec_int(values), std::cmp::Ordering::Less),
+            |values| extremum_index(&array_to_vec_float(values), std::cmp::Ordering::Less),
+        )
     }
 
     /// Compute the product of an array. Fails if the input is not an array, or if
@@ -296,6 +313,9 @@ pub mod stats {
     /// ```
     #[rhai_fn(name = "prod", return_raw, pure)]
     pub fn prod(arr: &mut Array) -> Result<Dynamic, Box<EvalAltResult>> {
+        if arr.is_empty() {
+            return Ok(Dynamic::from_int(1));
+        }
         if_list_do_int_or_do_float(
             arr,
             |arr| {
@@ -535,23 +555,33 @@ pub mod stats {
         )
     }
 
-    /// Performs ordinary least squares regression and provides a statistical assessment.
+    /// Performs ordinary least squares regression with an automatically fitted intercept.
+    /// Rows of `x` are observations; columns are predictors. Do not add a column of ones.
+    /// `y` may be a list, row vector, or column vector with one value per observation.
+    /// `parameters`, `pvalues`, and `standard_errors` describe the predictor columns in order;
+    /// `intercept` is returned separately. Predict with intercept + X * parameters.
     /// ```typescript
-    /// let x = [[1.0, 0.0],
-    ///          [1.0, 1.0],
-    ///          [1.0, 2.0]];
+    /// let x = col([0.0, 1.0, 2.0]);
     /// let y = [[0.1],
     ///          [0.8],
     ///          [2.1]];
     /// let b = regress(x, y);
-    /// assert_eq(b,  #{"parameters": [-2.220446049250313e-16, 1.0000000000000002],
-    ///                 "pvalues": [1.0, 0.10918255350924745],
-    ///                 "standard_errors": [0.11180339887498947, 0.17320508075688767]});
+    /// assert_approx_eq(b.intercept, 0.0);
+    /// assert_approx_eq(b.parameters, [1.0]);
     /// ```
     #[cfg(feature = "nalgebra")]
     #[rhai_fn(name = "regress", return_raw, pure)]
     pub fn regress(x: &mut Array, y: Array) -> Result<Map, Box<EvalAltResult>> {
         use linregress::{FormulaRegressionBuilder, RegressionDataBuilder};
+        crate::matrix_functions::mat_from_array(x.clone())?;
+        let mut response = crate::matrix::numeric_vector_data(&y)?;
+        if response.len() != x.len() {
+            return Err(EvalAltResult::ErrorArithmetic(
+                "regress expects one response per predictor row".into(),
+                Position::NONE,
+            )
+            .into());
+        }
         let x_transposed = crate::matrix_functions::transpose(RhaiMatrix::from_array(x.clone()))?;
         let x_arr = x_transposed.to_array();
         let mut data: Vec<(String, Vec<f64>)> = vec![];
@@ -564,12 +594,11 @@ pub mod stats {
                 array_to_vec_float(&mut column.clone().into_array().unwrap()),
             ));
         }
-        data.push((
-            "y".to_string(),
-            array_to_vec_float(&mut crate::matrix_functions::flatten(&mut y.clone())),
-        ));
+        data.push(("y".to_string(), array_to_vec_float(&mut response)));
 
-        let regress_data = RegressionDataBuilder::new().build_from(data).unwrap();
+        let regress_data = RegressionDataBuilder::new()
+            .build_from(data)
+            .map_err(|e| EvalAltResult::ErrorArithmetic(e.to_string(), Position::NONE))?;
 
         let model = FormulaRegressionBuilder::new()
             .data(&regress_data)
@@ -597,6 +626,10 @@ pub mod stats {
         );
 
         let mut result = BTreeMap::new();
+        result.insert(
+            "intercept".into(),
+            Dynamic::from_float(model.parameters()[0]),
+        );
         let mut params = smartstring::SmartString::new();
         params.push_str("parameters");
         result.insert(params, parameters);

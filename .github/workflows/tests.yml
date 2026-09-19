@@ -12,6 +12,9 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        features: ["", "rand,nalgebra", "io,rand,nalgebra,metadata"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions-rs/toolchain@v1
@@ -23,5 +26,4 @@ jobs:
       - name: Format
         run: cargo fmt --all -- --check
       - name: Test
-        run: cargo test --no-default-features --features rand,nalgebra
-
+        run: cargo test --no-default-features --features "${{ matrix.features }}"

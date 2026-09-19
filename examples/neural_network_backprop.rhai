@@ -91,10 +91,10 @@ fn sum_squares(A) {
 }
 
 fn forward(W1, W2, x) {
-    let x_with_bias = vcat(x, col([1.0]));
-    let hidden = sigmoid_matrix(dot(W1, x_with_bias));
-    let hidden_with_bias = vcat(hidden, col([1.0]));
-    let output = sigmoid_matrix(dot(W2, hidden_with_bias));
+    let x_with_bias = vertcat(x, col([1.0]));
+    let hidden = sigmoid_matrix(mtimes(W1, x_with_bias));
+    let hidden_with_bias = vertcat(hidden, col([1.0]));
+    let output = sigmoid_matrix(mtimes(W2, hidden_with_bias));
 
     #{
         "x_with_bias": x_with_bias,
@@ -141,8 +141,8 @@ let inputs = [
 let targets = [0.0, 1.0, 1.0, 0.0];
 
 // Fixed starting weights keep the example deterministic while still learning.
-let W1 = M("0.6888 0.5159 -0.1589; -0.4822 0.0225 -0.1901");
-let W2 = M("0.5676 -0.3934 -0.0468");
+let W1 = mat([[0.6888, 0.5159, -0.1589], [-0.4822, 0.0225, -0.1901]]);
+let W2 = row([0.5676, -0.3934, -0.0468]);
 let learning_rate = 1.5;
 let epochs = 800;
 let initial_loss = total_loss(W1, W2, inputs, targets);
@@ -158,14 +158,14 @@ for epoch in 0..epochs {
         let output_slope = sigmoid_prime_from_activation(step.output);
         let output_delta = hadamard(output_error, output_slope);
         let output_weight_row = W2[0];
-        let output_weights_without_bias = T(row([output_weight_row[0], output_weight_row[1]]));
+        let output_weights_without_bias = transpose(row([output_weight_row[0], output_weight_row[1]]));
 
-        let hidden_error = dot(output_weights_without_bias, output_delta);
+        let hidden_error = mtimes(output_weights_without_bias, output_delta);
         let hidden_slope = sigmoid_prime_from_activation(step.hidden);
         let hidden_delta = hadamard(hidden_error, hidden_slope);
 
-        let grad_W2 = dot(output_delta, T(step.hidden_with_bias));
-        let grad_W1 = dot(hidden_delta, T(step.x_with_bias));
+        let grad_W2 = mtimes(output_delta, transpose(step.hidden_with_bias));
+        let grad_W1 = mtimes(hidden_delta, transpose(step.x_with_bias));
 
         W2 = sub_matrix(W2, scale_matrix(grad_W2, learning_rate));
         W1 = sub_matrix(W1, scale_matrix(grad_W1, learning_rate));

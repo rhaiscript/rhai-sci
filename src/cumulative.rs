@@ -72,25 +72,24 @@ pub mod cum_functions {
     /// ```
     #[rhai_fn(name = "cumtrapz", return_raw)]
     pub fn cumtrapz(x: Array, y: Array) -> Result<Array, Box<EvalAltResult>> {
-        if x.len() != y.len() {
-            Err(EvalAltResult::ErrorArithmetic(
-                "The arrays must have the same length".to_string(),
-                Position::NONE,
-            )
-            .into())
-        } else {
-            if_list_convert_to_vec_float_and_do(&mut y.clone(), |yf| {
-                if_list_convert_to_vec_float_and_do(&mut x.clone(), |xf| {
-                    let mut trapsum = 0.0;
-                    let mut cumtrapsum = vec![Dynamic::FLOAT_ZERO];
-                    for i in 1..x.len() {
-                        trapsum += (yf[i] + yf[i - 1]) * (xf[i] - xf[i - 1]) / 2.0;
-                        cumtrapsum.push(Dynamic::from_float(trapsum));
-                    }
-                    Ok(cumtrapsum)
-                })
+        if_list_convert_to_vec_float_and_do(&mut y.clone(), |yf| {
+            if_list_convert_to_vec_float_and_do(&mut x.clone(), |xf| {
+                if xf.len() != yf.len() {
+                    return Err(EvalAltResult::ErrorArithmetic(
+                        "The arrays must have the same length".into(),
+                        Position::NONE,
+                    )
+                    .into());
+                }
+                let mut trapsum = 0.0;
+                let mut cumulative = vec![Dynamic::FLOAT_ZERO];
+                for i in 1..xf.len() {
+                    trapsum += (yf[i] + yf[i - 1]) * (xf[i] - xf[i - 1]) / 2.0;
+                    cumulative.push(Dynamic::from_float(trapsum));
+                }
+                Ok(cumulative)
             })
-        }
+        })
     }
 
     /// Returns the cumulative approximate integral of the curve defined by Y and x using the
