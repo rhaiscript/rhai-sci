@@ -7,6 +7,8 @@
 
 mod patterns;
 pub use patterns::*;
+pub mod matrix;
+pub use matrix::{RhaiMatrix, RhaiVector};
 use rhai::{def_package, packages::Package, plugin::*, Engine, EvalAltResult};
 mod matrices_and_arrays;
 pub use matrices_and_arrays::matrix_functions;

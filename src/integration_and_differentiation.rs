@@ -20,23 +20,23 @@ pub mod int_and_diff {
     /// ```
     #[rhai_fn(name = "trapz", return_raw)]
     pub fn trapz(x: Array, y: Array) -> Result<Dynamic, Box<EvalAltResult>> {
-        if x.len() != y.len() {
-            Err(EvalAltResult::ErrorArithmetic(
-                "The arrays must have the same length".to_string(),
-                Position::NONE,
-            )
-            .into())
-        } else {
-            if_list_convert_to_vec_float_and_do(&mut y.clone(), |yf| {
-                if_list_convert_to_vec_float_and_do(&mut x.clone(), |xf| {
-                    let mut trapsum = 0.0;
-                    for i in 1..x.len() {
-                        trapsum += (yf[i] + yf[i - 1]) * (xf[i] - xf[i - 1]) / 2.0;
-                    }
-                    Ok(Dynamic::from_float(trapsum))
-                })
+        if_list_convert_to_vec_float_and_do(&mut y.clone(), |yf| {
+            if_list_convert_to_vec_float_and_do(&mut x.clone(), |xf| {
+                if xf.len() != yf.len() {
+                    return Err(EvalAltResult::ErrorArithmetic(
+                        "The arrays must have the same length".into(),
+                        Position::NONE,
+                    )
+                    .into());
+                }
+                let mut trapsum = 0.0;
+
+                for i in 1..xf.len() {
+                    trapsum += (yf[i] + yf[i - 1]) * (xf[i] - xf[i - 1]) / 2.0;
+                }
+                Ok(Dynamic::from_float(trapsum))
             })
-        }
+        })
     }
 
     /// Returns the approximate integral of the curve defined by `y` using the trapezoidal method.
@@ -70,6 +70,9 @@ pub mod int_and_diff {
     /// ```
     #[rhai_fn(name = "diff", return_raw, pure)]
     pub fn diff(arr: &mut Array) -> Result<Array, Box<EvalAltResult>> {
+        if arr.is_empty() {
+            return Ok(Array::new());
+        }
         crate::if_list_do_int_or_do_float(
             arr,
             |arr| {

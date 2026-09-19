@@ -1,22 +1,29 @@
-name: tests
+name: ci
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        features: ["", "rand,nalgebra", "io,rand,nalgebra,metadata"]
     steps:
-      - uses: actions/checkout@v2
-      - name: Build
-        run: cargo build --verbose --all-features
-      - name: Run tests
-        run: cargo test --verbose --all-features
+      - uses: actions/checkout@v4
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          components: rustfmt
+      - uses: Swatinem/rust-cache@v2
+      - name: Format
+        run: cargo fmt --all -- --check
+      - name: Test
+        run: cargo test --no-default-features --features "${{ matrix.features }}"

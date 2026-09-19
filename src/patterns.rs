@@ -1,3 +1,5 @@
+#[cfg(feature = "nalgebra")]
+use crate::matrix::{RhaiMatrix, RhaiVector};
 use rhai::{Array, Dynamic, EvalAltResult, Position, FLOAT, INT};
 
 /// Matrix compatibility conditions
@@ -36,6 +38,8 @@ where
     FA: FnMut(&mut Array) -> Result<T, Box<EvalAltResult>>,
     FB: FnMut(&mut Array) -> Result<T, Box<EvalAltResult>>,
 {
+    let mut normalized = crate::matrix::numeric_vector_data(arr)?;
+    let arr = &mut normalized;
     let (int, float, total) = int_and_float_totals(arr);
     if int == total {
         f_int(arr)
@@ -69,13 +73,8 @@ pub fn if_list_do<F, T>(arr: &mut Array, mut f: F) -> Result<T, Box<EvalAltResul
 where
     F: FnMut(&mut Array) -> Result<T, Box<EvalAltResult>>,
 {
-    crate::validation_functions::is_numeric_list(arr)
-        .then(|| f(arr))
-        .unwrap_or(Err(EvalAltResult::ErrorArithmetic(
-            format!("The elements of the input array must either be INT or FLOAT."),
-            Position::NONE,
-        )
-        .into()))
+    let mut normalized = crate::matrix::numeric_vector_data(arr)?;
+    f(&mut normalized)
 }
 
 pub fn if_list_convert_to_vec_float_and_do<F, T>(
@@ -189,11 +188,11 @@ pub fn if_matrix_convert_to_vec_array_and_do<F, T>(
 where
     F: FnMut(Vec<Array>) -> Result<T, Box<EvalAltResult>>,
 {
-    let matrix_as_vec = matrix
-        .into_iter()
-        .map(|x| x.clone().into_array().unwrap())
-        .collect::<Vec<Array>>();
     if crate::validation_functions::is_matrix(matrix) {
+        let matrix_as_vec = matrix
+            .iter()
+            .map(|x| x.clone().into_array().unwrap())
+            .collect::<Vec<Array>>();
         f(matrix_as_vec)
     } else {
         Err(EvalAltResult::ErrorArithmetic(
@@ -228,36 +227,32 @@ where
 
 pub fn array_to_vec_int(arr: &mut Array) -> Vec<INT> {
     arr.iter()
-        .map(|el| el.as_int().unwrap())
-        .collect::<Vec<INT>>()
+        .map(|value| {
+            value.as_int().unwrap_or_else(|_| {
+                value.as_float().expect("Array elements must be numeric") as INT
+            })
+        })
+        .collect()
 }
 
 pub fn array_to_vec_float(arr: &mut Array) -> Vec<FLOAT> {
-    arr.into_iter()
-        .map(|el| el.as_float().unwrap())
-        .collect::<Vec<FLOAT>>()
+    arr.iter()
+        .map(|value| {
+            value.as_float().unwrap_or_else(|_| {
+                value.as_int().expect("Array elements must be numeric") as FLOAT
+            })
+        })
+        .collect()
 }
 
 #[cfg(feature = "nalgebra")]
 pub fn omatrix_to_vec_dynamic(
     mat: nalgebralib::OMatrix<FLOAT, nalgebralib::Dyn, nalgebralib::Dyn>,
 ) -> Vec<Dynamic> {
-    let mut out = vec![];
-    for idx in 0..mat.shape().0 {
-        let mut new_row = vec![];
-        for jdx in 0..mat.shape().1 {
-            new_row.push(Dynamic::from_float(mat[(idx, jdx)]));
-        }
-        out.push(Dynamic::from_array(new_row));
-    }
-    out
+    RhaiMatrix::from_dmatrix(&mat).to_array()
 }
 
 #[cfg(feature = "nalgebra")]
 pub fn ovector_to_vec_dynamic(mat: nalgebralib::OVector<FLOAT, nalgebralib::Dyn>) -> Vec<Dynamic> {
-    let mut out = vec![];
-    for idx in 0..mat.shape().0 {
-        out.push(Dynamic::from_float(mat[idx]));
-    }
-    out
+    RhaiVector::from_dvector(&mat).to_array()
 }

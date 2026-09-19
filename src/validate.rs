@@ -2,9 +2,10 @@ use rhai::plugin::*;
 
 #[export_module]
 pub mod validation_functions {
+    use crate::matrix::{matrix_dimensions, numeric_vector_data};
     use rhai::Array;
 
-    /// Tests whether the input in a simple list array
+    /// Tests whether the input is a simple list or a numeric vector.
     /// ```typescript
     /// let x = [1, 2, 3, 4];
     /// assert_eq(is_list(x), true);
@@ -15,11 +16,7 @@ pub mod validation_functions {
     /// ```
     #[rhai_fn(name = "is_list", pure)]
     pub fn is_list(arr: &mut Array) -> bool {
-        if crate::matrix_functions::matrix_size_by_reference(arr).len() == 1 {
-            true
-        } else {
-            false
-        }
+        arr.iter().all(|value| !value.is_array()) || numeric_vector_data(arr).is_ok()
     }
 
     /// Determines if the entire array is numeric (ints or floats).
@@ -79,7 +76,8 @@ pub mod validation_functions {
         };
     }
 
-    /// Tests whether the input in a simple list array composed of either floating point or integer values.
+    /// Tests whether the input in a simple list array composed of either floating point or integer values
+    /// or a numeric row/column vector.
     /// ```typescript
     /// let x = [1.0, 2.0, 3.0, 4.0];
     /// assert_eq(is_numeric_list(x), true)
@@ -94,50 +92,35 @@ pub mod validation_functions {
     /// ```
     #[rhai_fn(name = "is_numeric_list", pure)]
     pub fn is_numeric_list(arr: &mut Array) -> bool {
-        let (int, float, total) = crate::int_and_float_totals(arr);
-        if (int == total || float == total) && is_list(arr) {
-            true
-        } else {
-            false
-        }
+        numeric_vector_data(arr).is_ok()
     }
 
-    /// Tests whether the input is a row vector
+    /// Tests whether the input is a row vector.
     /// ```typescript
-    /// let x = ones([1, 5]);
-    /// assert_eq(is_row_vector(x), true)
+    /// let row = [[1, 2, 3]];
+    /// assert_eq(is_row_vector(row), true);
     /// ```
     /// ```typescript
-    /// let x = ones([5, 5]);
-    /// assert_eq(is_row_vector(x), false)
+    /// let column = [[1], [2], [3]];
+    /// assert_eq(is_row_vector(column), false);
     /// ```
     #[rhai_fn(name = "is_row_vector", pure)]
     pub fn is_row_vector(arr: &mut Array) -> bool {
-        let s = crate::matrix_functions::matrix_size_by_reference(arr);
-        if s.len() == 2 && s[0].as_int().unwrap() == 1 {
-            true
-        } else {
-            false
-        }
+        matches!(matrix_dimensions(arr), Some((1, _)))
     }
 
-    /// Tests whether the input is a column vector
+    /// Tests whether the input is a column vector.
     /// ```typescript
-    /// let x = ones([5, 1]);
-    /// assert_eq(is_column_vector(x), true)
+    /// let column = [[1], [2], [3]];
+    /// assert_eq(is_column_vector(column), true);
     /// ```
     /// ```typescript
-    /// let x = ones([5, 5]);
-    /// assert_eq(is_column_vector(x), false)
+    /// let row = [[1, 2, 3]];
+    /// assert_eq(is_column_vector(row), false);
     /// ```
     #[rhai_fn(name = "is_column_vector", pure)]
     pub fn is_column_vector(arr: &mut Array) -> bool {
-        let s = crate::matrix_functions::matrix_size_by_reference(arr);
-        if s.len() == 2 && s[1].as_int().unwrap() == 1 {
-            true
-        } else {
-            false
-        }
+        matches!(matrix_dimensions(arr), Some((_, 1)))
     }
 
     /// Tests whether the input is a matrix
@@ -151,19 +134,6 @@ pub mod validation_functions {
     /// ```
     #[rhai_fn(name = "is_matrix", pure)]
     pub fn is_matrix(arr: &mut Array) -> bool {
-        if crate::matrix_functions::matrix_size_by_reference(arr).len() != 2 {
-            false
-        } else {
-            if crate::stats::prod(&mut crate::matrix_functions::matrix_size_by_reference(arr))
-                .unwrap()
-                .as_int()
-                .unwrap()
-                == crate::matrix_functions::numel_by_reference(arr)
-            {
-                true
-            } else {
-                false
-            }
-        }
+        matrix_dimensions(arr).is_some()
     }
 }

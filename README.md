@@ -2,52 +2,71 @@
 [![Crates.io](https://img.shields.io/crates/v/rhai-sci.svg)](https://crates.io/crates/rhai-sci)
 [![docs.rs](https://img.shields.io/docsrs/rhai-sci/latest?logo=rust)](https://docs.rs/rhai-sci)
 
-# About `rhai-sci`
+# rhai-sci
 
-This crate provides some basic scientific computing utilities for the [`Rhai`](https://rhai.rs/) scripting language,
-inspired by languages like MATLAB, Octave, and R. For a complete API reference,
-check [the docs](https://docs.rs/rhai-sci).
+Scientific computing for the [Rhai](https://rhai.rs/) scripting language, inspired
+by MATLAB, Octave, and R. Includes statistics, linear algebra, interpolation,
+integration, and regression.
 
-# Install
+## Quickstart
 
-To use the latest released version of `rhai-sci`, add this to your `Cargo.toml`:
+Add the crate to your `Cargo.toml`:
 
 ```toml
-rhai-sci = "0.2.3"
+rhai-sci = "0.4.0"
 ```
 
-# Usage
-
-Using this crate is pretty simple! If you just want to evaluate a single line of [`Rhai`](https://rhai.rs/), then you
-only need:
+Evaluate a Rhai expression:
 
 ```rust
 use rhai::INT;
 use rhai_sci::eval;
+
 let result = eval::<INT>("argmin([43, 42, -500])").unwrap();
+assert_eq!(result, 2);
 ```
 
-If you need to use `rhai-sci` as part of a persistent [`Rhai`](https://rhai.rs/) scripting engine, then do this instead:
+For a persistent engine, register `SciPackage` as shown in the
+[Rust host example](examples/regression_workflow.rs).
 
-```rust
-use rhai::{Engine, packages::Package, INT};
-use rhai_sci::SciPackage;
+## Numerical workflows
 
-// Create a new Rhai engine
-let mut engine = Engine::new();
+Use `row`, `col`, and `mat` to construct vectors and matrices from ordinary Rhai
+arrays. Statistics accept lists, rows, or columns; sequence results are flat lists.
+Use `mtimes` for matrix multiplication and `dot` for a scalar vector inner product.
 
-// Add the rhai-sci package to the new engine
-engine.register_global_module(SciPackage::new().as_shared_module());
+`regress(X, y)` fits an intercept automatically and returns it separately from the
+predictor coefficients. See the [workflow guide](docs/numerical-workflows.md) for
+shape conventions, predictions, and input validation.
 
-// Now run your code
-let value = engine.eval::<INT>("argmin([43, 42, -500])").unwrap();
+Run the bundled CSV example to fit a model and summarize its residuals:
+
+```bash
+cargo run --example regression_workflow
 ```
 
-# Features
+More examples: [matrix inversion](examples/matrix_inversion.rhai),
+[projectile motion](examples/projectile_motion.rhai), and
+[XOR backpropagation](examples/neural_network_backprop.rhai).
 
-| Feature    | Default  | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-|------------|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `metadata` | Disabled | Enables exporting function metadata and is ___necessary for running doc-tests on Rhai examples___.                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| `io`       | Enabled  | Enables the [`read_matrix`](#read_matrixfile_path-string---array) function but pulls in several additional dependencies (`polars`, `url`, `temp-file`, `csv-sniffer`, `minreq`).                                                                                                                                                                                                                                                                                                                                      |
-| `nalgebra` | Enabled  | Enables several functions ([`regress`](#regressx-array-y-array---map), [`inv`](#invmatrix-array---array), [`mtimes`](#mtimesmatrix1-array-matrix2-array---array), [`horzcat`](#horzcatmatrix1-array-matrix2-array---array), [`vertcat`](#vertcatmatrix1-array-matrix2-array---array), [`repmat`](#repmatmatrix-array-nx-i64-ny-i64---array), [`svd`](#svdmatrix-array---map), [`hessenberg`](#hessenbergmatrix-array---map), and [`qr`](#qrmatrix-array---map)) but brings in the `nalgebra` and `linregress` crates. |
-| `rand`     | Enabled  | Enables the [`rand`](#rand) function for generating random FLOAT values and random matrices, but brings in the `rand` crate.                                                                                                                                                                                                                                                                                                                                                                                          |
+## Features
+
+| Feature | Default | Enables |
+| --- | --- | --- |
+| `io` | On | CSV loading with `read_matrix` |
+| `nalgebra` | On | Matrix operations and regression |
+| `rand` | On | Random values and matrices |
+| `metadata` | Off | Function metadata and Rhai documentation tests |
+
+Disable default features and select only what you need for smaller builds;
+CSV support brings in Polars.
+
+## Reference
+
+[API documentation](https://docs.rs/rhai-sci) ·
+[Changelog](CHANGELOG.md) ·
+[Development checks](docs/numerical-workflows.md#development)
+
+## License
+
+Licensed under [MIT](LICENSE-MIT.txt) or [Apache-2.0](LICENSE-APACHE.txt), at your option.

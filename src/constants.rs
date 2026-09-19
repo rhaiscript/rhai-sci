@@ -7,15 +7,15 @@ pub mod constant_definitions {
 
     // The ratio of a circle's circumference to its diameter.
     #[allow(non_upper_case_globals)]
-    pub const pi: FLOAT = 3.14159265358979323846264338327950288;
+    pub const pi: FLOAT = 3.141_592_653_589_793_238_462_643_383_279_502_88;
 
     //Speed of light in meters per second (m/s).
     #[allow(non_upper_case_globals)]
-    pub const c: FLOAT = 299792458.0;
+    pub const c: FLOAT = 299_792_458.0;
 
     // Euler's number.
     #[allow(non_upper_case_globals)]
-    pub const e: FLOAT = 2.71828182845904523536028747135266250;
+    pub const e: FLOAT = 2.718_281_828_459_045_235_360_287_471_352_662_50;
 
     // Acceleration due to gravity on Earth in meters per second per second (m/s^2).
     #[allow(non_upper_case_globals)]
@@ -23,14 +23,14 @@ pub mod constant_definitions {
 
     // The Planck constant in Joules per Hertz (J/Hz)
     #[allow(non_upper_case_globals)]
-    pub const h: FLOAT = 6.62607015e-34;
+    pub const h: FLOAT = 6.626_070_15e-34;
 
     // The golden ratio
     #[allow(non_upper_case_globals)]
-    pub const phi: FLOAT = 1.61803398874989484820;
+    pub const phi: FLOAT = 1.618_033_988_749_894_848_20;
 
     // Newtonian gravitational constant
-    pub const G: FLOAT = 6.6743015e-11;
+    pub const G: FLOAT = 6.674_301_5e-11;
 
     /// Physical constants useful for science.
     ///  ### `pi: FLOAT`

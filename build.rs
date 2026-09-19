@@ -225,3 +225,8 @@ mod functions {
 
 #[cfg(feature = "metadata")]
 pub use functions::*;
+
+#[cfg(feature = "metadata")]
+pub mod matrix {
+    include!("src/matrix/mod.rs");
+}
